@@ -1,5 +1,28 @@
 <script setup>
 import avatar1 from '@images/avatars/avatar-1.png'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+
+const store = useStore()
+const user = ref()
+const router = useRouter()
+
+onMounted( async () => {
+  console.log(store)
+  await store.dispatch('getUser')
+  watchEffect(() => {
+    const getUser = store.state.user
+
+    user.value = getUser
+    
+    console.log(user.value)
+  })
+})
+
+const logout = async ()=>{
+  await store.dispatch('logout')
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -48,9 +71,9 @@ import avatar1 from '@images/avatars/avatar-1.png'
             </template>
 
             <VListItemTitle class="font-weight-semibold">
-              John Doe
+              {{ user.name }}
             </VListItemTitle>
-            <VListItemSubtitle>Admin</VListItemSubtitle>
+            <VListItemSubtitle>{{ user.role }}</VListItemSubtitle>
           </VListItem>
           <VDivider class="my-2" />
 
@@ -110,12 +133,13 @@ import avatar1 from '@images/avatars/avatar-1.png'
           <VDivider class="my-2" />
 
           <!-- 👉 Logout -->
-          <VListItem to="/login">
+          <VListItem>
             <template #prepend>
               <VIcon
                 class="me-2"
                 icon="mdi-logout"
                 size="22"
+                @click="logout"
               />
             </template>
 

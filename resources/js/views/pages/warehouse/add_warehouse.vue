@@ -1,5 +1,6 @@
 <script setup>
 import avatar1 from '@images/avatars/avatar-1.png'
+import { useStore } from 'vuex'
 
 const warehouseData = {
   warehousename: 'Warehouse',
@@ -9,9 +10,15 @@ const warehouseData = {
   address: '123 Main St, New York, NY 10001',
 }
 
+const store = useStore()
+const managerList = ref([])
 const refInputEl = ref()
 const accountDataLocal = ref(structuredClone(warehouseData))
 const isAccountDeactivated = ref(false)
+
+onMounted( async () => {
+  await store.dispatch('getAllUser') 
+})
 
 const resetForm = () => {
   accountDataLocal.value = structuredClone(warehouseData)

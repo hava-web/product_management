@@ -9,6 +9,7 @@ import authV1MaskDark from '@images/pages/auth-v1-mask-dark.png'
 import authV1MaskLight from '@images/pages/auth-v1-mask-light.png'
 import authV1Tree2 from '@images/pages/auth-v1-tree-2.png'
 import authV1Tree from '@images/pages/auth-v1-tree.png'
+import { useRouter } from 'vue-router'
 
 const alert = reactive({
   status: false,
@@ -21,12 +22,17 @@ const form = reactive({
   password: 'ha18062002',
 })
 
+const router = useRouter()
 const store = useStore()
 
 const login = async ()=>{
   await axiosIns.post('/api/auth/login', form)
     .then(res=>{
       console.log(res)
+      localStorage.setItem('accessToken', res.data.accessToken)
+      localStorage.setItem('isAuthenticated', true)
+      store.commit('login')
+      router.push('/')  
     })
     .catch(err=>{
       console.log(err)
