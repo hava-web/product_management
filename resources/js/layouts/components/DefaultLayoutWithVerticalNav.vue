@@ -86,10 +86,38 @@ const upgradeBanner = computed(() => {
         }"
       />
 
+      <!-- 👉 Users -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: 'Users',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Create Account',
+          icon: 'mdi-account-plus',
+          to: '/create_account',
+        }"
+      />
+
+      <!-- 👉 Warehouse -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: 'Warehouse',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Add Warehouse',
+          icon: 'mdi-store-plus-outline',
+          to: '/Add_warehouse',
+        }"
+      />
+
       <!-- 👉 Pages -->
       <VerticalNavSectionTitle
         :item="{
-          heading: 'Pages',
+          heading: 'Page',
         }"
       />
       <VerticalNavLink

@@ -61,7 +61,6 @@ class AuthController extends Controller
         $request->validate([
         'email' => 'required|string|email',
         'password' => 'required|string',
-        'remember_me' => 'boolean'
         ]);
 
         $credentials = request(['email','password']);
@@ -105,5 +104,10 @@ class AuthController extends Controller
         'message' => 'Successfully logged out'
         ]);
 
+    }
+    
+    public function getAllUsers(){
+        $users = User::all();
+        return response()->json([$users]);
     }
 }

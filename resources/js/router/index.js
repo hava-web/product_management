@@ -17,6 +17,14 @@ const router = createRouter({
           component: () => import('../pages/account-settings.vue'),
         },
         {
+          path: 'create_account',
+          component: () => import('../pages/create_account.vue'),
+        },
+        {
+          path: 'add_warehouse',
+          component: () => import('../pages/add_warehouse.vue'),
+        },
+        {
           path: 'typography',
           component: () => import('../pages/typography.vue'),
         },
