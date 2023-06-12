@@ -3,26 +3,71 @@ import avatar1 from '@images/avatars/avatar-1.png'
 import { useStore } from 'vuex'
 
 const warehouseData = {
-  warehousename: 'Warehouse',
-  manager: 'Doe',
-  city: 'johnDoe@example.com',
-  status: 'ThemeSelection',
-  address: '123 Main St, New York, NY 10001',
+  warehousename: '',
+  manager: null,
+  city: '',
+  status: '',
+  address: '',
 }
+
+const city = [
+  'Ho Chi Minh City',
+  'Hanoi',
+  'Da Nang',
+  'Can Tho',
+  'Hai Phong',
+  'Nha Trang',
+  'Hue',
+  'Ba Ria',
+  'Vung Tau',
+  'Qui Nhon',
+  'Rach Gia',
+  'Sa Dec',
+  'Vinh',
+  'Ha Tinh',
+  'Thai Nguyen',
+  'Lang Son',
+  'Dien Bien Phu',
+  'Da Lat',
+  'Pleiku',
+  'Phan Thiet',
+  'Ha Long',
+  'Tam Ky',
+]
+
+const status = [
+  'Open',
+  'Closed',
+  'Modifing',
+]
 
 const store = useStore()
 const managerList = ref([])
-const refInputEl = ref()
 const accountDataLocal = ref(structuredClone(warehouseData))
 const isAccountDeactivated = ref(false)
 
+const getAllUser = computed(() => store.getters.getAllUser)
+
 onMounted( async () => {
   await store.dispatch('getAllUser') 
+  managerList.value.push(...getAllUser.value)
+  console.log(managerList.value)
 })
+
+const submit = ()=>{
+  console.log(accountDataLocal.value)
+}
+
+const getId = manager => manager.id
+
+const formatName = ()=>{
+  return managerList.value.map(manager => manager.id + ' - ' + manager.name)
+}
 
 const resetForm = () => {
   accountDataLocal.value = structuredClone(warehouseData)
 }
+
 
 // reset avatar image
 const resetAvatar = () => {
@@ -49,7 +94,7 @@ const resetAvatar = () => {
                 cols="12"
               >
                 <VTextField
-                  v-model="accountDataLocal.firstName"
+                  v-model="accountDataLocal.warehousename"
                   label="Warehouse Name"
                 />
               </VCol>
@@ -59,8 +104,11 @@ const resetAvatar = () => {
                 md="6"
                 cols="12"
               >
-                <VTextField
-                  v-model="accountDataLocal.lastName"
+                <VSelect
+                  v-model="accountDataLocal.manager"
+                  :items="managerList"
+                  :item-value="getId"
+                  :item-title="formatName"
                   label="Manager"
                 />
               </VCol>
@@ -70,8 +118,9 @@ const resetAvatar = () => {
                 cols="12"
                 md="6"
               >
-                <VTextField
-                  v-model="accountDataLocal.email"
+                <VSelect
+                  v-model="accountDataLocal.city"
+                  :items="city"
                   label="City"
                 />
               </VCol>
@@ -81,8 +130,9 @@ const resetAvatar = () => {
                 cols="12"
                 md="6"
               >
-                <VTextField
-                  v-model="accountDataLocal.org"
+                <VSelect
+                  v-model="accountDataLocal.status"
+                  :items="status"
                   label="Status"
                 />
               </VCol>
@@ -100,7 +150,7 @@ const resetAvatar = () => {
                 cols="12"
                 class="d-flex flex-wrap gap-4"
               >
-                <VBtn>Save changes</VBtn>
+                <VBtn @click="submit">Add Warehouse</VBtn>
 
                 <VBtn
                   color="secondary"
