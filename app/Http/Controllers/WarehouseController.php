@@ -25,10 +25,15 @@ class WarehouseController extends Controller
         ]);
 
         if($warehouse->save()){
-            return response()->json([$warehouse]);
+            return response()->json($warehouse, 201);
         }
         else{
             return response()->json(['error'=>'Provide proper details']);
         }
+    }
+
+    public function getWarehouseByPage(){
+        $warehouses = Warehouse::paginate(3);
+        return response()->json($warehouses);
     }
 }

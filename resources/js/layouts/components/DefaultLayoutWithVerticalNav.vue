@@ -110,7 +110,14 @@ const upgradeBanner = computed(() => {
         :item="{
           title: 'Add Warehouse',
           icon: 'mdi-store-plus-outline',
-          to: '/Add_warehouse',
+          to: '/add_warehouse',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'View Warehouse',
+          icon: 'mdi-store-search-outline',
+          to: '/view_warehouse',
         }"
       />
 

@@ -26,6 +26,10 @@ const router = createRouter({
           component: () => import('../pages/add_warehouse.vue'),
         },
         {
+          path: 'view_warehouse',
+          component: () => import('../pages/view_warehouse.vue'),
+        },
+        {
           path: 'typography',
           component: () => import('../pages/typography.vue'),
         },

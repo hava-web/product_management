@@ -1,9 +1,19 @@
 <script setup>
+import axiosIns from '@/plugins/axios'
 import avatar1 from '@images/avatars/avatar-1.png'
+import { reactive } from 'vue'
 import { useStore } from 'vuex'
 
+const alert = reactive({
+  status: false,
+  title: '',
+  text: '',
+  color: '',
+
+})
+
 const warehouseData = {
-  warehousename: '',
+  name: '',
   manager: null,
   city: '',
   status: '',
@@ -54,8 +64,36 @@ onMounted( async () => {
   console.log(managerList.value)
 })
 
-const submit = ()=>{
-  console.log(accountDataLocal.value)
+const submit = async ()=>{
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.post('/api/add_wareshouse', accountDataLocal.value, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  })
+    .then(res=>{
+      if(res.status === 201){
+        alert.title = 'Successfully'
+        alert.status = true
+        alert.text = 'Warehouse Added Successfully'
+        alert.color = 'rgba(39, 217, 11, 0.8)'
+        accountDataLocal.value = structuredClone(warehouseData)
+      }
+      else{
+        alert.title = 'Warning'
+        alert.status = true
+        alert.text = 'Something went wrong'
+        alert.color = 'rgba(234, 223, 30, 0.8)'
+      }
+    })
+    .catch(err=>{
+      alert.title = 'Error'
+      alert.status = true
+      alert.text = err.response.data.message
+      alert.color = 'rgba(222, 29, 29, 0.8)'
+      console.log(err)
+    })
 }
 
 const getId = manager => manager.id
@@ -76,6 +114,19 @@ const resetAvatar = () => {
 </script>
 
 <template>
+  <Transition name="slide-fade">
+    <VAlert 
+      v-if="alert.status"
+      :color="alert.color"
+      icon=""
+      :title="alert.title"
+      closable
+      class="alert"
+      max-width="400px"
+      :text="alert.text"
+      @click:close="alert.status = false"
+    />
+  </Transition>
   <VRow>
     <VCol cols="12">
       <VCard 
@@ -94,7 +145,7 @@ const resetAvatar = () => {
                 cols="12"
               >
                 <VTextField
-                  v-model="accountDataLocal.warehousename"
+                  v-model="accountDataLocal.name"
                   label="Warehouse Name"
                 />
               </VCol>
@@ -150,7 +201,9 @@ const resetAvatar = () => {
                 cols="12"
                 class="d-flex flex-wrap gap-4"
               >
-                <VBtn @click="submit">Add Warehouse</VBtn>
+                <VBtn @click="submit">
+                  Add Warehouse
+                </VBtn>
 
                 <VBtn
                   color="secondary"
@@ -168,3 +221,26 @@ const resetAvatar = () => {
     </VCol>
   </VRow>
 </template>
+
+<style scoped>
+  .alert{
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  z-index: 100;
+}
+
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+</style>

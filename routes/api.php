@@ -24,6 +24,9 @@ Route::group(['prefix' => 'auth'], function () {
       Route::get('logout', [AuthController::class, 'logout']);
       Route::get('user', [AuthController::class, 'user']);
       Route::get('all_users', [AuthController::class, 'getAllUsers']);
-      Route::post('add_wareshouse', [WarehouseController::class, 'addWarehouse']);
     });
 });
+ Route::group(['middleware' => 'auth:sanctum'], function() {
+  Route::post('add_wareshouse', [WarehouseController::class, 'addWarehouse']);
+  Route::get('view_warehouse', [WarehouseController::class, 'getWarehouseByPage']);
+ });
