@@ -28,6 +28,13 @@ const router = createRouter({
         {
           path: 'view_warehouse',
           component: () => import('../pages/view_warehouse.vue'),
+          children: [
+            {
+              path: 'warehouse/:id',
+              name: 'warehouse',
+              component: ()=> import('../views/pages/warehouse/viewbyid.vue'),
+            },
+          ],
         },
         {
           path: 'typography',
