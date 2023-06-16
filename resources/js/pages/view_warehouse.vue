@@ -10,10 +10,15 @@ const route = useRoute()
 const page = ref()
 const length = ref()
 const show = ref(true)
+const dialog = ref(false)
 
 const getWarehouseByPage = computed(()=>{
   return store.state.warehousesByPage
 })
+
+const update = id=>{
+ 
+}
 
 // Call the action to retrieve the warehouse data and set the initial value of currentWarehouseList to the result.
 
@@ -117,18 +122,58 @@ watchEffect(() => {
                             View
                           </VTooltip>
                         </VBtn>
-                        <VBtn 
-                          icon="mdi-pencil"
-                          color="none"
+                      </VListItem>
+                      <VListItem>
+                        <VDialog
+                          v-model="dialog"
+                          persistent
+                          width="auto"
                         >
-                          <VIcon icon="mdi-pencil" />
-                          <VTooltip
-                            activator="parent"
-                            location="top"
-                          >
-                            Update
-                          </VTooltip>
-                        </VBtn>
+                          <template #activator="{ props }">
+                            <VBtn
+                              color="none"
+                              v-bind="props"
+                              icon="mdi-pencil"
+                              @click="update(warehouse.id)"
+                            >
+                              <VIcon icon="mdi-pencil" />
+                              <VTooltip
+                                activator="parent"
+                                location="top"
+                              >
+                                Update
+                              </VTooltip>
+                            </VBtn>
+                          </template>
+                          <VCard>
+                            <VCardTitle class="text-h5">
+                              Update Warehouse 
+                            </VCardTitle>
+                            <VCardText>
+                              Let Google help apps determine location. This means sending anonymous
+                              location data to Google, even when no apps are running.
+                            </VCardText>
+                            <VCardActions>
+                              <VSpacer />
+                              <VBtn
+                                color="green-darken-1"
+                                variant="text"
+                                @click="dialog = false"
+                              >
+                                Cancel
+                              </VBtn>
+                              <VBtn
+                                color="green-darken-1"
+                                variant="text"
+                                @click="dialog = false"
+                              >
+                                Update
+                              </VBtn>
+                            </VCardActions>
+                          </VCard>
+                        </VDialog>
+                      </VListItem>
+                      <VListItem>
                         <VBtn 
                           icon="mdi-delete-empty"
                           color="none"
