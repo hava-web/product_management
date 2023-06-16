@@ -1,6 +1,8 @@
 <script setup>
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
+import { reactive } from 'vue'
+import axiosIns from '@/plugins/axios'
 
 
 const warehouseList = ref([])
@@ -9,15 +11,109 @@ const router = useRouter()
 const route = useRoute()
 const page = ref()
 const length = ref()
+const cancel = ref(false)
 const show = ref(true)
 const dialog = ref(false)
+const managerList = ref([])
+
+const getAllUser = computed(() => store.getters.getAllUser)
+
+onMounted( async () => {
+  await store.dispatch('getAllUser') 
+  managerList.value.push(...getAllUser.value)
+  console.log(managerList.value)
+})
+
+const formatName = ()=>{
+  return managerList.value.map(manager => manager.id + ' - ' + manager.name)
+}
+
 
 const getWarehouseByPage = computed(()=>{
   return store.state.warehousesByPage
 })
 
-const update = id=>{
- 
+const warehouseInfo = reactive({
+  id: null,
+  name: '',
+  manager: null,
+  city: '',
+  status: '',
+  address: '',
+}) 
+
+const city = [
+  'Ho Chi Minh City',
+  'Hanoi',
+  'Da Nang',
+  'Can Tho',
+  'Hai Phong',
+  'Nha Trang',
+  'Hue',
+  'Ba Ria',
+  'Vung Tau',
+  'Qui Nhon',
+  'Rach Gia',
+  'Sa Dec',
+  'Vinh',
+  'Ha Tinh',
+  'Thai Nguyen',
+  'Lang Son',
+  'Dien Bien Phu',
+  'Da Lat',
+  'Pleiku',
+  'Phan Thiet',
+  'Ha Long',
+  'Tam Ky',
+]
+
+const status = [
+  'Open',
+  'Closed',
+  'Modifing',
+]
+
+const updateForm = async id=>{
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.get('/api/warehouse/' + id, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    warehouseInfo.id = res.data.id
+    warehouseInfo.name = res.data.name
+    warehouseInfo.manager = res.data.manager
+    warehouseInfo.city = res.data.city
+    warehouseInfo.status = res.data.status
+    warehouseInfo.address = res.data.address
+    console.log(res.data)
+  }).catch(err=>{
+    console.log(err)
+  })
+}
+
+const update = async id=>{
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.post('/api/update/warehouse/' + id, warehouseInfo, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    console.log(res)
+    dialog.value = false
+  }).catch(err=>{
+    console.log(err)
+  })
+} 
+
+const deleteForm = id=>{
+  console.log(id)
+}
+
+const deleteWarehouse = id=>{
+  console.log(id)
 }
 
 // Call the action to retrieve the warehouse data and set the initial value of currentWarehouseList to the result.
@@ -127,14 +223,14 @@ watchEffect(() => {
                         <VDialog
                           v-model="dialog"
                           persistent
-                          width="auto"
+                          width="800px"
                         >
                           <template #activator="{ props }">
                             <VBtn
                               color="none"
                               v-bind="props"
                               icon="mdi-pencil"
-                              @click="update(warehouse.id)"
+                              @click="updateForm(warehouse.id)"
                             >
                               <VIcon icon="mdi-pencil" />
                               <VTooltip
@@ -145,27 +241,91 @@ watchEffect(() => {
                               </VTooltip>
                             </VBtn>
                           </template>
-                          <VCard>
-                            <VCardTitle class="text-h5">
-                              Update Warehouse 
-                            </VCardTitle>
+                          <VCard
+                            prepend-icon="mdi-store-edit"
+                            title=" Update Warehouse "
+                          >
+                            <VDivider />
+
                             <VCardText>
-                              Let Google help apps determine location. This means sending anonymous
-                              location data to Google, even when no apps are running.
+                              <!-- 👉 Form -->
+                              <VForm class="mt-6">
+                                <VRow>
+                                  <!-- 👉 Warehouse Name -->
+                                  <VCol
+                                    md="6"
+                                    cols="12"
+                                  >
+                                    <VTextField 
+                                      v-model="warehouseInfo.name"
+                                      label="Warehouse Name"
+                                    />
+                                  </VCol>
+
+                                  <!-- 👉 Manager -->
+                                  <VCol
+                                    md="6"
+                                    cols="12"
+                                  >
+                                    <VSelect
+                                      v-model="warehouseInfo.manager"
+                                      :items="managerList"
+                                      :item-value="getId"
+                                      :item-title="formatName"
+                                      label="Manager"
+                                    />
+                                  </VCol>
+
+                                  <!-- 👉 City -->
+                                  <VCol
+                                    cols="12"
+                                    md="6"
+                                  >
+                                    <VSelect
+                                      v-model="warehouseInfo.city"
+                                      :items="city"
+                                      label="City"
+                                    />
+                                  </VCol>
+
+                                  <!-- 👉 Status -->
+                                  <VCol
+                                    cols="12"
+                                    md="6"
+                                  >
+                                    <VSelect
+                                      v-model="warehouseInfo.status"
+                                      :items="status"
+                                      label="Status"
+                                    />
+                                  </VCol>
+
+                                  <!-- 👉 Address -->
+                                  <VCol cols="12">
+                                    <VTextField 
+                                      v-model="warehouseInfo.address"
+                                      label="Address"
+                                    />
+                                  </VCol>
+                                </VRow>
+                              </VForm>
                             </VCardText>
                             <VCardActions>
                               <VSpacer />
                               <VBtn
-                                color="green-darken-1"
-                                variant="text"
+                                color="red"
+                                variant="elevated"
+                                class="btn-cancel"
+                                prepend-icon="mdi-close"
                                 @click="dialog = false"
                               >
                                 Cancel
                               </VBtn>
                               <VBtn
-                                color="green-darken-1"
-                                variant="text"
-                                @click="dialog = false"
+                                color="primary"
+                                variant="elevated"
+                                prepend-icon="mdi-pencil-outline"
+                                @click="update(warehouseInfo.id)"
                               >
                                 Update
                               </VBtn>
@@ -174,18 +334,54 @@ watchEffect(() => {
                         </VDialog>
                       </VListItem>
                       <VListItem>
-                        <VBtn 
-                          icon="mdi-delete-empty"
-                          color="none"
+                        <VDialog
+                          v-model="cancel"
+                          width="auto"
                         >
-                          <VIcon icon="mdi-delete-empty" />
-                          <VTooltip
-                            activator="parent"
-                            location="top"
+                          <template #activator="{ props }">
+                            <VBtn 
+                              icon="mdi-delete-empty"
+                              v-bind="props"
+                              color="none"
+                              @click="deleteForm(warehouse.id)"
+                            >
+                              <VIcon icon="mdi-delete-empty" />
+                              <VTooltip
+                                activator="parent"
+                                location="top"
+                              >
+                                Delete
+                              </VTooltip>
+                            </VBtn>
+                          </template>
+                          <VCard
+                            prepend-icon="mdi-alert"
+                            title="Do you want delete this warehouse ?"
                           >
-                            Delete
-                          </VTooltip>
-                        </VBtn>
+                            <VCardText>
+                              Once you delete this warehouse you can not get this warehouse information again. Are you sure you want delete this ?
+                            </VCardText>
+                            <VCardActions>
+                              <VSpacer />
+                              <VBtn
+                                color="green-darken-1"
+                                prepend-icon="mdi-close"
+                                variant="elevated"
+                                @click="cancel = false"
+                              >
+                                Cancel
+                              </VBtn>
+                              <VBtn
+                                color="red"
+                                prepend-icon="mdi-trash-can-outline"
+                                variant="elevated"
+                                @click="deleteWarehouse(warehouse.id)"
+                              >
+                                Delete
+                              </VBtn>
+                            </VCardActions>
+                          </VCard>
+                        </VDialog>
                       </VListItem>
                     </VList>
                   </VMenu>
@@ -203,3 +399,10 @@ watchEffect(() => {
     </VCol>
   </VRow>
 </template>
+
+<style scoped>
+.btn-cancel{
+  background-color: #E53935;
+  color: white;
+}
+</style>

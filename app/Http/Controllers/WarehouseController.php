@@ -45,8 +45,59 @@ class WarehouseController extends Controller
         else{
             return response()->json([
                 "message" => "Warehouse does not exits",
-            ]);
+            ],404);
         }
        
+    }
+
+    public function updateWarehouse(Request $request, $id){
+
+        $validatedData = $request->validate([
+            'name' => 'required|string',
+            'manager'=>'required|int',
+            'city'=>'required|string',
+            'status' => 'required|string',
+            'address' => 'required|string',
+        ]);
+        $warehouse = Warehouse::find($id);
+        if($warehouse){
+           $warehouse->name = $validatedData['name'];
+           $warehouse->manager = $validatedData['manager'];
+           $warehouse->city = $validatedData['city'];
+           $warehouse->status = $validatedData['status'];
+           $warehouse->address = $validatedData['address'];
+           $warehouse->save();
+           if( $warehouse->save()){
+            return response()->json([
+                'message' => 'Warehouse updated successfully',
+                'data' => $warehouse
+            ]);
+           }
+        }
+        else{
+            return response()->json([
+                'message'=>'Warehouse does not exits'
+            ], 404);
+        }
+
+    }
+
+    public function deleteWarehouse( $id ){
+        $warehouse = Warehouse::find($id);
+        if (!$warehouse) {
+            return response()->json([
+                'message' => 'Warehouse does not exist'
+            ], 404);
+        }
+    
+        if ($warehouse->delete()) {
+            return response()->json([
+                'message' => 'Warehouse deleted successfully'
+            ]);
+        }
+    
+        return response()->json([
+            'message' => 'Something went wrong'
+        ]);
     }
 }

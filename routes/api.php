@@ -30,5 +30,7 @@ Route::group(['prefix' => 'auth'], function () {
   Route::post('add_wareshouse', [WarehouseController::class, 'addWarehouse']);
   Route::get('view_warehouse', [WarehouseController::class, 'getWarehouseByPage']);
   Route::get('warehouse/{id}', [WarehouseController::class, 'getWarehouseById']);
+  Route::post('update/warehouse/{id}', [WarehouseController::class, 'updateWarehouse']);
+  Route::get('delete/warehouse/{id}', [WarehouseController::class, 'deleteWarehouse']);
   Route::get('user/{id}', [AuthController::class, 'getUserById']);
  });

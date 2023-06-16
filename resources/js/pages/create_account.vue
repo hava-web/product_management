@@ -37,16 +37,6 @@ const tabs = [
       <VWindowItem value="account">
         <AccountSettingsAccount />
       </VWindowItem>
-
-      <!-- Security -->
-      <VWindowItem value="security">
-        <AccountSettingsSecurity />
-      </VWindowItem>
-
-      <!-- Notification -->
-      <VWindowItem value="notification">
-        <AccountSettingsNotification />
-      </VWindowItem>
     </VWindow>
   </div>
 </template>
