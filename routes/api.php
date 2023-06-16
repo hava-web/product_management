@@ -29,4 +29,6 @@ Route::group(['prefix' => 'auth'], function () {
  Route::group(['middleware' => 'auth:sanctum'], function() {
   Route::post('add_wareshouse', [WarehouseController::class, 'addWarehouse']);
   Route::get('view_warehouse', [WarehouseController::class, 'getWarehouseByPage']);
+  Route::get('warehouse/{id}', [WarehouseController::class, 'getWarehouseById']);
+  Route::get('user/{id}', [AuthController::class, 'getUserById']);
  });

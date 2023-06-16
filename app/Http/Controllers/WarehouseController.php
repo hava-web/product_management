@@ -36,4 +36,17 @@ class WarehouseController extends Controller
         $warehouses = Warehouse::paginate(3);
         return response()->json($warehouses);
     }
+
+    public function getWarehouseById( $id ){
+        $warehouse = Warehouse::where('id',$id)->first();
+        if($warehouse){
+            return response()->json($warehouse);
+        }
+        else{
+            return response()->json([
+                "message" => "Warehouse does not exits",
+            ]);
+        }
+       
+    }
 }

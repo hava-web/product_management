@@ -110,4 +110,16 @@ class AuthController extends Controller
         $users = User::all();
         return response()->json($users);
     }
+
+    public function getUserById( $id ){
+        $user = User::where('id', $id)->first();
+        if($user){
+            return response()->json($user);
+        }
+        else{
+            return response()->json([
+                'message' => 'User Does Not Exits'
+            ]);
+        }
+    }
 }
