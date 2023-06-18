@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,11 +21,19 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
+            'image' => 'string|nullable',
+            'firstname' => 'required|string',
+            'lastname' => 'required|string',
             'name' => 'required|string',
-            'email'=>'required|string|unique:users',
             'password'=>'required|string',
-            // 'c_password' => 'required|same:password'
+            'email'=>'required|string|unique:users',
+            'warehouse_id' => 'required|int',
+            'phone' => 'required|string',
+            'date_of_birth' => 'required|date',
             'role' => 'required|string',
+            'salary' => 'int',
+            'city' => 'required|string',
+            'address' => 'required|string',
         ]);
 
         $user = new User([
@@ -34,13 +43,34 @@ class AuthController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
-        if($user->save()){
-            $tokenResult = $user->createToken('Personal Access Token');
-            $token = $tokenResult->plainTextToken;
+        $user->save();
 
+        $employee = new Employee([
+            'image' => $request->image,
+            'firstname' => $request->firstname,
+            'user_id' => $user->id,
+            'lastname' => $request->lastname,
+            'warehouse_id' => $request->warehouse_id,
+            'phone' => $request->phone,
+            'date_of_birth' => $request->date_of_birth,
+            'salary' => $request->salary,
+            'city' => $request->city,
+            'address' => $request->address,
+        ]);
+
+        $employee->save();
+
+        if($user->save() && $employee->save()){
+            // $tokenResult = $user->createToken('Personal Access Token');
+            // $token = $tokenResult->plainTextToken;
+
+            // return response()->json([
+            // 'message' => 'Successfully created user!',
+            // 'accessToken'=> $token,
+            // ],201);
             return response()->json([
-            'message' => 'Successfully created user!',
-            'accessToken'=> $token,
+                'account' => $user,
+                'employee' => $employee
             ],201);
         }
         else{

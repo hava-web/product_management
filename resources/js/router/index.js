@@ -37,6 +37,10 @@ const router = createRouter({
           ],
         },
         {
+          path: 'view_employee',
+          component: () => import('../pages/view_employees.vue'),
+        },
+        {
           path: 'typography',
           component: () => import('../pages/typography.vue'),
         },

@@ -45,6 +45,7 @@ const formatName = manager=>{
 }
 
 
+
 const getWarehouseByPage = computed(()=>{
   return store.state.warehousesByPage
 })
@@ -202,7 +203,7 @@ watchEffect(() => {
   <VRow v-if="show">
     <VCol cols="12">
       <VCard 
-        title="All Warehouse"
+        title="All Employees"
         prepend-icon="mdi-store-plus-outline"
       >
         <VDivider />

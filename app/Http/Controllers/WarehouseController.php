@@ -10,7 +10,7 @@ class WarehouseController extends Controller
     public function addWarehouse(Request $request){
         $request->validate([
             'name' => 'required|string',
-            'manager'=>'required|int',
+            'manager'=>'int',
             'city'=>'required|string',
             'status' => 'required|string',
             'address' => 'required|string',
@@ -36,6 +36,11 @@ class WarehouseController extends Controller
         $warehouses = Warehouse::paginate(3);
         return response()->json($warehouses);
     }
+
+    public function getAllWarehouse(){
+        $warehouses = Warehouse::all();
+        return $warehouses;
+    }   
 
     public function getWarehouseById( $id ){
         $warehouse = Warehouse::where('id',$id)->first();

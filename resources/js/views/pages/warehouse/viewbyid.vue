@@ -66,7 +66,13 @@ watchEffect( async ()=>{
           <tr>
             <td class="title-table">
               <div class="title">
-                ID:
+                <VIcon
+                  class="icon"
+                  icon="mdi-id-card"
+                />
+                <div class="">
+                  ID:
+                </div>
               </div>
             </td>
             <td>{{ warehouse.id }}</td>
@@ -74,7 +80,13 @@ watchEffect( async ()=>{
           <tr>
             <td class="title-table">
               <div class="title">
-                Warehouse Name:
+                <VIcon
+                  class="icon"
+                  icon="mdi-warehouse"
+                />
+                <div class="">
+                  Warehouse Name:
+                </div>
               </div>
             </td>
             <td>{{ warehouse.name }}</td>
@@ -82,7 +94,13 @@ watchEffect( async ()=>{
           <tr>
             <td class="title-table">
               <div class="title">
-                Manager:
+                <VIcon
+                  class="icon"
+                  icon="mdi-account-tie"
+                />
+                <div class="">
+                  Manager:
+                </div>
               </div>
             </td>
             <td>{{ manager }}</td>
@@ -90,7 +108,13 @@ watchEffect( async ()=>{
           <tr>
             <td class="title-table">
               <div class="title">
-                City:
+                <VIcon
+                  class="icon"
+                  icon="mdi-city-variant"
+                />
+                <div class="">
+                  City:
+                </div>
               </div>
             </td>
             <td>{{ warehouse.city }}</td>
@@ -98,7 +122,13 @@ watchEffect( async ()=>{
           <tr>
             <td class="title-table">
               <div class="title">
-                Status:
+                <VIcon
+                  class="icon"
+                  icon="mdi-bulletin-board"
+                />
+                <div class="">
+                  Status:
+                </div>
               </div>
             </td>
             <td>{{ warehouse.status }}</td>
@@ -106,7 +136,13 @@ watchEffect( async ()=>{
           <tr>
             <td class="title-table">
               <div class="title">
-                Address:
+                <VIcon
+                  class="icon"
+                  icon="mdi-map-marker"
+                />
+                <div class="">
+                  Address:
+                </div>
               </div>
             </td>
             <td>{{ warehouse.address }}</td>
@@ -125,8 +161,11 @@ watchEffect( async ()=>{
 .title{
     margin-top: 5px;
     margin-left: 20px;
+    display: flex;
     margin-bottom: 10px;
-    font-weight: bold
-    
+    font-weight: bold   
+}
+.icon{
+    margin-right: 10px;
 }
 </style>

@@ -7,12 +7,14 @@ const store = createStore({
       users: null,
       user: null,
       warehousesByPage: null,
+      warehouses: null,
       isAuthenticated: localStorage.getItem('isAuthenticated') || false,
     }
   },
   getters: {
     getAllUser: state => state.users,
     getUser: state => state.user,
+    getAllWarehouse: state => state.warehouses,
     getWarehousebyPage: state=> state.warehousesByPage,
     isAuthenticated: state => state.isAuthenticated,
   },
@@ -25,6 +27,9 @@ const store = createStore({
     },
     getWarehouseByPage(state, warehousesByPage){
       state.warehousesByPage = warehousesByPage
+    },
+    getAllWarehouse(state, warehouses){
+      state.warehouses = warehouses
     },
     logout(state){
       state.user = null
@@ -109,6 +114,21 @@ const store = createStore({
         .catch(err=>{
           console.log(err)
         })
+    },
+
+    async getAllWarehouse({ commit }){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/all_warehouse', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      }).then(res=>{
+        console.log(res)
+        commit('getAllWarehouse', res.data)
+      }).catch(err=>{
+        console.log(err)
+      })
     },
   },
 })

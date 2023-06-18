@@ -18,9 +18,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login']);
-    Route::post('register', [AuthController::class, 'register']);
-
+    
     Route::group(['middleware' => 'auth:sanctum'], function() {
+      Route::post('register', [AuthController::class, 'register']);
       Route::get('logout', [AuthController::class, 'logout']);
       Route::get('user', [AuthController::class, 'user']);
       Route::get('all_users', [AuthController::class, 'getAllUsers']);
@@ -29,6 +29,7 @@ Route::group(['prefix' => 'auth'], function () {
  Route::group(['middleware' => 'auth:sanctum'], function() {
   Route::post('add_wareshouse', [WarehouseController::class, 'addWarehouse']);
   Route::get('view_warehouse', [WarehouseController::class, 'getWarehouseByPage']);
+  Route::get('all_warehouse', [WarehouseController::class, 'getAllWarehouse']);
   Route::get('warehouse/{id}', [WarehouseController::class, 'getWarehouseById']);
   Route::post('update/warehouse/{id}', [WarehouseController::class, 'updateWarehouse']);
   Route::get('delete/warehouse/{id}', [WarehouseController::class, 'deleteWarehouse']);

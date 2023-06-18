@@ -15,8 +15,8 @@ const alert = reactive({
 const warehouseData = {
   name: '',
   manager: null,
-  city: '',
-  status: '',
+  city: null,
+  status: null,
   address: '',
 }
 
@@ -98,8 +98,8 @@ const submit = async ()=>{
 
 const getId = manager => manager.id
 
-const formatName = ()=>{
-  return managerList.value.map(manager => manager.id + ' - ' + manager.name)
+const formatName = manager=>{
+  return  manager.id + ' - ' + manager.name
 }
 
 const resetForm = () => {

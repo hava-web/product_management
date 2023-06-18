@@ -100,6 +100,14 @@ const upgradeBanner = computed(() => {
         }"
       />
 
+      <VerticalNavLink
+        :item="{
+          title: 'View Employee',
+          icon: 'mdi-account-card',
+          to: '/view_employee',
+        }"
+      />
+
       <!-- 👉 Warehouse -->
       <VerticalNavSectionTitle
         :item="{
