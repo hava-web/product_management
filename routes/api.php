@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,3 +36,14 @@ Route::group(['prefix' => 'auth'], function () {
   Route::get('delete/warehouse/{id}', [WarehouseController::class, 'deleteWarehouse']);
   Route::get('user/{id}', [AuthController::class, 'getUserById']);
  });
+
+ Route::group(['middleware' => 'auth:sanctum'], function(){
+  Route::get('users_by_page',[AuthController::class, 'getUserByPage']);
+  Route::get('all_employees',[EmployeeController::class, 'viewAllEmployee']);
+  Route::get('employees',[EmployeeController::class, 'getEmployeeByPage']);
+  Route::get('employee/{id}',[EmployeeController::class, 'getEmployeeById']);
+  Route::post('update/employee/{id}',[AuthController::class, 'updateUser']);
+  Route::get('delete/employee/{id}',[EmployeeController::class, 'destroy']);
+ });
+
+ 

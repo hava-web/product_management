@@ -39,6 +39,13 @@ const router = createRouter({
         {
           path: 'view_employee',
           component: () => import('../pages/view_employees.vue'),
+          children: [
+            {
+              path: 'employee/:id',
+              name: 'employee',
+              component: ()=> import('../views/employee/view.vue'),
+            },
+          ],
         },
         {
           path: 'typography',

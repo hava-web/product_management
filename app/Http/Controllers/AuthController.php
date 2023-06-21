@@ -141,6 +141,11 @@ class AuthController extends Controller
         return response()->json($users);
     }
 
+    public function getUserByPage(){
+        $users = User::paginate(3);
+        return response()->json($users);
+    }
+
     public function getUserById( $id ){
         $user = User::where('id', $id)->first();
         if($user){
@@ -150,6 +155,50 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'User Does Not Exits'
             ]);
+        }
+    }
+    
+    public function updateUser( Request $request, $id ){
+        
+        $validatedData = $request->validate([
+            'warehouse_id' => 'required|int',
+            'role' => 'required|string',
+            'salary' => 'int',
+        ]);
+
+        $employee = Employee::find($id);
+        if($employee){
+            $user = User::find($employee->user_id);
+            if($user){
+                //Employee
+                $employee->warehouse_id = $validatedData['warehouse_id'];
+                $employee->salary = $validatedData['salary'];
+                $employee->save();
+
+                //Account
+                $user->role = $validatedData['role'];
+                $user->save();
+
+                if($employee->save() && $user->save()){
+                    return response()->json([
+                        'message' => 'Saved Successfully',
+                    ]);
+                }
+                else{
+                    return response()->json([
+                        'message' => 'Something went wrong'
+                    ],500);
+                }
+
+            }else{
+                return response()->json([
+                    'message' => 'Account does not exits'
+                ]);
+            }
+        }else{
+            return response()->json([
+                'message' => 'Employee does not exits'
+            ],404);
         }
     }
 }

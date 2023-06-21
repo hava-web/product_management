@@ -7,6 +7,7 @@ const store = createStore({
       users: null,
       user: null,
       warehousesByPage: null,
+      employeesByPage: null,
       warehouses: null,
       isAuthenticated: localStorage.getItem('isAuthenticated') || false,
     }
@@ -16,6 +17,7 @@ const store = createStore({
     getUser: state => state.user,
     getAllWarehouse: state => state.warehouses,
     getWarehousebyPage: state=> state.warehousesByPage,
+    getemployeesByPage: state => state.employeesByPage,
     isAuthenticated: state => state.isAuthenticated,
   },
   mutations: {
@@ -27,6 +29,9 @@ const store = createStore({
     },
     getWarehouseByPage(state, warehousesByPage){
       state.warehousesByPage = warehousesByPage
+    },
+    getEmployeesByPage(state, employeesByPage){
+      state.employeesByPage = employeesByPage
     },
     getAllWarehouse(state, warehouses){
       state.warehouses = warehouses
@@ -96,6 +101,23 @@ const store = createStore({
         })
     },
 
+    async getEmployeesByPage({ commit }, page){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/employees?page=' + page, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res)
+          commit('getEmployeesByPage', res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
     async logout({ commit }){
       const accessToken = localStorage.getItem('accessToken')
 
@@ -108,7 +130,9 @@ const store = createStore({
           console.log(res)
           localStorage.removeItem('accessToken')
           localStorage.removeItem('user')
+          localStorage.removeItem('users')
           localStorage.removeItem('isAuthenticated')
+          localStorage.removeItem('warehouses')
           commit('logout')
         })
         .catch(err=>{

@@ -148,6 +148,11 @@ watchEffect( async ()=>{
             <td>{{ warehouse.address }}</td>
           </tr>
         </VTable>
+        <VDivider />
+        <VCard
+          title="Employees List" 
+          prepend-icon="mdi-account-box"
+        />
       </VCard>
     </VCol>
   </VRow>

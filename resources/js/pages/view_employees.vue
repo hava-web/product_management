@@ -2,10 +2,11 @@
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
 import { reactive } from 'vue'
+import { roles } from '@/constants/roles'
 import axiosIns from '@/plugins/axios'
 
 
-const warehouseList = ref([])
+const userList = ref([])
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
@@ -14,7 +15,7 @@ const length = ref()
 const cancel = ref(false)
 const show = ref(true)
 const dialog = ref(false)
-const managerList = ref([])
+const warehouseList = ref([])
 
 const alert = reactive({
   status: false,
@@ -30,59 +31,40 @@ const error = reactive({
   color: '',
 })
 
-const getAllUser = computed(() => store.getters.getAllUser)
+const getAllWarehouse = computed(()=> store.getters.getAllWarehouse)
 
-onMounted( async () => {
-  await store.dispatch('getAllUser') 
-  managerList.value.push(...getAllUser.value)
-  console.log(managerList.value)
+onMounted(async () => {
+  await store.dispatch('getAllWarehouse')
+  warehouseList.value.push(...getAllWarehouse.value)
+  console.log(getAllWarehouse.value)
 })
 
 const getId = warehouse => warehouse.id
 
-const formatName = manager=>{
-  return  manager.id + ' - ' + manager.name
+const formatName = warehouse=>{
+  return  warehouse.id + ' - ' + warehouse.name
 }
 
-
-
-const getWarehouseByPage = computed(()=>{
-  return store.state.warehousesByPage
+const getEmployeesByPage = computed(()=>{
+  return store.getters.getemployeesByPage
 })
 
-const warehouseInfo = reactive({
+const userInfor = reactive({
   id: null,
-  name: '',
-  manager: null,
-  city: '',
-  status: '',
+  image: null,
+  firstname: '',
+  lastname: '',
+  username: '',
+  email: '',
+  warehouse_id: null,
+  user_id: '',
+  phone: '',
+  date_of_birth: '',
+  role: null,
+  salary: '',
+  city: null,
   address: '',
 }) 
-
-const city = [
-  'Ho Chi Minh City',
-  'Hanoi',
-  'Da Nang',
-  'Can Tho',
-  'Hai Phong',
-  'Nha Trang',
-  'Hue',
-  'Ba Ria',
-  'Vung Tau',
-  'Qui Nhon',
-  'Rach Gia',
-  'Sa Dec',
-  'Vinh',
-  'Ha Tinh',
-  'Thai Nguyen',
-  'Lang Son',
-  'Dien Bien Phu',
-  'Da Lat',
-  'Pleiku',
-  'Phan Thiet',
-  'Ha Long',
-  'Tam Ky',
-]
 
 const status = [
   'Open',
@@ -93,17 +75,23 @@ const status = [
 const updateForm = async id=>{
   const accessToken = localStorage.getItem('accessToken')
 
-  await axiosIns.get('/api/warehouse/' + id, {
+  await axiosIns.get('/api/employee/' + id, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
   }).then(res=>{
-    warehouseInfo.id = res.data.id
-    warehouseInfo.name = res.data.name
-    warehouseInfo.manager = res.data.manager
-    warehouseInfo.city = res.data.city
-    warehouseInfo.status = res.data.status
-    warehouseInfo.address = res.data.address
+    userInfor.id = res.data.id
+    userInfor.image = res.data.image
+    userInfor.firstname = res.data.firstname
+    userInfor.lastname = res.data.lastname
+    userInfor.city = res.data.city
+    userInfor.warehouse_id = res.data.warehouse_id
+    userInfor.user_id =res.data.user_id
+    userInfor.phone = res.data.phone
+    userInfor.date_of_birth = res.data.date_of_birth
+    userInfor.salary = res.data.salary
+    userInfor.city = res.data.city
+    userInfor.address = res.data.address
     console.log(res.data)
   }).catch(err=>{
     console.log(err)
@@ -113,7 +101,8 @@ const updateForm = async id=>{
 const update = async id=>{
   const accessToken = localStorage.getItem('accessToken')
 
-  await axiosIns.post('/api/update/warehouse/' + id, warehouseInfo, {
+  console.log(userInfor)
+  await axiosIns.post('/api/update/employee/' + id, userInfor, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
@@ -125,6 +114,7 @@ const update = async id=>{
     alert.text = 'Warehouse Updated Successfully'
     alert.color = 'rgba(39, 217, 11, 0.8)'
   }).catch(err=>{
+    console.log(userInfor)
     console.log(err)
     error.status = true
     error.title = 'You have some errors'
@@ -137,10 +127,10 @@ const deleteForm = id=>{
   console.log(id)
 }
 
-const deleteWarehouse = id=>{
+const deleteEmp = id=>{
   const accessToken = localStorage.getItem('accessToken')
 
-  axiosIns.get('/api/delete/warehouse/' + id, {
+  axiosIns.get('/api/delete/employee/' + id, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
@@ -156,33 +146,51 @@ const deleteWarehouse = id=>{
   })
 }
 
-// Call the action to retrieve the warehouse data and set the initial value of currentWarehouseList to the result.
+// Call the action to retrieve the warehouse data and set the initial value of currentuserList to the result.
 
-store.dispatch('getWarehouseByPage', page.value).then(() => {
-  warehouseList.value.push(...getWarehouseByPage.value.data)
-  console.log(warehouseList.value)
-  length.value = Math.ceil(getWarehouseByPage.value.total / getWarehouseByPage.value.data.length)
+store.dispatch('getEmployeesByPage', page.value).then(() => {
+  userList.value.push(...getEmployeesByPage.value.data)
+  console.log(userList.value)
+  length.value = Math.ceil(getEmployeesByPage.value.total / getEmployeesByPage.value.data.length)
 })
 
 // Call this function whenever the "page" value changes.
-function updateWarehouseList() {
-  store.dispatch('getWarehouseByPage', page.value).then(() => {
-    warehouseList.value = getWarehouseByPage.value.data
+function updateuserList() {
+  store.dispatch('getEmployeesByPage', page.value).then(() => {
+    userList.value = getEmployeesByPage.value.data
   })
 }
 
-watch(page, updateWarehouseList)
+watch(page, updateuserList)
 
-const viewwarehouse = id =>{
+const viewEmployee = id =>{
   show.value = false
-  router.push({ name: 'warehouse', params: { id: id } })
+  router.push({ name: 'employee', params: { id: id } })
+  console.log(id)
 }
 
 watchEffect(() => {
-  const warehousePath = /^\/view_warehouse\/warehouse\/\d+$/
+  const employeePath = /^\/view_employee\/employee\/\d+$/
 
-  show.value = !warehousePath.test(route.path)
+  show.value = !employeePath.test(route.path)
 })
+
+watchEffect( async ()=>{
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.get('/api/user/' + userInfor.user_id, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    userInfor.role = res.data.role
+    userInfor.username = res.data.name
+    userInfor.email = res.data.email
+    console.log(res.data)
+  }).catch(err=>{
+    console.log(err)
+  })
+}, { immediate: true })
 </script>
 
 <template>
@@ -217,10 +225,10 @@ watchEffect(() => {
                 Name
               </th>
               <th class="text-uppercase text-center">
-                Setup Time
+                Created Time
               </th>
               <th class="text-uppercase text-center">
-                Status
+                Image
               </th>
               <th class="text-uppercase text-center">
                 Action
@@ -230,20 +238,28 @@ watchEffect(() => {
 
           <tbody>
             <tr
-              v-for="warehouse in warehouseList"
-              :key="warehouse.warehouseList"
+              v-for="user in userList"
+              :key="user.userList"
             >
               <td>
-                {{ warehouse.id }}
+                {{ user.id }}
               </td>
               <td class="text-center">
-                {{ warehouse.name }}
+                {{ user.firstname + ' ' + user.lastname }}
               </td>
               <td class="text-center">
-                {{ warehouse.created_at }}
+                {{ user.created_at }}
               </td>
               <td class="text-center">
-                {{ warehouse.status }}
+                <div class="image">
+                  <VImg
+                    width="20"
+                    class="item-image"
+                    content-class="text-center"
+                    cover
+                    :src="user.image"
+                  />
+                </div>
               </td>
               <td class="text-center">
                 <VBtn
@@ -261,7 +277,7 @@ watchEffect(() => {
                         <VBtn 
                           icon="mdi-eye-outline"
                           color="none"
-                          @click="viewwarehouse(warehouse.id)"
+                          @click="viewEmployee(user.id)"
                         >
                           <VIcon icon="mdi-eye-outline" />
                           <VTooltip
@@ -283,7 +299,7 @@ watchEffect(() => {
                               color="none"
                               v-bind="props"
                               icon="mdi-pencil"
-                              @click="updateForm(warehouse.id)"
+                              @click="updateForm(user.id)"
                             >
                               <VIcon icon="mdi-pencil" />
                               <VTooltip
@@ -309,68 +325,43 @@ watchEffect(() => {
                           </Transition>
                           <VCard
                             prepend-icon="mdi-store-edit"
-                            title=" Update Warehouse "
+                            title=" Update Employee "
                           >
-                            <VDivider />
-
                             <VCardText>
                               <!-- 👉 Form -->
                               <VForm class="mt-6">
                                 <VRow>
-                                  <!-- 👉 Warehouse Name -->
+                                  <!-- 👉 Warehouse -->
                                   <VCol
-                                    md="6"
                                     cols="12"
-                                  >
-                                    <VTextField 
-                                      v-model="warehouseInfo.name"
-                                      label="Warehouse Name"
-                                    />
-                                  </VCol>
-
-                                  <!-- 👉 Manager -->
-                                  <VCol
                                     md="6"
-                                    cols="12"
                                   >
                                     <VSelect
-                                      v-model="warehouseInfo.manager"
-                                      :items="managerList"
-                                      :item-value="getId"
+                                      v-model="userInfor.warehouse_id"
+                                      label="Warehouse"
+                                      :items="warehouseList"
                                       :item-title="formatName"
-                                      label="Manager"
+                                      :item-value="getId"
                                     />
                                   </VCol>
 
-                                  <!-- 👉 City -->
+                                  <!-- 👉 Role -->
                                   <VCol
                                     cols="12"
                                     md="6"
                                   >
                                     <VSelect
-                                      v-model="warehouseInfo.city"
-                                      :items="city"
-                                      label="City"
+                                      v-model="userInfor.role"
+                                      label="Role"
+                                      :items="roles"
                                     />
                                   </VCol>
 
-                                  <!-- 👉 Status -->
-                                  <VCol
-                                    cols="12"
-                                    md="6"
-                                  >
-                                    <VSelect
-                                      v-model="warehouseInfo.status"
-                                      :items="status"
-                                      label="Status"
-                                    />
-                                  </VCol>
-
-                                  <!-- 👉 Address -->
+                                  <!-- 👉 Salary -->
                                   <VCol cols="12">
-                                    <VTextField 
-                                      v-model="warehouseInfo.address"
-                                      label="Address"
+                                    <VTextField
+                                      v-model="userInfor.salary"
+                                      label="Salary"
                                     />
                                   </VCol>
                                 </VRow>
@@ -391,7 +382,7 @@ watchEffect(() => {
                                 color="primary"
                                 variant="elevated"
                                 prepend-icon="mdi-pencil-outline"
-                                @click="update(warehouseInfo.id)"
+                                @click="update(user.id)"
                               >
                                 Update
                               </VBtn>
@@ -409,7 +400,7 @@ watchEffect(() => {
                               icon="mdi-delete-empty"
                               v-bind="props"
                               color="none"
-                              @click="deleteForm(warehouse.id)"
+                              @click="deleteForm(user.id)"
                             >
                               <VIcon icon="mdi-delete-empty" />
                               <VTooltip
@@ -441,7 +432,7 @@ watchEffect(() => {
                                 color="red"
                                 prepend-icon="mdi-trash-can-outline"
                                 variant="elevated"
-                                @click="deleteWarehouse(warehouse.id)"
+                                @click="deleteEmp(user.id)"
                               >
                                 Delete
                               </VBtn>
@@ -490,5 +481,11 @@ watchEffect(() => {
 .slide-fade-leave-to {
   transform: translateX(20px);
   opacity: 0;
+}
+.image{
+  display: flex;
+}
+.item-image{
+  margin: 10px;
 }
 </style>
