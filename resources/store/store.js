@@ -8,6 +8,7 @@ const store = createStore({
       user: null,
       warehousesByPage: null,
       employeesByPage: null,
+      categoryBypage: null,
       warehouses: null,
       isAuthenticated: localStorage.getItem('isAuthenticated') || false,
     }
@@ -18,6 +19,7 @@ const store = createStore({
     getAllWarehouse: state => state.warehouses,
     getWarehousebyPage: state=> state.warehousesByPage,
     getemployeesByPage: state => state.employeesByPage,
+    getCategoryByPage: state => state.categoryBypage,
     isAuthenticated: state => state.isAuthenticated,
   },
   mutations: {
@@ -32,6 +34,9 @@ const store = createStore({
     },
     getEmployeesByPage(state, employeesByPage){
       state.employeesByPage = employeesByPage
+    },
+    getCategoryByPage(state, categoryBypage){
+      state.categoryBypage = categoryBypage
     },
     getAllWarehouse(state, warehouses){
       state.warehouses = warehouses
@@ -112,6 +117,23 @@ const store = createStore({
         .then(res =>{
           console.log(res)
           commit('getEmployeesByPage', res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    async getCategoryByPage({ commit }, page){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/view_categories?page=' + page, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res)
+          commit('getCategoryByPage', res.data)
         })
         .catch(err => {
           console.log(err)

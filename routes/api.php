@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Http\Request;
@@ -44,6 +45,14 @@ Route::group(['prefix' => 'auth'], function () {
   Route::get('employee/{id}',[EmployeeController::class, 'getEmployeeById']);
   Route::post('update/employee/{id}',[AuthController::class, 'updateUser']);
   Route::get('delete/employee/{id}',[EmployeeController::class, 'destroy']);
+ });
+
+ Route::group(['middleware' => 'auth:sanctum'], function(){
+  Route::post('add_category', [CategoryController::class, 'create']);
+  Route::get('view_categories', [CategoryController::class, 'getCategoryByPage']);
+  Route::get('category/{id}', [CategoryController::class, 'getCategoryById']);
+  Route::post('update/category/{id}', [CategoryController::class, 'update']);
+  Route::get('delete/category/{id}', [CategoryController::class, 'remove']);
  });
 
  

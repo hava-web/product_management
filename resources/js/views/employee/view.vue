@@ -89,7 +89,7 @@ watchEffect( async ()=>{
     <VCol cols="12">
       <VCard 
         title="Employee"
-        prepend-icon="mdi-account-tie"
+        prepend-icon="mdi-badge-account-outline"
       >
         <VDivider />
         <div class="d-flex">

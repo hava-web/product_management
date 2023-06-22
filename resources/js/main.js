@@ -7,6 +7,8 @@ import router from '@/router'
 // eslint-disable-next-line import/no-unresolved
 import '@core-scss/template/index.scss'
 import '@layouts/styles/index.scss'
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 import '@styles/styles.scss'
 import store from '../store/store'
 import { createPinia } from 'pinia'
@@ -18,6 +20,7 @@ loadFonts()
 // Create vue app
 const app = createApp(App)
 
+app.component('VueDatePicker', VueDatePicker)
 
 // Use plugins
 app.use(vuetify)

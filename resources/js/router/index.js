@@ -48,6 +48,14 @@ const router = createRouter({
           ],
         },
         {
+          path: 'view_category',
+          component: () => import('../pages/view_category.vue'),
+        },
+        {
+          path: 'add_category',
+          component: () => import('../pages/add_category.vue'),
+        },
+        {
           path: 'typography',
           component: () => import('../pages/typography.vue'),
         },

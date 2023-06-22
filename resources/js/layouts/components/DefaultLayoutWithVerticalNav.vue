@@ -129,6 +129,48 @@ const upgradeBanner = computed(() => {
         }"
       />
 
+      <!-- 👉 Category -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: 'Category',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Add Category',
+          icon: 'mdi-card-plus',
+          to: '/add_category',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'View Category',
+          icon: 'mdi-card-text',
+          to: '/view_category',
+        }"
+      />
+
+      <!-- 👉 Product -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: 'Product',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Add Product',
+          icon: 'mdi-package-variant-closed-plus',
+          to: '/',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'View Category',
+          icon: 'mdi-package-variant-closed',
+          to: '/',
+        }"
+      />
+
       <!-- 👉 Pages -->
       <VerticalNavSectionTitle
         :item="{

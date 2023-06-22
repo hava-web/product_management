@@ -11,49 +11,36 @@ const alert = reactive({
 
 })
 
+const imagePreview = ref(null)
+
 const warehouseData = {
   name: '',
-  manager: null,
-  city: null,
-  status: null,
-  address: '',
+  image: null,
+  status: 0,
 }
 
-const city = [
-  'Ho Chi Minh City',
-  'Hanoi',
-  'Da Nang',
-  'Can Tho',
-  'Hai Phong',
-  'Nha Trang',
-  'Hue',
-  'Ba Ria',
-  'Vung Tau',
-  'Qui Nhon',
-  'Rach Gia',
-  'Sa Dec',
-  'Vinh',
-  'Ha Tinh',
-  'Thai Nguyen',
-  'Lang Son',
-  'Dien Bien Phu',
-  'Da Lat',
-  'Pleiku',
-  'Phan Thiet',
-  'Ha Long',
-  'Tam Ky',
-]
-
-const status = [
-  'Open',
-  'Closed',
-  'Modifing',
-]
 
 const store = useStore()
+const haveImg = ref(false)
 const managerList = ref([])
 const accountDataLocal = ref(structuredClone(warehouseData))
-const isAccountDeactivated = ref(false)
+
+
+//Handle Image Input
+function onFileChange(event){
+  haveImg.value = true
+  accountDataLocal.value.image = event.target.files[0]
+  let reader = new FileReader()
+  reader.addEventListener("load", function(){
+    imagePreview.value = reader.result
+  }.bind(), false)
+
+  if(accountDataLocal.value.image &&  /\.(jpe?g|png|gif)$/i.test( accountDataLocal.value.image.name)){
+    reader.readAsDataURL(accountDataLocal.value.image)
+  }
+
+}
+
 
 const getAllUser = computed(() => store.getters.getAllUser)
 
@@ -66,7 +53,7 @@ onMounted( async () => {
 const submit = async ()=>{
   const accessToken = localStorage.getItem('accessToken')
 
-  await axiosIns.post('/api/add_wareshouse', accountDataLocal.value, {
+  await axiosIns.post('/api/add_category', accountDataLocal.value, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
@@ -78,6 +65,8 @@ const submit = async ()=>{
         alert.text = 'Warehouse Added Successfully'
         alert.color = 'rgba(39, 217, 11, 0.8)'
         accountDataLocal.value = structuredClone(warehouseData)
+        imagePreview.value = null
+        haveImg.value = false
       }
       else{
         alert.title = 'Warning'
@@ -91,18 +80,17 @@ const submit = async ()=>{
       alert.status = true
       alert.text = err.response.data.message
       alert.color = 'rgba(222, 29, 29, 0.8)'
+      console.log(accountDataLocal.value)
       console.log(err)
     })
 }
 
-const getId = manager => manager.id
 
-const formatName = manager=>{
-  return  manager.id + ' - ' + manager.name
-}
 
 const resetForm = () => {
   accountDataLocal.value = structuredClone(warehouseData)
+  imagePreview.value = null
+  haveImg.value = false
 }
 
 
@@ -129,8 +117,8 @@ const resetAvatar = () => {
   <VRow>
     <VCol cols="12">
       <VCard 
-        title="Add Warehouse"
-        prepend-icon="mdi-store-plus-outline"
+        title="Add Category"
+        prepend-icon="mdi-card-text-outline"
       >
         <VDivider />
 
@@ -138,40 +126,13 @@ const resetAvatar = () => {
           <!-- 👉 Form -->
           <VForm class="mt-6">
             <VRow>
-              <!-- 👉 Warehouse Name -->
-              <VCol
-                md="6"
-                cols="12"
-              >
+              <!-- 👉 Category Name -->
+              <VCol cols="12">
                 <VTextField
                   v-model="accountDataLocal.name"
-                  label="Warehouse Name"
-                />
-              </VCol>
-
-              <!-- 👉 Manager -->
-              <VCol
-                md="6"
-                cols="12"
-              >
-                <VSelect
-                  v-model="accountDataLocal.manager"
-                  :items="managerList"
-                  :item-value="getId"
-                  :item-title="formatName"
-                  label="Manager"
-                />
-              </VCol>
-
-              <!-- 👉 City -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="accountDataLocal.city"
-                  :items="city"
-                  label="City"
+                  prepend-icon="mdi-rename"
+                  pre
+                  label="Category Name"
                 />
               </VCol>
 
@@ -180,20 +141,46 @@ const resetAvatar = () => {
                 cols="12"
                 md="6"
               >
-                <VSelect
+                <VFileInput
+                  v-model="accountDataLocal.image"
+                  clearable
+                  prepend-icon="mdi-camera"
+                  label="Select Image"
+                  accept="image/*"
+                  @change="onFileChange"
+                />
+                <VCard
+                  :width="100"
+                  class="image"
+                >
+                  <VImg
+                    v-if="haveImg"
+                    :width="100"
+                    :height="100"
+                    content-class="text-center"
+                    alt="Image"
+                    cover
+                    :src="imagePreview"
+                  />
+                </VCard>
+              </VCol>
+
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VSwitch
                   v-model="accountDataLocal.status"
-                  :items="status"
+                  :true-value="1"
+                  :false-value="0"
+                  prepend-icon="mdi-list-status"
                   label="Status"
+                  color="primary"
+                  :value="status"
+                  hide-details
                 />
               </VCol>
 
-              <!-- 👉 Address -->
-              <VCol cols="12">
-                <VTextField
-                  v-model="accountDataLocal.address"
-                  label="Address"
-                />
-              </VCol>
 
               <!-- 👉 Form Actions -->
               <VCol
@@ -201,7 +188,7 @@ const resetAvatar = () => {
                 class="d-flex flex-wrap gap-4"
               >
                 <VBtn @click="submit">
-                  Add Warehouse
+                  Add Category
                 </VBtn>
 
                 <VBtn
@@ -241,5 +228,10 @@ const resetAvatar = () => {
 .slide-fade-leave-to {
   transform: translateX(20px);
   opacity: 0;
+}
+.image{
+  margin-top: 10px;
+  margin-left: 40px;
+  display: flex;
 }
 </style>

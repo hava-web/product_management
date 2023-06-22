@@ -6,16 +6,17 @@ import { roles } from '@/constants/roles'
 import axiosIns from '@/plugins/axios'
 
 
-const userList = ref([])
 const store = useStore()
-const router = useRouter()
 const route = useRoute()
 const page = ref()
 const length = ref()
 const cancel = ref(false)
 const show = ref(true)
 const dialog = ref(false)
-const warehouseList = ref([])
+const categoryList = ref([])
+const haveImg = ref(false)
+const imagePreview = ref(null)
+
 
 const alert = reactive({
   status: false,
@@ -31,61 +32,46 @@ const error = reactive({
   color: '',
 })
 
-const getAllWarehouse = computed(()=> store.getters.getAllWarehouse)
 
-onMounted(async () => {
-  await store.dispatch('getAllWarehouse')
-  warehouseList.value.push(...getAllWarehouse.value)
-  console.log(getAllWarehouse.value)
+const getCategoryByPage = computed(()=>{
+  return store.getters.getCategoryByPage
 })
 
-const getId = warehouse => warehouse.id
-
-const formatName = warehouse=>{
-  return  warehouse.id + ' - ' + warehouse.name
-}
-
-const getEmployeesByPage = computed(()=>{
-  return store.getters.getemployeesByPage
-})
-
-const userInfor = reactive({
+const categoryInfo = reactive({
   id: null,
+  name: '',
   image: null,
-  firstname: '',
-  lastname: '',
-  username: '',
-  email: '',
-  warehouse_id: null,
-  user_id: '',
-  phone: '',
-  date_of_birth: '',
-  role: null,
-  salary: '',
-  city: null,
-  address: '',
-}) 
+  status: null,
+})
+
+function onFileChange(event){
+  haveImg.value = true
+  categoryInfo.image = event.target.files[0]
+  let reader = new FileReader()
+  reader.addEventListener("load", function(){
+    imagePreview.value = reader.result
+  }.bind(), false)
+
+  if(categoryInfo.image &&  /\.(jpe?g|png|gif)$/i.test( categoryInfo.image.name)){
+    reader.readAsDataURL(categoryInfo.image)
+  }
+
+}
 
 const updateForm = async id=>{
   const accessToken = localStorage.getItem('accessToken')
 
-  await axiosIns.get('/api/employee/' + id, {
+  await axiosIns.get('/api/category/' + id, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
   }).then(res=>{
-    userInfor.id = res.data.id
-    userInfor.image = res.data.image
-    userInfor.firstname = res.data.firstname
-    userInfor.lastname = res.data.lastname
-    userInfor.city = res.data.city
-    userInfor.warehouse_id = res.data.warehouse_id
-    userInfor.user_id =res.data.user_id
-    userInfor.phone = res.data.phone
-    userInfor.date_of_birth = res.data.date_of_birth
-    userInfor.salary = res.data.salary
-    userInfor.city = res.data.city
-    userInfor.address = res.data.address
+    categoryInfo.id = res.data.id
+    categoryInfo.image = res.data.image
+    categoryInfo.name = res.data.name
+    categoryInfo.status = res.data.status
+    imagePreview.value = 'storage/images/' + categoryInfo.image
+    haveImg.value = categoryInfo.image ? true : false
     console.log(res.data)
   }).catch(err=>{
     console.log(err)
@@ -95,8 +81,7 @@ const updateForm = async id=>{
 const update = async id=>{
   const accessToken = localStorage.getItem('accessToken')
 
-  console.log(userInfor)
-  await axiosIns.post('/api/update/employee/' + id, userInfor, {
+  await axiosIns.post('/api/update/category/' + id, categoryInfo, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
@@ -105,26 +90,27 @@ const update = async id=>{
     dialog.value = false
     alert.status = true
     alert.title = 'Updated Successfully'
-    alert.text = 'Warehouse Updated Successfully'
+    alert.text = 'Categoty Updated Successfully'
     alert.color = 'rgba(39, 217, 11, 0.8)'
   }).catch(err=>{
-    console.log(userInfor)
+    console.log(categoryInfo)
     console.log(err)
     error.status = true
     error.title = 'You have some errors'
     error.text = err.response.data.message
     error.color = 'rgba(222, 29, 29, 0.8)'
   })
+  console.log(categoryInfo)
 } 
 
 const deleteForm = id=>{
   console.log(id)
 }
 
-const deleteEmp = id=>{
+const deleteCat = id=>{
   const accessToken = localStorage.getItem('accessToken')
 
-  axiosIns.get('/api/delete/employee/' + id, {
+  axiosIns.get('/api/delete/category/' + id, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
@@ -133,58 +119,40 @@ const deleteEmp = id=>{
     cancel.value = false
     alert.status = true
     alert.title = 'Deleted Successfully'
-    alert.text = 'Warehouse deleted Successfully'
+    alert.text = 'Category deleted Successfully'
     alert.color = 'rgba(39, 217, 11, 0.8)'
+
+    const index = categoryList.value.findIndex(cat => cat.id === id)
+
+    categoryList.value.splice(index, 1)
   }).catch(err=>{
     console.log(err)
   })
 }
 
-// Call the action to retrieve the warehouse data and set the initial value of currentuserList to the result.
+// Call the action to retrieve the warehouse data and set the initial value of currentcategoryList to the result.
 
-store.dispatch('getEmployeesByPage', page.value).then(() => {
-  userList.value.push(...getEmployeesByPage.value.data)
-  console.log(userList.value)
-  length.value = Math.ceil(getEmployeesByPage.value.total / getEmployeesByPage.value.data.length)
+store.dispatch('getCategoryByPage', page.value).then(() => {
+  categoryList.value.push(...getCategoryByPage.value.data)
+  console.log(categoryList.value)
+  length.value = Math.ceil(getCategoryByPage.value.total / getCategoryByPage.value.data.length)
 })
 
 // Call this function whenever the "page" value changes.
-function updateuserList() {
-  store.dispatch('getEmployeesByPage', page.value).then(() => {
-    userList.value = getEmployeesByPage.value.data
+function updatecategoryList() {
+  store.dispatch('getCategoryByPage', page.value).then(() => {
+    categoryList.value = getCategoryByPage.value.data
   })
 }
 
-watch(page, updateuserList)
+watch(page, updatecategoryList)
 
-const viewEmployee = id =>{
-  show.value = false
-  router.push({ name: 'employee', params: { id: id } })
-  console.log(id)
-}
 
 watchEffect(() => {
   const employeePath = /^\/view_employee\/employee\/\d+$/
 
   show.value = !employeePath.test(route.path)
 })
-
-watchEffect( async ()=>{
-  const accessToken = localStorage.getItem('accessToken')
-
-  await axiosIns.get('/api/user/' + userInfor.user_id, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-    },
-  }).then(res=>{
-    userInfor.role = res.data.role
-    userInfor.username = res.data.name
-    userInfor.email = res.data.email
-    console.log(res.data)
-  }).catch(err=>{
-    console.log(err)
-  })
-}, { immediate: true })
 </script>
 
 <template>
@@ -232,26 +200,27 @@ watchEffect( async ()=>{
 
           <tbody>
             <tr
-              v-for="user in userList"
-              :key="user.userList"
+              v-for="category in categoryList"
+              :key="category.categoryList"
             >
               <td>
-                {{ user.id }}
+                {{ category.id }}
               </td>
               <td class="text-center">
-                {{ user.firstname + ' ' + user.lastname }}
+                {{ category.name }}
               </td>
               <td class="text-center">
-                {{ user.created_at }}
+                {{ category.created_at }}
               </td>
               <td class="text-center">
                 <div class="image">
                   <VImg
-                    width="20"
+                    :width="20"
                     class="item-image"
+                    alt="Image"
                     content-class="text-center"
                     cover
-                    :src="user.image"
+                    :src="'storage/images/' + category.image"
                   />
                 </div>
               </td>
@@ -268,21 +237,6 @@ watchEffect( async ()=>{
                   >
                     <VList>
                       <VListItem>
-                        <VBtn 
-                          icon="mdi-eye-outline"
-                          color="none"
-                          @click="viewEmployee(user.id)"
-                        >
-                          <VIcon icon="mdi-eye-outline" />
-                          <VTooltip
-                            activator="parent"
-                            location="top"
-                          >
-                            View
-                          </VTooltip>
-                        </VBtn>
-                      </VListItem>
-                      <VListItem>
                         <VDialog
                           v-model="dialog"
                           persistent
@@ -293,7 +247,7 @@ watchEffect( async ()=>{
                               color="none"
                               v-bind="props"
                               icon="mdi-pencil"
-                              @click="updateForm(user.id)"
+                              @click="updateForm(category.id)"
                             >
                               <VIcon icon="mdi-pencil" />
                               <VTooltip
@@ -325,37 +279,58 @@ watchEffect( async ()=>{
                               <!-- 👉 Form -->
                               <VForm class="mt-6">
                                 <VRow>
-                                  <!-- 👉 Warehouse -->
-                                  <VCol
-                                    cols="12"
-                                    md="6"
-                                  >
-                                    <VSelect
-                                      v-model="userInfor.warehouse_id"
-                                      label="Warehouse"
-                                      :items="warehouseList"
-                                      :item-title="formatName"
-                                      :item-value="getId"
-                                    />
-                                  </VCol>
-
-                                  <!-- 👉 Role -->
-                                  <VCol
-                                    cols="12"
-                                    md="6"
-                                  >
-                                    <VSelect
-                                      v-model="userInfor.role"
-                                      label="Role"
-                                      :items="roles"
-                                    />
-                                  </VCol>
-
-                                  <!-- 👉 Salary -->
+                                  <!-- 👉 Category Name -->
                                   <VCol cols="12">
                                     <VTextField
-                                      v-model="userInfor.salary"
-                                      label="Salary"
+                                      v-model="categoryInfo.name"
+                                      prepend-icon="mdi-rename"
+                                      pre
+                                      label="Category Name"
+                                    />
+                                  </VCol>
+
+                                  <!-- 👉 Status -->
+                                  <VCol
+                                    cols="12"
+                                    md="6"
+                                  >
+                                    <VFileInput
+                                      :clearable="false"
+                                      prepend-icon="mdi-camera"
+                                      label="Select Image"
+                                      accept="image/*"
+                                      @change="onFileChange"
+                                    />
+                                    <VCard
+                                      v-if="haveImg"
+                                      :width="100"
+                                      class="image"
+                                    >
+                                      <VImg
+                                        v-model="categoryInfo.image"
+                                        :width="100"
+                                        :height="100"
+                                        content-class="text-center"
+                                        alt="Image"
+                                        :src="imagePreview"
+                                        cover
+                                      />
+                                    </VCard>
+                                  </VCol>
+
+                                  <VCol
+                                    cols="12"
+                                    md="6"
+                                  >
+                                    <VSwitch
+                                      v-model="categoryInfo.status"
+                                      :true-value="1"
+                                      :false-value="0"
+                                      prepend-icon="mdi-list-status"
+                                      label="Status"
+                                      color="primary"
+                                      :value="status"
+                                      hide-details
                                     />
                                   </VCol>
                                 </VRow>
@@ -376,7 +351,7 @@ watchEffect( async ()=>{
                                 color="primary"
                                 variant="elevated"
                                 prepend-icon="mdi-pencil-outline"
-                                @click="update(user.id)"
+                                @click="update(category.id)"
                               >
                                 Update
                               </VBtn>
@@ -394,7 +369,7 @@ watchEffect( async ()=>{
                               icon="mdi-delete-empty"
                               v-bind="props"
                               color="none"
-                              @click="deleteForm(user.id)"
+                              @click="deleteForm(category.id)"
                             >
                               <VIcon icon="mdi-delete-empty" />
                               <VTooltip
@@ -426,7 +401,7 @@ watchEffect( async ()=>{
                                 color="red"
                                 prepend-icon="mdi-trash-can-outline"
                                 variant="elevated"
-                                @click="deleteEmp(user.id)"
+                                @click="deleteCat(category.id)"
                               >
                                 Delete
                               </VBtn>
@@ -478,6 +453,8 @@ watchEffect( async ()=>{
 }
 .image{
   display: flex;
+  margin-top: 20px;
+  margin-left: 40px;
 }
 .item-image{
   margin: 10px;
