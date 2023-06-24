@@ -56,6 +56,26 @@ const router = createRouter({
           component: () => import('../pages/add_category.vue'),
         },
         {
+          path: 'add_product',
+          component: () => import('../pages/add_product.vue'),
+        },
+        {
+          path: 'add_color',
+          component: () => import('../pages/add_color.vue'),
+        },
+        {
+          path: 'view_color',
+          component: () => import('../pages/view_color.vue'),
+        },
+        {
+          path: 'add_brand',
+          component: () => import('../pages/add_brand.vue'),
+        },
+        {
+          path: 'view_brands',
+          component: () => import('../pages/view_brands.vue'),
+        },
+        {
           path: 'typography',
           component: () => import('../pages/typography.vue'),
         },

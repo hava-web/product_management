@@ -160,14 +160,56 @@ const upgradeBanner = computed(() => {
         :item="{
           title: 'Add Product',
           icon: 'mdi-package-variant-closed-plus',
-          to: '/',
+          to: '/add_product',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'View Category',
+          title: 'View Product',
           icon: 'mdi-package-variant-closed',
           to: '/',
+        }"
+      />
+
+      <!-- 👉 Color -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: 'Color',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Add Color',
+          icon: 'mdi-brush-outline',
+          to: '/add_color',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'View Color',
+          icon: 'mdi-palette-outline',
+          to: '/view_color',
+        }"
+      />
+
+      <!-- 👉 Brand -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: 'Brand',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Add Brand',
+          icon: 'mdi-tag-plus-outline',
+          to: '/add_brand',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'View Brand',
+          icon: 'mdi-tag-text',
+          to: '/view_brands',
         }"
       />
 

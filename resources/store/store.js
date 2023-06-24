@@ -9,6 +9,8 @@ const store = createStore({
       warehousesByPage: null,
       employeesByPage: null,
       categoryBypage: null,
+      colorByPage: null,
+      brandByPage: null,
       warehouses: null,
       isAuthenticated: localStorage.getItem('isAuthenticated') || false,
     }
@@ -20,6 +22,8 @@ const store = createStore({
     getWarehousebyPage: state=> state.warehousesByPage,
     getemployeesByPage: state => state.employeesByPage,
     getCategoryByPage: state => state.categoryBypage,
+    getColorByPage: state => state.colorByPage,
+    getBrandByPage: state => state.brandByPage,
     isAuthenticated: state => state.isAuthenticated,
   },
   mutations: {
@@ -37,6 +41,12 @@ const store = createStore({
     },
     getCategoryByPage(state, categoryBypage){
       state.categoryBypage = categoryBypage
+    },
+    getColorByPage(state, colorByPage){
+      state.colorByPage = colorByPage
+    },
+    getBrandByPage(state, brandByPage){
+      state.brandByPage = brandByPage
     },
     getAllWarehouse(state, warehouses){
       state.warehouses = warehouses
@@ -134,6 +144,40 @@ const store = createStore({
         .then(res =>{
           console.log(res)
           commit('getCategoryByPage', res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    async getColorByPage({ commit }, page){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/view_colors?page=' + page, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res)
+          commit('getColorByPage', res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    async getBrandByPage({ commit }, page){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/view_brands?page=' + page, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res)
+          commit('getBrandByPage', res.data)
         })
         .catch(err => {
           console.log(err)
