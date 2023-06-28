@@ -48,6 +48,11 @@ class CategoryController extends Controller
         $category = Category::find($id);
         return response()->json($category);
     }
+    
+    public function all(){
+        $categories = Category::all();
+        return response()->json($categories);
+    }
 
     public function update(Request $request, $id)
     {

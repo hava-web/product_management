@@ -214,74 +214,78 @@ const upgradeBanner = computed(() => {
       />
 
       <!-- 👉 Pages -->
-      <VerticalNavSectionTitle
+      <!--
+        <VerticalNavSectionTitle
         :item="{
-          heading: 'Page',
+        heading: 'Page',
         }"
-      />
-      <VerticalNavLink
+        />
+        <VerticalNavLink
         :item="{
-          title: 'Login',
-          icon: 'mdi-login',
-          to: '/login',
+        title: 'Login',
+        icon: 'mdi-login',
+        to: '/login',
         }"
-      />
-      <VerticalNavLink
+        />
+        <VerticalNavLink
         :item="{
-          title: 'Register',
-          icon: 'mdi-account-plus-outline',
-          to: '/register',
+        title: 'Register',
+        icon: 'mdi-account-plus-outline',
+        to: '/register',
         }"
-      />
-      <VerticalNavLink
+        />
+        <VerticalNavLink
         :item="{
-          title: 'Error',
-          icon: 'mdi-information-outline',
-          to: '/no-existence',
+        title: 'Error',
+        icon: 'mdi-information-outline',
+        to: '/no-existence',
         }"
-      />
+        /> 
+      -->
 
       <!-- 👉 User Interface -->
-      <VerticalNavSectionTitle
+      <!--
+        <VerticalNavSectionTitle
         :item="{
-          heading: 'User Interface',
+        heading: 'User Interface',
         }"
-      />
-      <VerticalNavLink
+        />
+        <VerticalNavLink
         :item="{
-          title: 'Typography',
-          icon: 'mdi-alpha-t-box-outline',
-          to: '/typography',
+        title: 'Typography',
+        icon: 'mdi-alpha-t-box-outline',
+        to: '/typography',
         }"
-      />
-      <VerticalNavLink
+        />
+        <VerticalNavLink
         :item="{
-          title: 'Icons',
-          icon: 'mdi-eye-outline',
-          to: '/icons',
+        title: 'Icons',
+        icon: 'mdi-eye-outline',
+        to: '/icons',
         }"
-      />
-      <VerticalNavLink
+        />
+        <VerticalNavLink
         :item="{
-          title: 'Cards',
-          icon: 'mdi-credit-card-outline',
-          to: '/cards',
+        title: 'Cards',
+        icon: 'mdi-credit-card-outline',
+        to: '/cards',
         }"
-      />
-      <VerticalNavLink
+        />
+        <VerticalNavLink
         :item="{
-          title: 'Tables',
-          icon: 'mdi-table',
-          to: '/tables',
+        title: 'Tables',
+        icon: 'mdi-table',
+        to: '/tables',
         }"
-      />
-      <VerticalNavLink
+        />
+        <VerticalNavLink
         :item="{
-          title: 'Form Layouts',
-          icon: 'mdi-form-select',
-          to: '/form-layouts',
+        title: 'Form Layouts',
+        icon: 'mdi-form-select',
+        to: '/form-layouts',
         }"
-      />
+        /> 
+      -->
     </template>
 
     <template #after-vertical-nav-items>

@@ -38,6 +38,11 @@ class ColorController extends Controller
         return response()->json($color);
     }
 
+    public function getAll(){
+        $colors = Color::all();
+        return response()->json($colors);
+    }
+
     public function update(Request $request, $id){
         $validatedData = $request->validate([
             'name' => 'required|string',

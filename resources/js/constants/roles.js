@@ -6,3 +6,9 @@ export const roles = [
   'Sale',
   'Marketing',
 ]
+
+export const productStatus = [
+  'Selling',
+  'Discontinue',
+  'Guarantee',
+]

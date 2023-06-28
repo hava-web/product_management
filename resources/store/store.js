@@ -6,6 +6,9 @@ const store = createStore({
     return{
       users: null,
       user: null,
+      categories: null,
+      brands: null,
+      colors: null,
       warehousesByPage: null,
       employeesByPage: null,
       categoryBypage: null,
@@ -18,6 +21,9 @@ const store = createStore({
   getters: {
     getAllUser: state => state.users,
     getUser: state => state.user,
+    getCategories: state => state.categories,
+    getBrands: state => state.brands,
+    getColors: state => state.colors,
     getAllWarehouse: state => state.warehouses,
     getWarehousebyPage: state=> state.warehousesByPage,
     getemployeesByPage: state => state.employeesByPage,
@@ -32,6 +38,15 @@ const store = createStore({
     },
     getAllUser(state, users){
       state.users = users
+    },
+    getCategories(state, categories){
+      state.categories = categories
+    },
+    getBrands(state, brands){
+      state.brands = brands
+    },
+    getColors(state, colors){
+      state.colors = colors
     },
     getWarehouseByPage(state, warehousesByPage){
       state.warehousesByPage = warehousesByPage
@@ -93,6 +108,57 @@ const store = createStore({
           users = res.data
           console.log(users)
           commit('getAllUser', users)
+        })
+        .catch(err =>{
+          console.log(err)
+        })
+    },
+
+    async getCategories({ commit }){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/all_categories', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res.data)
+          commit('getCategories', res.data)
+        })
+        .catch(err =>{
+          console.log(err)
+        })
+    },
+
+    async getBrands({ commit }){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/all_brands', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res.data)
+          commit('getBrands', res.data)
+        })
+        .catch(err =>{
+          console.log(err)
+        })
+    },
+
+    async getColors({ commit }){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/all_colors', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res.data)
+          commit('getColors', res.data)
         })
         .catch(err =>{
           console.log(err)

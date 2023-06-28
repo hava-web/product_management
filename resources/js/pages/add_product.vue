@@ -1,32 +1,41 @@
 <script setup>
 import avatar1 from '@images/avatars/avatar-1.png'
 import { useStore } from 'vuex'
-import { roles } from '../constants/roles'
-import { city, alert } from '@/constants/cities'
+import { alert } from '@/constants/cities'
+import { productStatus } from '../constants/roles'
 import axiosIns from '@/plugins/axios'
 
 const productData = {
-  image: avatar1,
+  images: [],
   name: '',
-  category: '',
+  category: null,
   description: '',
   brand: null,
   original_price: null,
   selling_price: null,
-  quantiy: null,
+  quantity: null,
   status: null,
-  import_date: null,
+  imported_date: null,
   expired_date: null,
   warehouse_id: null,
-  deliveredFrom: null,
-  salePercentage: null,
+  delivered_from: null,
+  sale_percentage: null,
+  colors: [], 
 }
 
+const colorQuantity= ref({})
+
+
+
 const warehouseList = ref([])
+const haveImg = ref(false)
+const attachment = ref([])
+const imagePreview = ref([])
+const categoryList = ref([])
+const colorList = ref([])
+const brandList = ref([])
 
 const store = useStore()
-
-const refInputEl = ref()
 const productDataLocal = ref(structuredClone(productData))
 
 const resetForm = () => {
@@ -34,6 +43,9 @@ const resetForm = () => {
 }
 
 const getAllWarehouse = computed(()=> store.getters.getAllWarehouse)
+const getCategories = computed(()=> store.getters.getCategories)
+const getBrands = computed(()=> store.getters.getBrands)
+const getColors = computed(() => store.getters.getColors)
 
 onMounted(async () => {
   await store.dispatch('getAllWarehouse')
@@ -41,61 +53,118 @@ onMounted(async () => {
   console.log(getAllWarehouse.value)
 })
 
+onMounted(async () => {
+  await store.dispatch('getCategories')
+  categoryList.value.push(...getCategories.value)
+  console.log(getCategories.value)
+})
+
+onMounted(async () => {
+  await store.dispatch('getBrands')
+  brandList.value.push(...getBrands.value)
+  console.log(getBrands.value)
+})
+
+onMounted(async () => {
+  await store.dispatch('getColors')
+  colorList.value.push(...getColors.value)
+  console.log(getColors.value)
+})
+
+
+const chosenColors = ref([])
+
+const isChosenColor = color => {
+  return !!chosenColors.value.find(c => c.id === color.id)
+}
+
+const toggleChosenColor = color => {
+  const colorIndex = chosenColors.value.findIndex(c => c.id === color.id)
+
+  if (colorIndex === -1) {
+    chosenColors.value.push({
+      ...color,
+      quantity: colorQuantity[color.id] || 0, 
+    })
+  } else {
+    chosenColors.value.splice(colorIndex, 1)
+  }
+}
+
+const updateColorQuantity = (colorId, quantity) => {
+  colorQuantity.value[colorId] = quantity
+
+  const colorIndex = chosenColors.value.findIndex(c => c.id === colorId)
+  if (colorIndex > -1) {
+    chosenColors.value[colorIndex].quantity = Number(quantity)
+  }
+}
+
+
+
+// computed property to check if the quantity field is enabled for a specific color
+const isQuantityFieldEnabled = color => {
+  return !!chosenColors.value.find(c => c.id === color.id)
+}
+
+
 const getId = warehouse => warehouse.id
 
 const formatName = warehouse=>{
   return warehouse.id + ' - ' + warehouse.name
 }
 
-// const submit = async ()=>{
-//   console.log(productDataLocal.value)
 
-//   const accessToken = localStorage.getItem('accessToken')
+function fileChange(event){
+  console.log(event)
+  let selectedFiles = event.target.files
+  if(!selectedFiles.length){
+    return false
+  }
 
-//   await axiosIns.post('/api/auth/register', productDataLocal.value, {
-//     headers: {
-//       'Authorization': `Bearer ${accessToken}`,
-//     },
-//   }).then(res=>{
-//     console.log(res)
-//     if(res.status === 201){
-//       alert.title = 'Successfully'
-//       alert.status = true
-//       alert.text = 'Account Added Successfully'
-//       alert.color = 'rgba(39, 217, 11, 0.8)'
-//       productDataLocal.value = structuredClone(warehouseData)
-//     }
-//     else{
-//       alert.title = 'Warning'
-//       alert.status = true
-//       alert.text = 'Something went wrong'
-//       alert.color = 'rgba(234, 223, 30, 0.8)'
-//     }
-//   }).catch(err=>{
-//     console.log(err)
-//     alert.title = 'Error'
-//     alert.status = true
-//     alert.text = err.response.data.message
-//     alert.color = 'rgba(222, 29, 29, 0.8)'
-//   })
-// }
-
-
-const changeAvatar = file => {
-  const fileReader = new FileReader()
-  const { files } = file.target
-  if (files && files.length) {
-    fileReader.readAsDataURL(files[0])
-    fileReader.onload = () => {
-      if (typeof fileReader.result === 'string')
-        productDataLocal.value.image = fileReader.result
-    }
+  for(let i=0; i< selectedFiles.length; i++){
+    attachment.value.push(selectedFiles[i])
   }
 }
 
-// reset avatar image
-const resetAvatar = () => {
-  productDataLocal.value.image = productData.image
+const submit = async ()=>{
+  productDataLocal.value.colors.push(...chosenColors.value)
+  console.log(productDataLocal.value)
+  console.log(chosenColors.value)
+
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.post('/api/add_product', productDataLocal.value, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  }).then(res=>{
+    console.log(res)
+    if(res.status === 201){
+      alert.title = 'Successfully'
+      alert.status = true
+      alert.text = 'Account Added Successfully'
+      alert.color = 'rgba(39, 217, 11, 0.8)'
+      productDataLocal.value = structuredClone(productData)
+      chosenColors.value = []
+    }
+    else{
+      alert.title = 'Warning'
+      alert.status = true
+      alert.text = 'Something went wrong'
+      alert.color = 'rgba(234, 223, 30, 0.8)'
+    }
+  }).catch(err=>{
+    console.log(err)
+    alert.title = 'Error'
+    alert.status = true
+    alert.text = err.response.data.message
+    alert.color = 'rgba(222, 29, 29, 0.8)'
+    productDataLocal.value = structuredClone(productData)
+    chosenColors.value = []
+  })
+  console.log(productDataLocal.value)
 }
 </script>
 
@@ -121,50 +190,83 @@ const resetAvatar = () => {
       >
         <VCardText class="d-flex">
           <!-- 👉 Avatar -->
-          <VAvatar
+          <!--
+            <VAvatar
             rounded="lg"
             size="100"
             class="me-6"
             :image="productDataLocal.image"
-          />
+            /> 
+          -->
 
           <!-- 👉 Upload Photo -->
           <form class="d-flex flex-column justify-center gap-5">
-            <div class="d-flex flex-wrap gap-2">
+            <!--
+              <div class="d-flex flex-wrap gap-2">
               <VBtn
-                color="primary"
-                @click="refInputEl?.click()"
+              color="primary"
+              @click="refInputEl?.click()"
               >
-                <VIcon
-                  icon="mdi-cloud-upload-outline"
-                  class="d-sm-none"
-                />
-                <span class="d-none d-sm-block">Upload new photo</span>
+              <VIcon
+              icon="mdi-cloud-upload-outline"
+              class="d-sm-none"
+              />
+              <span class="d-none d-sm-block">Upload new photo</span>
               </VBtn>
 
               <input
-                :ref="refInputEl"
-                multiple
-                type="file"
-                name="file"
-                accept=".jpeg,.png,.jpg,GIF"
-                hidden
-                @input="changeAvatar"
+              :ref="refInputEl"
+              multiple
+              type="file"
+              name="file"
+              accept=".jpeg,.png,.jpg,GIF"
+              hidden
+              @input="changeAvatar"
               >
 
               <VBtn
-                type="reset"
-                color="error"
-                variant="tonal"
-                @click="resetAvatar"
+              type="reset"
+              color="error"
+              variant="tonal"
+              @click="resetAvatar"
               >
-                <span class="d-none d-sm-block">Reset</span>
-                <VIcon
-                  icon="mdi-refresh"
-                  class="d-sm-none"
-                />
+              <span class="d-none d-sm-block">Reset</span>
+              <VIcon
+              icon="mdi-refresh"
+              class="d-sm-none"
+              />
               </VBtn>
-            </div>
+              </div> 
+            -->
+            <!-- 👉 Image -->
+            <VCol cols="20">
+              <VFileInput
+                v-model="productDataLocal.images"
+                clearable
+                multiple="true"
+                chips
+                prepend-icon="mdi-camera"
+                label="Select Image"
+                accept="image/*"
+                @click:clear="productDataLocal.value.images = []"
+                @change="fileChange"
+              />
+              <VCard
+                :width="100"
+                class="image"
+              >
+                <VImg
+                  v-if="haveImg"
+                  :width="100"
+                  :height="100"
+                  content-class="text-center"
+                  alt="Image"
+                  cover
+                  :src="imagePreview"
+                />
+              </VCard>
+            </VCol>
+
 
             <p class="text-body-1 mb-0">
               Allowed JPG, GIF or PNG. Max size of 800K
@@ -194,22 +296,11 @@ const resetAvatar = () => {
                 md="6"
               >
                 <VSelect
-                  v-model="productDataLocal.warehouse_id"
+                  v-model="productDataLocal.category"
                   label="Category"
-                  :items="warehouseList"
+                  :items="categoryList"
                   :item-title="formatName"
                   :item-value="getId"
-                />
-              </VCol>
-
-              <!-- 👉 Description -->
-              <VCol
-                md="6"
-                cols="12"
-              >
-                <VTextField
-                  v-model="productDataLocal.category"
-                  label="Description"
                 />
               </VCol>
 
@@ -227,13 +318,27 @@ const resetAvatar = () => {
                 />
               </VCol>
 
+              <!-- 👉 Brand -->
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <VSelect
+                  v-model="productDataLocal.brand"
+                  label="Brand"
+                  :items="brandList"
+                  :item-title="formatName"
+                  :item-value="getId"
+                />
+              </VCol>
+
               <!-- 👉 Original Price -->
               <VCol
                 md="6"
                 cols="12"
               >
                 <VTextField
-                  v-model="productDataLocal.category"
+                  v-model="productDataLocal.original_price"
                   label="Original Price"
                 />
               </VCol>
@@ -244,7 +349,7 @@ const resetAvatar = () => {
                 cols="12"
               >
                 <VTextField
-                  v-model="productDataLocal.category"
+                  v-model="productDataLocal.selling_price"
                   label="Selling Price"
                 />
               </VCol>
@@ -255,7 +360,7 @@ const resetAvatar = () => {
                 md="6"
               >
                 <VTextField
-                  v-model="productDataLocal.phone"
+                  v-model="productDataLocal.quantity"
                   label="Quantity"
                 />
               </VCol>
@@ -265,9 +370,10 @@ const resetAvatar = () => {
                 cols="12"
                 md="6"
               >
-                <VTextField
-                  v-model="productDataLocal.phone"
+                <VSelect
+                  v-model="productDataLocal.status"
                   label="Status"
+                  :items="productStatus"
                 />
               </VCol>
 
@@ -277,7 +383,7 @@ const resetAvatar = () => {
                 md="6"
               >
                 <VTextField
-                  v-model="productDataLocal.date_of_birth"
+                  v-model="productDataLocal.imported_date"
                   type="date"
                   label="Imported Date"
                 />
@@ -289,7 +395,7 @@ const resetAvatar = () => {
                 md="6"
               >
                 <VTextField
-                  v-model="productDataLocal.date_of_birth"
+                  v-model="productDataLocal.expired_date"
                   type="date"
                   label="Expired Date"
                 />
@@ -301,7 +407,7 @@ const resetAvatar = () => {
                 md="6"
               >
                 <VTextField
-                  v-model="productDataLocal.salary"
+                  v-model="productDataLocal.delivered_from"
                   label="Delivered From"
                 />
               </VCol>
@@ -312,14 +418,70 @@ const resetAvatar = () => {
                 md="6"
               >
                 <VTextField
-                  v-model="productDataLocal.address"
+                  v-model="productDataLocal.sale_percentage"
                   label="Saling Percentange"
                 />
               </VCol>
 
+              <!-- 👉 Description -->
+              <VCol cols="12">
+                <VTextarea
+                  v-model="productDataLocal.description"
+                  label="Description"
+                />
+              </VCol>
               
+              <VDivider />
+              <div class="">
+                <VCardTitle
+                  cols="12"
+                  class="d-flex flex-wrap gap-4"
+                >
+                  <VIcon icon="mdi-palette" />
+                  Color
+                </VCardTitle>
 
-
+                <!-- 👉 Form -->
+                <div class="d-flex flex-wrap color">
+                  <VCol
+                    v-for="color in colorList"
+                    :key="color.colorList"
+                    md="6"
+                    cols="2"
+                  >
+                    <div class="d-flex pa-4">
+                      <VSheet
+                        class="mt-2 mb-2 color"
+                        elevation="12"
+                        rounded="circle"
+                        :color="color.code_color"
+                        height="50"
+                        width="50"
+                      />
+                      <div class="lable pa-4">
+                        <div class="lable-title">
+                          {{ color.name }}
+                        </div>
+                        <VCheckboxBtn
+                          :checked="isChosenColor(color)"
+                          class="pe-2"
+                          :value="color.id"
+                          @click="toggleChosenColor(color)"
+                        />
+                      </div>
+                      <div class="field">
+                        <VTextField
+                          v-model="colorQuantity[color.id]"
+                          :disabled="!isQuantityFieldEnabled(color)"
+                          label="Quantity"
+                          @input="updateColorQuantity(color.id, $event.target.value)"
+                        />
+                      </div>
+                    </div>
+                  </VCol>
+                </div>
+              </div>
+              
               <!-- 👉 Form Actions -->
               <VCol
                 cols="12"
@@ -343,31 +505,7 @@ const resetAvatar = () => {
         </VCardText>
       </VCard>
     </VCol>
-
-    <!-- 👉 Deactivate Account -->
-    <!--
-      <VCol cols="12">
-      <VCard title="Deactivate Account">
-      <VCardText>
-      <div>
-      <VCheckbox
-      v-model="isAccountDeactivated"
-      label="I confirm my account deactivation"
-      />
-      </div>
-
-      <VBtn
-      :disabled="!isAccountDeactivated"
-      color="error"
-      class="mt-3"
-      >
-      Deactivate Account
-      </VBtn>
-      </VCardText>
-      </VCard>
-      </VCol> 
-    -->
-  </VRow>
+  </vrow>
 </template>
 
 <style scoped>
@@ -378,8 +516,20 @@ const resetAvatar = () => {
   z-index: 100;
 }
 
+.title{
+  display: block;
+}
+.lable{
+  display: flex;
+}
 .slide-fade-enter-active {
   transition: all 0.3s ease-out;
+}
+
+.lable-title{
+  max-width: 50px;
+  width: 50px;
+  margin-top: 10px ;
 }
 
 .slide-fade-leave-active {
@@ -390,5 +540,11 @@ const resetAvatar = () => {
 .slide-fade-leave-to {
   transform: translateX(20px);
   opacity: 0;
+}
+.color{
+  width: 1000px;
+}
+.field{
+  width: 230px;
 }
 </style>

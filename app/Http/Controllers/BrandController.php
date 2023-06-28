@@ -29,6 +29,12 @@ class BrandController extends Controller
         }
     }
 
+    public function all(){
+        $brands = Brand::where('status',1)->get();
+        return response()->json($brands);
+    }
+
+
     public function getByPage()
     {
         $brand = Brand::paginate(3);

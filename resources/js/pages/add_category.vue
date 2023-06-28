@@ -73,6 +73,7 @@ const submit = async ()=>{
         alert.status = true
         alert.text = 'Something went wrong'
         alert.color = 'rgba(234, 223, 30, 0.8)'
+        console.log(res.data)
       }
     })
     .catch(err=>{
@@ -147,6 +148,7 @@ const resetAvatar = () => {
                   prepend-icon="mdi-camera"
                   label="Select Image"
                   accept="image/*"
+                  @click:clear="haveImg = false"
                   @change="onFileChange"
                 />
                 <VCard

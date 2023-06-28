@@ -5,6 +5,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,7 @@ Route::group(['prefix' => 'auth'], function () {
  Route::group(['middleware' => 'auth:sanctum'], function(){
   Route::post('add_category', [CategoryController::class, 'create']);
   Route::get('view_categories', [CategoryController::class, 'getCategoryByPage']);
+  Route::get('all_categories', [CategoryController::class, 'all']);
   Route::get('category/{id}', [CategoryController::class, 'getCategoryById']);
   Route::post('update/category/{id}', [CategoryController::class, 'update']);
   Route::get('delete/category/{id}', [CategoryController::class, 'remove']);
@@ -60,6 +62,7 @@ Route::group(['prefix' => 'auth'], function () {
  Route::group(['middleware' => 'auth:sanctum'], function(){
   Route::post('add_color', [ColorController::class, 'create']);
   Route::get('view_colors', [ColorController::class, 'getByPage']);
+  Route::get('all_colors', [ColorController::class, 'getAll']);
   Route::get('color/{id}', [ColorController::class, 'getColor']);
   Route::post('update/color/{id}', [ColorController::class, 'update']);
   Route::get('delete/color/{id}', [ColorController::class, 'destroy']);
@@ -68,9 +71,14 @@ Route::group(['prefix' => 'auth'], function () {
  Route::group(['middleware' => 'auth:sanctum'], function(){
   Route::post('add_brand', [BrandController::class, 'create']);
   Route::get('view_brands', [BrandController::class, 'getByPage']);
+  Route::get('/all_brands', [BrandController::class, 'all']);
   Route::get('brand/{id}', [BrandController::class, 'getById']);
   Route::post('update/brand/{id}', [BrandController::class, 'update']);
   Route::get('delete/brand/{id}', [BrandController::class, 'destroy']);
+ });
+
+ Route::group(['middleware' => 'auth:sanctum'], function(){
+  Route::post('add_product', [ProductController::class, 'create']);
  });
 
  
