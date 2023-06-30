@@ -167,7 +167,7 @@ const upgradeBanner = computed(() => {
         :item="{
           title: 'View Product',
           icon: 'mdi-package-variant-closed',
-          to: '/',
+          to: '/view_product',
         }"
       />
 
@@ -213,6 +213,26 @@ const upgradeBanner = computed(() => {
         }"
       />
 
+      <!-- 👉 Size -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: 'Size',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Add Size',
+          icon: 'mdi-weight',
+          to: '/add_size',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'View Size',
+          icon: 'mdi-format-line-weight',
+          to: '/view_sizes',
+        }"
+      />
       <!-- 👉 Pages -->
       <!--
         <VerticalNavSectionTitle

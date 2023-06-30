@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SizeController;
 use App\Http\Controllers\WarehouseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -78,7 +79,24 @@ Route::group(['prefix' => 'auth'], function () {
  });
 
  Route::group(['middleware' => 'auth:sanctum'], function(){
+  Route::post('add_size', [SizeController::class, 'create']);
+  Route::get('view_sizes', [SizeController::class, 'getByPage']);
+  Route::get('/all_sizes', [SizeController::class, 'all']);
+  Route::get('size/{id}', [SizeController::class, 'getById']);
+  Route::post('update/size/{id}', [SizeController::class, 'update']);
+  Route::get('delete/size/{id}', [SizeController::class, 'destroy']);
+ });
+
+ Route::group(['middleware' => 'auth:sanctum'], function(){
   Route::post('add_product', [ProductController::class, 'create']);
+  Route::get('view_products',[ProductController::class, 'getByPage']);
+  Route::get('view_properties/{id}/{warehouse_id}',[ProductController::class, 'getProperties']);
+  Route::get('get_image/{id}',[ProductController::class, 'getImage']);
+  Route::get('get_warehouses/{id}',[ProductController::class, 'getWarehouse']);
+  Route::get('get_images/{id}',[ProductController::class, 'getAllImageById']);
+  Route::get('product/{id}',[ProductController::class, 'getById']);
+  Route::get('delete/product/{id}', [ProductController::class, 'destroy']);
+  Route::get('product_colors/{id}',[ProductController::class, 'getColorByProductId']);
  });
 
  

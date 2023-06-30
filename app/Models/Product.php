@@ -13,7 +13,6 @@ class Product extends Model
         'name',
         'category',
         'description',
-        'brand',
         'original_price',
         'selling_price',
         'quantity',
@@ -22,7 +21,6 @@ class Product extends Model
         'expired_date',
         'warehouse_id',
         'delivered_from',
-        'sale_percentage',
     ];
 
     public function category(){
@@ -33,8 +31,8 @@ class Product extends Model
         return $this->hasMany(ProductImage::class,'product_id','id');
     }
 
-    public function productColors(){
-        return $this->hasMany(ProductColor::class,'product_id','id');
+    public function productProperty(){
+        return $this->hasMany(ProductProperty::class,'product_id','id');
     }
 
 

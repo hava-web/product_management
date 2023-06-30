@@ -35,7 +35,13 @@ class ColorController extends Controller
 
     public function getColor($id){
         $color = Color::find($id);
-        return response()->json($color);
+        if($color){
+            return response()->json($color);
+        }else{
+            return response()->json([
+                'message' => 'Color does not exits'
+            ],404);
+        }
     }
 
     public function getAll(){

@@ -12,3 +12,11 @@ export const productStatus = [
   'Discontinue',
   'Guarantee',
 ]
+
+export const size = [
+  'XXL',
+  'XL',
+  'XM',
+  'L',
+  'M',
+]

@@ -60,6 +60,17 @@ const router = createRouter({
           component: () => import('../pages/add_product.vue'),
         },
         {
+          path: 'view_product',
+          component: () => import('../pages/view_products.vue'),
+          children: [
+            {
+              path: 'product/:id',
+              name: 'product',
+              component: ()=> import('../views//product/view.vue'),
+            },
+          ],
+        },
+        {
           path: 'add_color',
           component: () => import('../pages/add_color.vue'),
         },
@@ -74,6 +85,14 @@ const router = createRouter({
         {
           path: 'view_brands',
           component: () => import('../pages/view_brands.vue'),
+        },
+        {
+          path: 'add_size',
+          component: () => import('../pages/add_size.vue'),
+        },
+        {
+          path: 'view_sizes',
+          component: () => import('../pages/view_sizes.vue'),
         },
         {
           path: 'typography',

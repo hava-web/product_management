@@ -2,7 +2,7 @@
 import avatar1 from '@images/avatars/avatar-1.png'
 import { useStore } from 'vuex'
 import { alert } from '@/constants/cities'
-import { productStatus } from '../constants/roles'
+import { productStatus, size } from '../constants/roles'
 import axiosIns from '@/plugins/axios'
 
 const productData = {
@@ -10,22 +10,12 @@ const productData = {
   name: '',
   category: null,
   description: '',
-  brand: null,
+  properties: [],
   original_price: null,
   selling_price: null,
-  quantity: null,
-  status: null,
   imported_date: null,
-  expired_date: null,
-  warehouse_id: null,
-  delivered_from: null,
-  sale_percentage: null,
-  colors: [], 
+  delivered_from: null, 
 }
-
-const colorQuantity= ref({})
-
-
 
 const warehouseList = ref([])
 const haveImg = ref(false)
@@ -34,24 +24,41 @@ const imagePreview = ref([])
 const categoryList = ref([])
 const colorList = ref([])
 const brandList = ref([])
+const sizeList = ref([])
+const fields = ref([])
 
 const store = useStore()
 const productDataLocal = ref(structuredClone(productData))
 
 const resetForm = () => {
   productDataLocal.value = structuredClone(productData)
+  fields.value = []
 }
 
 const getAllWarehouse = computed(()=> store.getters.getAllWarehouse)
 const getCategories = computed(()=> store.getters.getCategories)
 const getBrands = computed(()=> store.getters.getBrands)
 const getColors = computed(() => store.getters.getColors)
+const getSizes = computed(() => store.getters.getSizes)
 
 onMounted(async () => {
   await store.dispatch('getAllWarehouse')
   warehouseList.value.push(...getAllWarehouse.value)
   console.log(getAllWarehouse.value)
 })
+
+const addField = () => {
+  fields.value.push({
+    quantity: null,
+    discount: null,
+    brand: null,
+    warehouse_id: null,
+    color: null,
+    status: null,
+    size: null,
+    expired_date: null,
+  })
+}
 
 onMounted(async () => {
   await store.dispatch('getCategories')
@@ -71,41 +78,49 @@ onMounted(async () => {
   console.log(getColors.value)
 })
 
+onMounted(async () => {
+  await store.dispatch('getSizes')
+  sizeList.value.push(...getSizes.value)
+  console.log(getSizes.value)
+})
+
+
+
 
 const chosenColors = ref([])
 
-const isChosenColor = color => {
-  return !!chosenColors.value.find(c => c.id === color.id)
-}
+// const isChosenColor = color => {
+//   return !!chosenColors.value.find(c => c.id === color.id)
+// }
 
-const toggleChosenColor = color => {
-  const colorIndex = chosenColors.value.findIndex(c => c.id === color.id)
+// const toggleChosenColor = color => {
+//   const colorIndex = chosenColors.value.findIndex(c => c.id === color.id)
 
-  if (colorIndex === -1) {
-    chosenColors.value.push({
-      ...color,
-      quantity: colorQuantity[color.id] || 0, 
-    })
-  } else {
-    chosenColors.value.splice(colorIndex, 1)
-  }
-}
+//   if (colorIndex === -1) {
+//     chosenColors.value.push({
+//       ...color,
+//       quantity: colorQuantity[color.id] || 0, 
+//     })
+//   } else {
+//     chosenColors.value.splice(colorIndex, 1)
+//   }
+// }
 
-const updateColorQuantity = (colorId, quantity) => {
-  colorQuantity.value[colorId] = quantity
+// const updateColorQuantity = (colorId, quantity) => {
+//   colorQuantity.value[colorId] = quantity
 
-  const colorIndex = chosenColors.value.findIndex(c => c.id === colorId)
-  if (colorIndex > -1) {
-    chosenColors.value[colorIndex].quantity = Number(quantity)
-  }
-}
+//   const colorIndex = chosenColors.value.findIndex(c => c.id === colorId)
+//   if (colorIndex > -1) {
+//     chosenColors.value[colorIndex].quantity = Number(quantity)
+//   }
+// }
 
 
 
 // computed property to check if the quantity field is enabled for a specific color
-const isQuantityFieldEnabled = color => {
-  return !!chosenColors.value.find(c => c.id === color.id)
-}
+// const isQuantityFieldEnabled = color => {
+//   return !!chosenColors.value.find(c => c.id === color.id)
+// }
 
 
 const getId = warehouse => warehouse.id
@@ -128,7 +143,18 @@ function fileChange(event){
 }
 
 const submit = async ()=>{
-  productDataLocal.value.colors.push(...chosenColors.value)
+  const properties = fields.value.map(field => ({
+    quantity: field.quantity,
+    discount: field.discount,
+    brand: field.brand,
+    warehouse_id: field.warehouse_id,
+    color: field.color,
+    size: field.size,
+    status: field.status,
+    expired_date: field.expired_date,
+  }))
+
+  productDataLocal.value.properties.push(...properties)
   console.log(productDataLocal.value)
   console.log(chosenColors.value)
 
@@ -148,6 +174,7 @@ const submit = async ()=>{
       alert.color = 'rgba(39, 217, 11, 0.8)'
       productDataLocal.value = structuredClone(productData)
       chosenColors.value = []
+      fields.value = []
     }
     else{
       alert.title = 'Warning'
@@ -162,9 +189,8 @@ const submit = async ()=>{
     alert.text = err.response.data.message
     alert.color = 'rgba(222, 29, 29, 0.8)'
     productDataLocal.value = structuredClone(productData)
-    chosenColors.value = []
+    fields.value = []
   })
-  console.log(productDataLocal.value)
 }
 </script>
 
@@ -304,34 +330,6 @@ const submit = async ()=>{
                 />
               </VCol>
 
-              <!-- 👉 Warehouse -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="productDataLocal.warehouse_id"
-                  label="Warehouse"
-                  :items="warehouseList"
-                  :item-title="formatName"
-                  :item-value="getId"
-                />
-              </VCol>
-
-              <!-- 👉 Brand -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="productDataLocal.brand"
-                  label="Brand"
-                  :items="brandList"
-                  :item-title="formatName"
-                  :item-value="getId"
-                />
-              </VCol>
-
               <!-- 👉 Original Price -->
               <VCol
                 md="6"
@@ -362,18 +360,7 @@ const submit = async ()=>{
                 <VTextField
                   v-model="productDataLocal.quantity"
                   label="Quantity"
-                />
-              </VCol>
-
-              <!-- 👉 Status -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="productDataLocal.status"
-                  label="Status"
-                  :items="productStatus"
+                  @input="check"
                 />
               </VCol>
 
@@ -389,37 +376,11 @@ const submit = async ()=>{
                 />
               </VCol>
 
-              <!-- 👉 Exprired Date -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="productDataLocal.expired_date"
-                  type="date"
-                  label="Expired Date"
-                />
-              </VCol>
-
               <!-- 👉 Delivered From -->
-              <VCol
-                cols="12"
-                md="6"
-              >
+              <VCol cols="12">
                 <VTextField
                   v-model="productDataLocal.delivered_from"
                   label="Delivered From"
-                />
-              </VCol>
-
-              <!-- 👉 Saling Percentange -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="productDataLocal.sale_percentage"
-                  label="Saling Percentange"
                 />
               </VCol>
 
@@ -432,63 +393,179 @@ const submit = async ()=>{
               </VCol>
               
               <VDivider />
+
+              <!-- 👉 Properties -->
               <div class="">
-                <VCardTitle
-                  cols="12"
-                  class="d-flex flex-wrap gap-4"
-                >
-                  <VIcon icon="mdi-palette" />
-                  Color
-                </VCardTitle>
+                <div class="d-flex">
+                  <VCardTitle
+                    cols="12"
+                    class="d-flex flex-wrap gap-4"
+                  >
+                    <VIcon icon="mdi-atom-variant" />
+                    Properties
+                  </VCardTitle>
+                  <VBtn
+                    variant="tonal"
+                    class="mt-2 add-props"
+                    prepend-icon="mdi-plus"
+                    @click="addField"
+                  >
+                    Add
+                  </VBtn>
+                </div>
 
                 <!-- 👉 Form -->
-                <div class="d-flex flex-wrap color">
+                <div
+                  v-for="field in fields"
+                  :key="field.fields"
+                  class="d-flex flex-wrap form"
+                >
+                  <!-- 👉 Quantity -->
+                  <VCol cols="12">
+                    <VTextField
+                      v-model="field.quantity"
+                      label="Quantity"
+                    />
+                  </VCol>
+
+                  <!-- 👉 Discount -->
                   <VCol
-                    v-for="color in colorList"
-                    :key="color.colorList"
+                    cols="12"
                     md="6"
-                    cols="2"
                   >
-                    <div class="d-flex pa-4">
-                      <VSheet
-                        class="mt-2 mb-2 color"
-                        elevation="12"
-                        rounded="circle"
-                        :color="color.code_color"
-                        height="50"
-                        width="50"
-                      />
-                      <div class="lable pa-4">
-                        <div class="lable-title">
-                          {{ color.name }}
-                        </div>
-                        <VCheckboxBtn
-                          :checked="isChosenColor(color)"
-                          class="pe-2"
-                          :value="color.id"
-                          @click="toggleChosenColor(color)"
-                        />
-                      </div>
-                      <div class="field">
-                        <VTextField
+                    <VTextField
+                      v-model="field.discount"
+                      label="Discount"
+                    />
+                  </VCol>
+
+                  <!-- 👉 Brand -->
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
+                    <VSelect
+                      v-model="field.brand"
+                      label="Brand"
+                      :items="brandList"
+                      :item-title="formatName"
+                      :item-value="getId"
+                    />
+                  </VCol>
+
+                  <!-- 👉 Warehouse -->
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
+                    <VSelect
+                      v-model="field.warehouse_id"
+                      label="Warehouse"
+                      :items="warehouseList"
+                      :item-title="formatName"
+                      :item-value="getId"
+                    />
+                  </VCol>
+
+                  <!-- 👉 Size -->
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
+                    <VSelect
+                      v-model="field.size"
+                      label="Size"
+                      :items="sizeList"
+                      :item-title="formatName"
+                      :item-value="getId"
+                    />
+                  </VCol>
+
+                  <!-- 👉 Status -->
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
+                    <VSelect
+                      v-model="field.status"
+                      label="Status"
+                      :items="productStatus"
+                    />
+                  </VCol>
+
+                  <!-- 👉 Exprired Date -->
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
+                    <VTextField
+                      v-model="field.expired_date"
+                      type="date"
+                      label="Expired Date"
+                    />
+                  </VCol>
+                  <div class="d-flex flex-wrap color ">
+                    <VRadioGroup
+                      v-model="field.color"
+                      inline
+                      class="group"
+                    >
+                      <VCol
+                        v-for="color in colorList"
+                        :key="color.colorList"
+                        md="3"
+                        cols="2"
+                      >
+                        <div class="d-flex">
+                          <VSheet
+                            class="mt-2 mb-2 "
+                            elevation="12"
+                            rounded="circle"
+                            :color="color.code_color"
+                            height="50"
+                            width="50"
+                          />
+                          <div class="lable pa-4">
+                            <div class="lable-title">
+                              {{ color.name }}
+                            </div>
+                            <!--
+                              <VCheckboxBtn
+                              :checked="isChosenColor(color)"
+                              class="pe-2"
+                              :value="color.id"
+                              @click="toggleChosenColor(color)"
+                              /> 
+                            -->
+                            <VRadio
+                              class="pe-2"
+                              :value="color.id"
+                            />
+                          </div>
+                        <!--
+                          <div class="field">
+                          <VTextField
                           v-model="colorQuantity[color.id]"
                           :disabled="!isQuantityFieldEnabled(color)"
                           label="Quantity"
                           @input="updateColorQuantity(color.id, $event.target.value)"
-                        />
-                      </div>
-                    </div>
-                  </VCol>
+                          />
+                          </div> 
+                        -->
+                        </div>
+                      </VCol>
+                    </VRadioGroup>
+                  </div>
                 </div>
               </div>
-              
+
               <!-- 👉 Form Actions -->
               <VCol
                 cols="12"
                 class="d-flex flex-wrap gap-4"
               >
                 <VBtn @click="submit">
-                  Create Account
+                  Add Product
                 </VBtn>
 
                 <VBtn
@@ -527,9 +604,9 @@ const submit = async ()=>{
 }
 
 .lable-title{
-  max-width: 50px;
-  width: 50px;
-  margin-top: 10px ;
+  max-width: 80px;
+  width:80px;
+ 
 }
 
 .slide-fade-leave-active {
@@ -541,10 +618,25 @@ const submit = async ()=>{
   transform: translateX(20px);
   opacity: 0;
 }
-.color{
-  width: 1000px;
-}
 .field{
   width: 230px;
+}
+.add-props{
+  position: absolute;
+  right: 30px;
+
+}
+.color{
+  margin-left: 10px;
+}
+
+.form{
+  border: 2px solid #9155FD;
+  border-radius: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.group{
+  margin-left: 30px;
 }
 </style>

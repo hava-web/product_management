@@ -9,11 +9,14 @@ const store = createStore({
       categories: null,
       brands: null,
       colors: null,
+      sizes: null,
       warehousesByPage: null,
       employeesByPage: null,
       categoryBypage: null,
       colorByPage: null,
       brandByPage: null,
+      sizeByPage: null,
+      productByPage: null,
       warehouses: null,
       isAuthenticated: localStorage.getItem('isAuthenticated') || false,
     }
@@ -24,12 +27,15 @@ const store = createStore({
     getCategories: state => state.categories,
     getBrands: state => state.brands,
     getColors: state => state.colors,
+    getSizes: state => state.sizes,
     getAllWarehouse: state => state.warehouses,
     getWarehousebyPage: state=> state.warehousesByPage,
     getemployeesByPage: state => state.employeesByPage,
     getCategoryByPage: state => state.categoryBypage,
     getColorByPage: state => state.colorByPage,
     getBrandByPage: state => state.brandByPage,
+    getSizeByPage: state => state.sizeByPage,
+    getProductByPage: state => state.productByPage,
     isAuthenticated: state => state.isAuthenticated,
   },
   mutations: {
@@ -48,6 +54,9 @@ const store = createStore({
     getColors(state, colors){
       state.colors = colors
     },
+    getSizes(state, sizes){
+      state.sizes = sizes
+    },
     getWarehouseByPage(state, warehousesByPage){
       state.warehousesByPage = warehousesByPage
     },
@@ -62,6 +71,12 @@ const store = createStore({
     },
     getBrandByPage(state, brandByPage){
       state.brandByPage = brandByPage
+    },
+    getSizeByPage(state, sizeByPage){
+      state.sizeByPage = sizeByPage
+    },
+    getProductByPage(state, productByPage){
+      state.productByPage = productByPage
     },
     getAllWarehouse(state, warehouses){
       state.warehouses = warehouses
@@ -165,6 +180,23 @@ const store = createStore({
         })
     },
 
+    async getSizes({ commit }){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/all_sizes', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res.data)
+          commit('getSizes', res.data)
+        })
+        .catch(err =>{
+          console.log(err)
+        })
+    },
+
     async getWarehouseByPage({ commit }, page){
       const accessToken = localStorage.getItem('accessToken')
 
@@ -244,6 +276,40 @@ const store = createStore({
         .then(res =>{
           console.log(res)
           commit('getBrandByPage', res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    async getSizeByPage({ commit }, page){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/view_sizes?page=' + page, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res)
+          commit('getSizeByPage', res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    async getProductByPage({ commit }, page){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/view_products?page=' + page, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res)
+          commit('getProductByPage', res.data)
         })
         .catch(err => {
           console.log(err)
