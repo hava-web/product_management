@@ -35,18 +35,6 @@ const resetForm = () => {
   fields.value = []
 }
 
-const getAllWarehouse = computed(()=> store.getters.getAllWarehouse)
-const getCategories = computed(()=> store.getters.getCategories)
-const getBrands = computed(()=> store.getters.getBrands)
-const getColors = computed(() => store.getters.getColors)
-const getSizes = computed(() => store.getters.getSizes)
-
-onMounted(async () => {
-  await store.dispatch('getAllWarehouse')
-  warehouseList.value.push(...getAllWarehouse.value)
-  console.log(getAllWarehouse.value)
-})
-
 const addField = () => {
   fields.value.push({
     quantity: null,
@@ -59,6 +47,18 @@ const addField = () => {
     expired_date: null,
   })
 }
+
+const getAllWarehouse = computed(()=> store.getters.getAllWarehouse)
+const getCategories = computed(()=> store.getters.getCategories)
+const getBrands = computed(()=> store.getters.getBrands)
+const getColors = computed(() => store.getters.getColors)
+const getSizes = computed(() => store.getters.getSizes)
+
+onMounted(async () => {
+  await store.dispatch('getAllWarehouse')
+  warehouseList.value.push(...getAllWarehouse.value)
+  console.log(getAllWarehouse.value)
+})
 
 onMounted(async () => {
   await store.dispatch('getCategories')

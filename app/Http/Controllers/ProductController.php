@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\ProductColor;
 use App\Models\ProductImage;
 use App\Models\ProductProperty;
 use Illuminate\Http\Request;
@@ -115,7 +114,7 @@ class ProductController extends Controller
         }
     }
     
-    public function getProperties($id , $warehouse_id){
+    public function getPropertiesAndWare($id , $warehouse_id){
         $properties = DB::table('product_properties as pp')
         ->join('colors as c', 'c.id', '=', 'pp.color_id')
         ->join('sizes as s', 's.id', '=', 'pp.size_id')
@@ -130,6 +129,18 @@ class ProductController extends Controller
         else{
             return response()->json([
                 'message' => 'Product or warehouse does not exits'
+            ]);
+        }
+    }
+
+    public function getProperties($id){
+        $properties = ProductProperty::where('product_id', $id)->get();
+        if($properties){
+            return response()->json($properties);
+        }
+        else{
+            return response()->json([
+                'message' => 'properties does not exits'
             ]);
         }
     }
@@ -158,6 +169,90 @@ class ProductController extends Controller
                 'message' => 'Product does not exits'
             ],404);
         }
+    }
+
+    public function update(Request $request, $id){
+        $validatedData = $request->validate([
+            'images' => 'nullable',
+            'name' => 'required|string',
+            'category' => 'required|integer',
+            'description' => 'required|string',
+            'original_price' => 'required',
+            'properties' => 'required',
+            'selling_price' => 'required',
+            'imported_date' => 'required|date',
+            'delivered_from' => 'required|string',
+            // 'properties.*.warehouse_id' => 'required|integer',
+        ]);
+        $product = Product::find($id);
+        if($product){
+            $product->name = $validatedData['name'];
+            $product->category = $validatedData['category'];
+            $product->description = $validatedData['description'];
+            $product->original_price = intval($validatedData['original_price']);
+            $product->selling_price = intval($validatedData['selling_price']);
+            $product->imported_date = $validatedData['imported_date'];
+            $product->delivered_from = $validatedData['delivered_from'];
+        }
+
+        if($request->properties && $product->save()){
+            $properties = ProductProperty::where('product_id', $id)->get();
+            foreach($properties as $property) {
+                $property->delete();
+            }
+            $sum = 0;
+            foreach ($request->properties as $property) {
+                $sum += intval($property['quantity']);
+            }
+
+            if ($sum > $request->quantity) {
+                return response()->json([
+                    'message' => 'Sum of color are larger than product quantity'
+                ],422);
+            } else {
+                foreach ($request->properties as $property) {
+                    $product->productProperty()->create([
+                        'product_id' => $product->id,
+                        'color_id' => intval($property['color_id']),
+                        'quantity' => intval($property['quantity']),
+                        'sale_percentage' => intval($property['sale_percentage']),
+                        'expired_date' => $property['expired_date'],
+                        'status' => $property['status'],
+                        'warehouse_id' => intval($property['warehouse_id']),
+                        'brand_id' => intval($property['brand_id']),
+                        'size_id' => intval($property['size_id']),
+                    ]);  
+                }
+            }
+        }
+
+        if ($request->hasFile('images') && $product->save()) {
+            $images = ProductImage::where('product_id', $id)->get();
+            foreach($images as $image) {
+                $image->delete();
+            }
+            $i = 1;
+            foreach ($request->images as $imageFile) {
+                $ext = $imageFile->extension();
+                $file = time() . $i++ . '.' . $ext;
+                $imageFile->storeAs('images', $file, 'public');
+                $product->productImages()->create([
+                    'product_id' => $product->id,
+                    'image' => $file
+                ]);
+            }
+        }
+
+        if ($product->save()) {
+            return response()->json([
+                'message' => 'Product Added Successfully',
+            ], 201);
+        } else {
+            return response()->json([
+                'message' => 'Something went wrong',
+            ], 500);
+        }
+
     }
 
     public function destroy($id){

@@ -89,8 +89,10 @@ Route::group(['prefix' => 'auth'], function () {
 
  Route::group(['middleware' => 'auth:sanctum'], function(){
   Route::post('add_product', [ProductController::class, 'create']);
+  Route::post('update/product/{id}', [ProductController::class, 'update']);
   Route::get('view_products',[ProductController::class, 'getByPage']);
-  Route::get('view_properties/{id}/{warehouse_id}',[ProductController::class, 'getProperties']);
+  Route::get('view_properties/{id}/{warehouse_id}',[ProductController::class, 'getPropertiesAndWare']);
+  Route::get('product_properties/{id}',[ProductController::class, 'getProperties']);
   Route::get('get_image/{id}',[ProductController::class, 'getImage']);
   Route::get('get_warehouses/{id}',[ProductController::class, 'getWarehouse']);
   Route::get('get_images/{id}',[ProductController::class, 'getAllImageById']);

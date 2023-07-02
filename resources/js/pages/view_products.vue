@@ -2,6 +2,7 @@
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
 import { reactive } from 'vue'
+import { productStatus } from '@/constants/roles'
 import axiosIns from '@/plugins/axios'
 
 
@@ -13,9 +14,14 @@ const length = ref()
 const cancel = ref(false)
 const show = ref(true)
 const dialog = ref(false)
+const fields = ref([])
 const productList = ref([])
-const haveImg = ref(false)
-const imagePreview = ref(null)
+const categoryList = ref([])
+const warehouseList = ref([])
+const brandList = ref([])
+const colorList = ref([])
+const sizeList = ref([])
+const imageList = ref([])
 
 
 const alert = reactive({
@@ -32,31 +38,94 @@ const error = reactive({
   color: '',
 })
 
+const productInfor = reactive({
+  id: null,
+  images: [],
+  name: '',
+  category: null,
+  properties: [],
+  original_price: null,
+  selling_price: null,
+  quantity: null,
+  imported_date: null,
+  delivered_from: '',
+  description: '',
+})
 
 const getProductByPage = computed(()=>{
   return store.getters.getProductByPage
 })
 
-const productInfor = reactive({
-  id: null,
-  name: '',
-  image: null,
-  status: null,
+const getCategories = computed(()=> store.getters.getCategories)
+const getAllWarehouse = computed(()=> store.getters.getAllWarehouse)
+const getBrands = computed(()=> store.getters.getBrands)
+const getColors = computed(() => store.getters.getColors)
+const getSizes = computed(() => store.getters.getSizes)
+
+
+onMounted(async () => {
+  await store.dispatch('getAllWarehouse')
+  warehouseList.value.push(...getAllWarehouse.value)
+  console.log(getAllWarehouse.value)
 })
 
-function onFileChange(event){
-  haveImg.value = true
-  productInfor.image = event.target.files[0]
-  let reader = new FileReader()
-  reader.addEventListener("load", function(){
-    imagePreview.value = reader.result
-  }.bind(), false)
+onMounted( async() => {
+  await store.dispatch('getCategories')
+  categoryList.value.push(...getCategories.value)
+  console.log(categoryList.value)
+})
 
-  if(productInfor.image &&  /\.(jpe?g|png|gif)$/i.test( productInfor.image.name)){
-    reader.readAsDataURL(productInfor.image)
-  }
+onMounted(async () => {
+  await store.dispatch('getBrands')
+  brandList.value.push(...getBrands.value)
+  console.log(getBrands.value)
+})
 
+onMounted(async () => {
+  await store.dispatch('getColors')
+  colorList.value.push(...getColors.value)
+  console.log(getColors.value)
+})
+
+onMounted(async () => {
+  await store.dispatch('getSizes')
+  sizeList.value.push(...getSizes.value)
+  console.log(getSizes.value)
+})
+
+const getId = category => category.id
+
+const formatName = category=>{
+  return  category.id + ' - ' + category.name
 }
+
+
+const addField = () => {
+  fields.value.push({
+    quantity: null,
+    sale_percentage: null,
+    brand_id: null,
+    warehouse_id: null,
+    color_id: null,
+    status: null,
+    size_id: null,
+    expired_date: null,
+  })
+}
+
+// function onFileChange(event){
+//   haveImg.value = true
+//   productInfor.image = event.target.files[0]
+//   let reader = new FileReader()
+//   reader.addEventListener("load", function(){
+//     imagePreview.value = reader.result
+//   }.bind(), false)
+
+//   if(productInfor.image &&  /\.(jpe?g|png|gif)$/i.test( productInfor.image.name)){
+//     reader.readAsDataURL(productInfor.image)
+//   }
+
+// }
 
 const viewProduct = id =>{
   show.value = false
@@ -64,72 +133,129 @@ const viewProduct = id =>{
   console.log(id)
 }
 
-const getImageById = async id => {
-  var image = ref()
-  const accessToken = localStorage.getItem('accessToken')
-
-  await axiosIns('/api/get_image/' + id, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-    },
-  }).then(res=>{
-
-    image.value = res.data.image
-    
-  }).catch(err=>{
-    console.log(err)
-  })
-
-  return image.value
+const closeDialog = () =>{
+  dialog.value = false
+  productInfor.images = []
+  imageList.value = []
+  fields.value = []
+  productInfor.properties = []
 }
 
-
-
-
-// const updateForm = async id=>{
+// const getImageById = async id => {
+//   var image = ref()
 //   const accessToken = localStorage.getItem('accessToken')
 
-//   await axiosIns.get('/api/product/' + id, {
+//   await axiosIns('/api/get_image/' + id, {
 //     headers: {
 //       'Authorization': `Bearer ${accessToken}`,
 //     },
 //   }).then(res=>{
-//     productInfor.id = res.data.id
-//     productInfor.image = res.data.image
-//     productInfor.name = res.data.name
-//     productInfor.status = res.data.status
-//     imagePreview.value = 'storage/images/' + productInfor.image
-//     haveImg.value = productInfor.image ? true : false
-//     console.log(res.data)
+
+//     image.value = res.data.image
+    
 //   }).catch(err=>{
 //     console.log(err)
 //   })
 // }
 
-// const update = async id=>{
-//   const accessToken = localStorage.getItem('accessToken')
 
-//   await axiosIns.post('/api/update/product/' + id, productInfor, {
-//     headers: {
-//       'Authorization': `Bearer ${accessToken}`,
-//     },
-//   }).then(res=>{
-//     console.log(res)
-//     dialog.value = false
-//     alert.status = true
-//     alert.title = 'Updated Successfully'
-//     alert.text = 'Categoty Updated Successfully'
-//     alert.color = 'rgba(39, 217, 11, 0.8)'
-//   }).catch(err=>{
-//     console.log(productInfor)
-//     console.log(err)
-//     error.status = true
-//     error.title = 'You have some errors'
-//     error.text = err.response.data.message
-//     error.color = 'rgba(222, 29, 29, 0.8)'
-//   })
-//   console.log(productInfor)
-// } 
+
+
+const updateForm = async id=>{
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.get('/api/product/' + id, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    productInfor.id = res.data.id
+    productInfor.name = res.data.name
+    productInfor.category = res.data.category
+    productInfor.original_price = Number(res.data.original_price)
+    productInfor.selling_price = Number(res.data.selling_price)
+    productInfor.quantity = res.data.quantity
+    productInfor.imported_date = res.data.imported_date
+    productInfor.delivered_from = res.data.delivered_from
+    productInfor.description = res.data.description
+
+    // imagePreview.value = 'storage/images/' + productInfor.image
+    // haveImg.value = productInfor.image ? true : false
+    console.log(productInfor)
+  }).catch(err=>{
+    console.log(err)
+  })
+
+  //Call Images
+  await axiosIns('/api/get_images/' + id, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res => {
+
+    imageList.value.push(...res.data)
+    productInfor.images.push(...res.data)
+    console.log(imageList.value)
+
+  }).catch(err => {
+    console.log(err)
+  })
+
+  //Call Properties
+  await axiosIns('/api/product_properties/' + id, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res => {
+    console.log(res.data)
+    fields.value.push(...res.data)
+  }).catch(err => {
+    console.log(err)
+  })
+
+}
+
+const update = async id=>{
+  const properties = fields.value.map(field => ({
+    quantity: Number(field.quantity),
+    sale_percentage: Number(field.sale_percentage),
+    brand_id: field.brand_id,
+    warehouse_id: field.warehouse_id,
+    color_id: field.color_id,
+    size_id: field.size_id,
+    status: field.status,
+    expired_date: field.expired_date,
+  }))
+
+  productInfor.properties.push(...properties)
+
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.post('/api/update/product/' + id, productInfor, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    console.log(res)
+    dialog.value = false
+    alert.status = true
+    alert.title = 'Updated Successfully'
+    alert.text = 'Categoty Updated Successfully'
+    alert.color = 'rgba(39, 217, 11, 0.8)'
+    productInfor.images = []
+    imageList.value = []
+    fields.value = []
+    productInfor.properties = []
+  }).catch(err=>{
+    console.log(productInfor)
+    console.log(err)
+    error.status = true
+    error.title = 'You have some errors'
+    error.text = err.response.data.message
+    error.color = 'rgba(222, 29, 29, 0.8)'
+  })
+  console.log(productInfor)
+} 
 
 const deleteForm = id=>{
   console.log(id)
@@ -326,90 +452,378 @@ watchEffect(() => {
                             />
                           </Transition>
                           <VCard
-                            prepend-icon="mdi-store-edit"
-                            title=" Update Employee "
+                            title="Add Product"
+                            prepend-icon="mdi-package-variant-closed-plus"
                           >
-                            <VCardText>
-                              <!-- 👉 Form -->
-                              <VForm class="mt-6">
-                                <VRow>
-                                  <!-- 👉 product Name -->
-                                  <VCol cols="12">
-                                    <VTextField
-                                      v-model="productInfor.name"
-                                      prepend-icon="mdi-rename"
-                                      pre
-                                      label="product Name"
-                                    />
-                                  </VCol>
+                            <VCardText class="d-flex">
+                              <!-- 👉 Avatar -->
+                              <!--
+                                <VAvatar
+                                rounded="lg"
+                                size="100"
+                                class="me-6"
+                                :image="productDataLocal.image"
+                                /> 
+                              -->
 
-                                  <!-- 👉 Status -->
-                                  <VCol
-                                    cols="12"
-                                    md="6"
+                              <!-- 👉 Upload Photo -->
+                              <form class="d-flex flex-column justify-center gap-5">
+                                <!--
+                                  <div class="d-flex flex-wrap gap-2">
+                                  <VBtn
+                                  color="primary"
+                                  @click="refInputEl?.click()"
                                   >
-                                    <VFileInput
-                                      :clearable="false"
-                                      prepend-icon="mdi-camera"
-                                      label="Select Image"
-                                      accept="image/*"
-                                      @change="onFileChange"
-                                    />
+                                  <VIcon
+                                  icon="mdi-cloud-upload-outline"
+                                  class="d-sm-none"
+                                  />
+                                  <span class="d-none d-sm-block">Upload new photo</span>
+                                  </VBtn>
+
+                                  <input
+                                  :ref="refInputEl"
+                                  multiple
+                                  type="file"
+                                  name="file"
+                                  accept=".jpeg,.png,.jpg,GIF"
+                                  hidden
+                                  @input="changeAvatar"
+                                  >
+
+                                  <VBtn
+                                  type="reset"
+                                  color="error"
+                                  variant="tonal"
+                                  @click="resetAvatar"
+                                  >
+                                  <span class="d-none d-sm-block">Reset</span>
+                                  <VIcon
+                                  icon="mdi-refresh"
+                                  class="d-sm-none"
+                                  />
+                                  </VBtn>
+                                  </div> 
+                                -->
+                                <!-- 👉 Image -->
+                                <VCol cols="50">
+                                  <VFileInput
+                                    v-model="productInfor.images"
+                                    clearable
+                                    multiple="true"
+                                    chips
+                                    prepend-icon="mdi-camera"
+                                    label="Select Image"
+                                    accept="image/*"
+                                    @click:clear="productDataLocal.value.images = []"
+                                    @change="fileChange"
+                                  />
+                                  <div class="d-flex flex-wrap w-100">
                                     <VCard
-                                      v-if="haveImg"
+                                      v-for="image in imageList"
+                                      :key="image.imageList"
                                       :width="100"
                                       class="image"
                                     >
                                       <VImg
-                                        v-model="productInfor.image"
                                         :width="100"
                                         :height="100"
                                         content-class="text-center"
                                         alt="Image"
-                                        :src="imagePreview"
                                         cover
+                                        :src="'storage/images/' + image.image"
                                       />
                                     </VCard>
-                                  </VCol>
+                                  </div>
+                                </VCol>
 
+
+                                <p class="text-body-1 mb-0">
+                                  Allowed JPG, GIF or PNG. Max size of 800K
+                                </p>
+                              </form>
+                            </VCardText>
+
+                            <VDivider />
+
+                            <VCardText>
+                              <!-- 👉 Form -->
+                              <VForm class="mt-6">
+                                <VRow>
+                                  <!-- 👉 Product Name -->
+                                  <VCol
+                                    md="6"
+                                    cols="12"
+                                  >
+                                    <VTextField
+                                      v-model="productInfor.name"
+                                      label="Product Name"
+                                    />
+                                  </VCol>
+                                  <!-- 👉 Category -->
                                   <VCol
                                     cols="12"
                                     md="6"
                                   >
-                                    <VSwitch
-                                      v-model="productInfor.status"
-                                      :true-value="1"
-                                      :false-value="0"
-                                      prepend-icon="mdi-list-status"
-                                      label="Status"
-                                      color="primary"
-                                      :value="status"
-                                      hide-details
+                                    <VSelect
+                                      v-model="productInfor.category"
+                                      label="Category"
+                                      :items="categoryList"
+                                      :item-title="formatName"
+                                      :item-value="getId"
                                     />
+                                  </VCol>
+
+                                  <!-- 👉 Original Price -->
+                                  <VCol
+                                    md="6"
+                                    cols="12"
+                                  >
+                                    <VTextField
+                                      v-model="productInfor.original_price"
+                                      label="Original Price"
+                                    />
+                                  </VCol>
+
+                                  <!-- 👉 Selling Price -->
+                                  <VCol
+                                    md="6"
+                                    cols="12"
+                                  >
+                                    <VTextField
+                                      v-model="productInfor.selling_price"
+                                      label="Selling Price"
+                                    />
+                                  </VCol>
+
+                                  <!-- 👉 Quantity -->
+                                  <VCol
+                                    cols="12"
+                                    md="6"
+                                  >
+                                    <VTextField
+                                      v-model="productInfor.quantity"
+                                      label="Quantity"
+                                    />
+                                  </VCol>
+
+                                  <!-- 👉 Import Date -->
+                                  <VCol
+                                    cols="12"
+                                    md="6"
+                                  >
+                                    <VTextField
+                                      v-model="productInfor.imported_date"
+                                      type="date"
+                                      label="Imported Date"
+                                    />
+                                  </VCol>
+
+                                  <!-- 👉 Delivered From -->
+                                  <VCol cols="12">
+                                    <VTextField
+                                      v-model="productInfor.delivered_from"
+                                      label="Delivered From"
+                                    />
+                                  </VCol>
+
+                                  <!-- 👉 Description -->
+                                  <VCol cols="12">
+                                    <VTextarea
+                                      v-model="productInfor.description"
+                                      label="Description"
+                                    />
+                                  </VCol>
+              
+                                  <VDivider />
+
+                                  <!-- 👉 Properties -->
+                                  <div class="">
+                                    <div class="d-flex">
+                                      <VCardTitle
+                                        cols="12"
+                                        class="d-flex flex-wrap gap-4"
+                                      >
+                                        <VIcon icon="mdi-atom-variant" />
+                                        Properties
+                                      </VCardTitle>
+                                      <VBtn
+                                        variant="tonal"
+                                        class="mt-2 add-props"
+                                        prepend-icon="mdi-plus"
+                                        @click="addField"
+                                      >
+                                        Add
+                                      </VBtn>
+                                    </div>
+
+                                    <!-- 👉 Form -->
+                                    <div
+                                      v-for="field in fields"
+                                      :key="field.fields"
+                                      class="d-flex flex-wrap form"
+                                    >
+                                      <!-- 👉 Quantity -->
+                                      <VCol cols="12">
+                                        <VTextField
+                                          v-model="field.quantity"
+                                          type="number"
+                                          label="Quantity"
+                                        />
+                                      </VCol>
+
+                                      <!-- 👉 Discount -->
+                                      <VCol
+                                        cols="12"
+                                        md="6"
+                                      >
+                                        <VTextField
+                                          v-model="field.sale_percentage"
+                                          label="Discount"
+                                        />
+                                      </VCol>
+
+                                      <!-- 👉 Brand -->
+                                      <VCol
+                                        cols="12"
+                                        md="6"
+                                      >
+                                        <VSelect
+                                          v-model="field.brand_id"
+                                          label="Brand"
+                                          :items="brandList"
+                                          :item-title="formatName"
+                                          :item-value="getId"
+                                        />
+                                      </VCol>
+
+                                      <!-- 👉 Warehouse -->
+                                      <VCol
+                                        cols="12"
+                                        md="6"
+                                      >
+                                        <VSelect
+                                          v-model="field.warehouse_id"
+                                          label="Warehouse"
+                                          :items="warehouseList"
+                                          :item-title="formatName"
+                                          :item-value="getId"
+                                        />
+                                      </VCol>
+
+                                      <!-- 👉 Size -->
+                                      <VCol
+                                        cols="12"
+                                        md="6"
+                                      >
+                                        <VSelect
+                                          v-model="field.size_id"
+                                          label="Size"
+                                          :items="sizeList"
+                                          :item-title="formatName"
+                                          :item-value="getId"
+                                        />
+                                      </VCol>
+
+                                      <!-- 👉 Status -->
+                                      <VCol
+                                        cols="12"
+                                        md="6"
+                                      >
+                                        <VSelect
+                                          v-model="field.status"
+                                          label="Status"
+                                          :items="productStatus"
+                                        />
+                                      </VCol>
+
+                                      <!-- 👉 Exprired Date -->
+                                      <VCol
+                                        cols="12"
+                                        md="6"
+                                      >
+                                        <VTextField
+                                          v-model="field.expired_date"
+                                          type="date"
+                                          label="Expired Date"
+                                        />
+                                      </VCol>
+                                      <div class="w-100 d-flex flex-wrap color ">
+                                        <VRadioGroup
+                                          v-model="field.color_id"
+                                          inline
+                                          class="group"
+                                        >
+                                          <VCol
+                                            v-for="color in colorList"
+                                            :key="color.colorList"
+                                            md="3"
+                                            cols="2"
+                                          >
+                                            <div class="d-flex">
+                                              <VSheet
+                                                class="mt-2 mb-2 "
+                                                elevation="12"
+                                                rounded="circle"
+                                                :color="color.code_color"
+                                                height="50"
+                                                width="50"
+                                              />
+                                              <div class="lable pa-4">
+                                                <div class="lable-title">
+                                                  {{ color.name }}
+                                                </div>
+                                                <!--
+                                                  <VCheckboxBtn
+                                                  :checked="isChosenColor(color)"
+                                                  class="pe-2"
+                                                  :value="color.id"
+                                                  @click="toggleChosenColor(color)"
+                                                  /> 
+                                                -->
+                                                <VRadio
+                                                  class="pe-2"
+                                                  :value="color.id"
+                                                />
+                                              </div>
+                                              <!--
+                                                <div class="field">
+                                                <VTextField
+                                                v-model="colorQuantity[color.id]"
+                                                :disabled="!isQuantityFieldEnabled(color)"
+                                                label="Quantity"
+                                                @input="updateColorQuantity(color.id, $event.target.value)"
+                                                />
+                                                </div> 
+                                              -->
+                                            </div>
+                                          </VCol>
+                                        </VRadioGroup>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <!-- 👉 Form Actions -->
+                                  <VCol
+                                    cols="12"
+                                    class="d-flex flex-wrap gap-4"
+                                  >
+                                    <VBtn @click="update(product.id)">
+                                      Update Product
+                                    </VBtn>
+
+                                    <VBtn
+                                      color="secondary"
+                                      variant="tonal"
+                                      type="reset"
+                                      @click="closeDialog"
+                                    >
+                                      Cancel
+                                    </VBtn>
                                   </VCol>
                                 </VRow>
                               </VForm>
                             </VCardText>
-                            <VCardActions>
-                              <VSpacer />
-                              <VBtn
-                                color="red"
-                                variant="elevated"
-                                class="btn-cancel"
-                                prepend-icon="mdi-close"
-                                @click="dialog = false"
-                              >
-                                Cancel
-                              </VBtn>
-                              <VBtn
-                                color="primary"
-                                variant="elevated"
-                                prepend-icon="mdi-pencil-outline"
-                                @click="update(product.id)"
-                              >
-                                Update
-                              </VBtn>
-                            </VCardActions>
                           </VCard>
                         </VDialog>
                       </VListItem>
@@ -512,5 +926,10 @@ watchEffect(() => {
 }
 .item-image{
   margin: 10px;
+}
+.add-props{
+  position: absolute;
+  right: 30px;
+
 }
 </style>
