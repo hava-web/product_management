@@ -10,12 +10,9 @@ const router = useRouter()
 const product = reactive({
   name: '',
   category: null,
-  brand: null,
   quantity: null,
   status: null,
   warehouse: null,
-  original_price: null,
-  selling_price: null,
   imported_date: null,
   expired_date: null,
   size: null,

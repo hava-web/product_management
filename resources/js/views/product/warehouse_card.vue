@@ -33,14 +33,7 @@ const viewWarehouse = () => {
 <template>
   <VCard>
     <VRow no-gutters>
-      <VCol
-        cols="12"
-        sm="1"
-        md="12"
-        lg="7"
-        order="2"
-        order-lg="1"
-      >
+      <VCol cols="12">
         <VCardItem>
           <VCardTitle>
             <VIcon icon="mdi-warehouse" /> 
@@ -54,10 +47,10 @@ const viewWarehouse = () => {
               v-for="property in propertyList"
               :key="property.propertyList"
             >
-              <div class="d-flex">
-                <div class="a">
+              <div class="d-flex w-100">
+                <div class="d-flex align-items-center">
                   <VSheet
-                    class="color align-self-center"
+                    class="color"
                     elevation="12"
                     rounded="circle"
                     :color="property.color_code"
@@ -65,26 +58,46 @@ const viewWarehouse = () => {
                     width="50"
                   />
                 </div>
-                <div class="infor">
-                  <div class="w-100 font-weight-bold mb-3">
-                    <VIcon icon="mdi-palette-swatch" />
-                    Color Name:  <span class="font-weight-normal">{{ property.color_name }}</span>
+                <div class="w-100">
+                  <div class="d-flex">
+                    <div class="w-100 font-weight-bold mb-3">
+                      <VIcon icon="mdi-palette-swatch" />
+                      Color Name:  <span class="font-weight-normal">{{ property.color_name }}</span>
+                    </div>
+                    <div class="w-100 font-weight-bold mb-3">
+                      <VIcon icon="mdi-view-list-outline" />
+                      Quantity: <span class="font-weight-normal">{{ property.quantity }}</span>
+                    </div>
                   </div>
-                  <div class="w-100 font-weight-bold mb-3">
-                    <VIcon icon="mdi-view-list-outline" />
-                    Quantity: <span class="font-weight-normal">{{ property.quantity }}</span>
+                  <div class="d-flex">
+                    <div class="w-100 font-weight-bold mb-3">
+                      <VIcon icon="mdi-weight" />
+                      Size: <span class="font-weight-normal">{{ property.size_name }}</span>
+                    </div>
+                    <div class="w-100 font-weight-bold mb-3">
+                      <VIcon icon="mdi-eye-outline" />
+                      Status: <span class="font-weight-normal">{{ property.status }}</span>
+                    </div>
                   </div>
-                  <div class="w-100 font-weight-bold mb-3">
-                    <VIcon icon="mdi-weight" />
-                    Size: <span class="font-weight-normal">{{ property.size_name }}</span>
+                  <div class="d-flex">
+                    <div class="w-100 font-weight-bold mb-3">
+                      <VIcon icon="mdi-watermark" />
+                      Brand: <span class="font-weight-normal">{{ property.brand_name }}</span>
+                    </div>
+                    <div class="w-100 font-weight-bold mb-3">
+                      <VIcon icon="mdi-clipboard-text-clock-outline" />
+                      Expired Date: <span class="font-weight-normal">{{ property.expired_date }}</span>
+                    </div>
                   </div>
-                  <div class="w-100 font-weight-bold mb-3">
-                    <VIcon icon="mdi-eye-outline" />
-                    Status: <span class="font-weight-normal">{{ property.status }}</span>
-                  </div>
-                  <div class="w-100 font-weight-bold mb-3">
-                    <VIcon icon="mdi-clipboard-text-clock-outline" />
-                    Expired Date: <span class="font-weight-normal">{{ property.expired_date }}</span>
+                  <div class="d-flex">
+                    <div class="w-100 font-weight-bold mb-3">
+                      <VIcon icon="mdi-currency-usd" />
+                      Original Price: <span class="font-weight-normal">{{ property.original_price }}</span>
+                    </div>
+                    <div class="w-100 font-weight-bold mb-3">
+                      <VIcon icon="mdi-cash-multiple" />
+                      Selling Price: <span class="font-weight-normal">{{ property.selling_price }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -92,43 +105,23 @@ const viewWarehouse = () => {
           </VList>
         </VCardText>
       </VCol>
-
-      <VCol
-        cols="12"
-        sm="4"
-        md="12"
-        lg="5"
-        order="1"
-        order-lg="2"
-        class="member-pricing-bg text-center"
+      <VBtn
+        class="mt-8"
+        @click="viewWarehouse"
       >
-        <div class="membership-pricing d-flex flex-column align-center py-14 h-100 justify-center">
-          <p class="mb-5">
-            <sub class="text-h5">$</sub>
-            <sup class="text-h2 font-weight-medium">899</sup>
-            <sub class="text-h5">USD</sub>
-          </p>
-
-          <VBtn
-            class="mt-8"
-            @click="viewWarehouse"
-          >
-            View Warehouse
-          </VBtn>
-        </div>
-      </VCol>
+        View Warehouse
+      </VBtn>
     </VRow>
   </VCard>
 </template>
 
 <style scoped>
 .color{
-    margin-top: 50px;
-    margin-left: 10px;
     margin-right: 10px;
 }
 .infor{
-    max-width: 180px;
-    width: 180px;
+    max-width: 250px;
+    width: 500px;
+   
 }
 </style>

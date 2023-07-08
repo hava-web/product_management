@@ -66,7 +66,22 @@ const router = createRouter({
             {
               path: 'product/:id',
               name: 'product',
-              component: ()=> import('../views//product/view.vue'),
+              component: ()=> import('../views/product/view.vue'),
+            },
+          ],
+        },
+        {
+          path: 'add_order',
+          component: () => import('../pages/add_order.vue'),
+        },
+        {
+          path: 'view_order',
+          component: () => import('../pages/view_order.vue'),
+          children: [
+            {
+              path: 'order/:id',
+              name: 'order',
+              component: ()=> import('../views/order/view.vue'),
             },
           ],
         },
@@ -77,6 +92,21 @@ const router = createRouter({
         {
           path: 'view_color',
           component: () => import('../pages/view_color.vue'),
+        },
+        {
+          path: 'view_customer',
+          component: () => import('../pages/view_customer.vue'),
+          children: [
+            {
+              path: 'customer/:id',
+              name: 'customer',
+              component: ()=> import('../views/customer/view.vue'),
+            },
+          ],
+        },
+        {
+          path: 'revenue',
+          component: () => import('../pages/revenue.vue'),
         },
         {
           path: 'add_brand',

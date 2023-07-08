@@ -44,8 +44,6 @@ const productInfor = reactive({
   name: '',
   category: null,
   properties: [],
-  original_price: null,
-  selling_price: null,
   quantity: null,
   imported_date: null,
   delivered_from: '',
@@ -104,6 +102,8 @@ const addField = () => {
   fields.value.push({
     quantity: null,
     sale_percentage: null,
+    original_price: null,
+    selling_price: null,
     brand_id: null,
     warehouse_id: null,
     color_id: null,
@@ -220,6 +220,8 @@ const update = async id=>{
     quantity: Number(field.quantity),
     sale_percentage: Number(field.sale_percentage),
     brand_id: field.brand_id,
+    original_price: field.original_price,
+    selling_price: field.selling_price,
     warehouse_id: field.warehouse_id,
     color_id: field.color_id,
     size_id: field.size_id,
@@ -327,7 +329,7 @@ watchEffect(() => {
   <VRow v-if="show">
     <VCol cols="12">
       <VCard 
-        title="All Employees"
+        title="All Products"
         prepend-icon="mdi-store-plus-outline"
       >
         <VDivider />
@@ -574,28 +576,6 @@ watchEffect(() => {
                                     />
                                   </VCol>
 
-                                  <!-- 👉 Original Price -->
-                                  <VCol
-                                    md="6"
-                                    cols="12"
-                                  >
-                                    <VTextField
-                                      v-model="productInfor.original_price"
-                                      label="Original Price"
-                                    />
-                                  </VCol>
-
-                                  <!-- 👉 Selling Price -->
-                                  <VCol
-                                    md="6"
-                                    cols="12"
-                                  >
-                                    <VTextField
-                                      v-model="productInfor.selling_price"
-                                      label="Selling Price"
-                                    />
-                                  </VCol>
-
                                   <!-- 👉 Quantity -->
                                   <VCol
                                     cols="12"
@@ -696,6 +676,29 @@ watchEffect(() => {
                                           :item-value="getId"
                                         />
                                       </VCol>
+
+                                      <!-- 👉 Original Price -->
+                                      <VCol
+                                        md="6"
+                                        cols="12"
+                                      >
+                                        <VTextField
+                                          v-model="field.original_price"
+                                          label="Original Price"
+                                        />
+                                      </VCol>
+
+                                      <!-- 👉 Selling Price -->
+                                      <VCol
+                                        md="6"
+                                        cols="12"
+                                      >
+                                        <VTextField
+                                          v-model="field.selling_price"
+                                          label="Selling Price"
+                                        />
+                                      </VCol>
+
 
                                       <!-- 👉 Warehouse -->
                                       <VCol

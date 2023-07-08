@@ -10,6 +10,8 @@ const store = createStore({
       brands: null,
       colors: null,
       sizes: null,
+      products: null,
+      customers: null,
       warehousesByPage: null,
       employeesByPage: null,
       categoryBypage: null,
@@ -17,6 +19,9 @@ const store = createStore({
       brandByPage: null,
       sizeByPage: null,
       productByPage: null,
+      orderByPage: null,
+      customerByPage: null,
+      receivedOrderByPage: null,
       warehouses: null,
       isAuthenticated: localStorage.getItem('isAuthenticated') || false,
     }
@@ -28,6 +33,8 @@ const store = createStore({
     getBrands: state => state.brands,
     getColors: state => state.colors,
     getSizes: state => state.sizes,
+    getProducts: state => state.products,
+    getCustomers: state => state.customers,
     getAllWarehouse: state => state.warehouses,
     getWarehousebyPage: state=> state.warehousesByPage,
     getemployeesByPage: state => state.employeesByPage,
@@ -36,6 +43,9 @@ const store = createStore({
     getBrandByPage: state => state.brandByPage,
     getSizeByPage: state => state.sizeByPage,
     getProductByPage: state => state.productByPage,
+    getOrderByPage: state => state.orderByPage,
+    getCustomerByPage: state => state.customerByPage,
+    getReceivedOrderByPage: state => state.receivedOrderByPage,
     isAuthenticated: state => state.isAuthenticated,
   },
   mutations: {
@@ -56,6 +66,12 @@ const store = createStore({
     },
     getSizes(state, sizes){
       state.sizes = sizes
+    },
+    getProducts(state, products){
+      state.products = products
+    },
+    getCustomers(state, customers){
+      state.customers = customers
     },
     getWarehouseByPage(state, warehousesByPage){
       state.warehousesByPage = warehousesByPage
@@ -78,8 +94,17 @@ const store = createStore({
     getProductByPage(state, productByPage){
       state.productByPage = productByPage
     },
+    getOrderByPage(state, orderByPage){
+      state.orderByPage = orderByPage
+    },
+    getCustomerByPage(state, customerByPage){
+      state.customerByPage = customerByPage
+    },
     getAllWarehouse(state, warehouses){
       state.warehouses = warehouses
+    },
+    getReceivedOrderByPage(state, receivedOrderByPage){
+      state.receivedOrderByPage = receivedOrderByPage
     },
     logout(state){
       state.user = null
@@ -191,6 +216,40 @@ const store = createStore({
         .then(res =>{
           console.log(res.data)
           commit('getSizes', res.data)
+        })
+        .catch(err =>{
+          console.log(err)
+        })
+    },
+
+    async getProducts({ commit }){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/products', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res.data)
+          commit('getProducts', res.data)
+        })
+        .catch(err =>{
+          console.log(err)
+        })
+    },
+
+    async getCustomers({ commit }){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/customers', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res.data)
+          commit('getCustomers', res.data)
         })
         .catch(err =>{
           console.log(err)
@@ -310,6 +369,57 @@ const store = createStore({
         .then(res =>{
           console.log(res)
           commit('getProductByPage', res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    async getOrderByPage({ commit }, page){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/view_orders?page=' + page, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res)
+          commit('getOrderByPage', res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    async getCustomerByPage({ commit }, page){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/view_customers?page=' + page, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res)
+          commit('getCustomerByPage', res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    async getReceivedOrderByPage({ commit }, page){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/received_orders?page=' + page, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res)
+          commit('getReceivedOrderByPage', res.data)
         })
         .catch(err => {
           console.log(err)

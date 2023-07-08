@@ -1,28 +1,125 @@
 <script setup>
+import axiosIns from '@/plugins/axios'
+import { useRouter } from 'vue-router'
+
+const total_customer = ref()
+const total_product = ref()
+const total_order = ref()
+const revenue = ref()
+const router = useRouter()
+
+const test = 0
+
+onMounted( async () => {
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.get('api/total_customer', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    total_customer.value = Number(res.data)
+    console.log(res.data)
+  }).catch(err=>{
+    console.log(err.data)
+  })
+})
+
+onMounted( async () => {
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.get('api/total_product', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    total_product.value = Number(res.data)
+    console.log(res.data)
+  }).catch(err=>{
+    console.log(err.data)
+  })
+})
+
+onMounted( async () => {
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.get('api/total_order', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    total_order.value = Number(res.data)
+    console.log(total_order.value)
+  }).catch(err=>{
+    console.log(err.data)
+  })
+})
+
+onMounted( async () => {
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.get('api/revenue', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    revenue.value = Number(res.data) 
+    console.log(revenue.value)
+  }).catch(err=>{
+    console.log(err.data)
+  })
+})
+
+const view = link=>{
+  router.push(link)
+}
+
+function abbreviateNumber(value) {
+  var newValue = value
+  if (value >= 1000) {
+    var suffixes = ["", "K", "M", "B", "T"]
+    var suffixNum = Math.floor( (""+value).length/3 )
+    var shortValue = ''
+    for (var precision = 2; precision >= 1; precision--) {
+      shortValue = parseFloat( (suffixNum != 0 ? (value / Math.pow(1000, suffixNum) ) : value).toPrecision(precision))
+      var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g, '')
+      if (dotLessShortValue.length <= 2) { break }
+    }
+    if (shortValue % 1 != 0)  shortValue = shortValue.toFixed(1)
+    newValue = shortValue+suffixes[suffixNum]
+  }
+  
+  return newValue
+}
+
 const statistics = [
   {
     title: 'Sales',
-    stats: '245k',
+    stats: abbreviateNumber(total_order),
     icon: 'mdi-trending-up',
     color: 'primary',
+    link: '/view_order',
   },
   {
     title: 'Customers',
-    stats: '12.5k',
+    stats: abbreviateNumber(total_customer),
     icon: 'mdi-account-outline',
     color: 'success',
+    link: '/view_customer',
   },
   {
     title: 'Product',
-    stats: '1.54k',
+    stats: abbreviateNumber(total_product),
     icon: 'mdi-cellphone-link',
     color: 'warning',
+    link: '/view_product',
   },
   {
     title: 'Revenue',
-    stats: '$88k',
+    stats: abbreviateNumber(revenue),
     icon: 'mdi-currency-usd',
     color: 'info',
+    link: '/revenue',
   },
 ]
 </script>
@@ -56,9 +153,11 @@ const statistics = [
             <div class="me-3">
               <VAvatar
                 :color="item.color"
+                variant="elevated"
                 rounded
                 size="42"
-                class="elevation-1"
+                class="elevation-1 transaction-item"
+                @click="view(item.link)"
               >
                 <VIcon
                   size="24"
@@ -79,3 +178,9 @@ const statistics = [
     </VCardText>
   </VCard>
 </template>
+
+<style scoped>
+.transaction-item{
+  cursor: pointer;
+}
+</style>

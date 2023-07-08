@@ -1,8 +1,7 @@
 <script setup>
-import avatar1 from '@images/avatars/avatar-1.png'
 import { useStore } from 'vuex'
 import { alert } from '@/constants/cities'
-import { productStatus, size } from '../constants/roles'
+import { productStatus } from '../constants/roles'
 import axiosIns from '@/plugins/axios'
 
 const productData = {
@@ -11,8 +10,6 @@ const productData = {
   category: null,
   description: '',
   properties: [],
-  original_price: null,
-  selling_price: null,
   imported_date: null,
   delivered_from: null, 
 }
@@ -41,6 +38,8 @@ const addField = () => {
     discount: null,
     brand: null,
     warehouse_id: null,
+    original_price: null,
+    selling_price: null,
     color: null,
     status: null,
     size: null,
@@ -85,42 +84,7 @@ onMounted(async () => {
 })
 
 
-
-
 const chosenColors = ref([])
-
-// const isChosenColor = color => {
-//   return !!chosenColors.value.find(c => c.id === color.id)
-// }
-
-// const toggleChosenColor = color => {
-//   const colorIndex = chosenColors.value.findIndex(c => c.id === color.id)
-
-//   if (colorIndex === -1) {
-//     chosenColors.value.push({
-//       ...color,
-//       quantity: colorQuantity[color.id] || 0, 
-//     })
-//   } else {
-//     chosenColors.value.splice(colorIndex, 1)
-//   }
-// }
-
-// const updateColorQuantity = (colorId, quantity) => {
-//   colorQuantity.value[colorId] = quantity
-
-//   const colorIndex = chosenColors.value.findIndex(c => c.id === colorId)
-//   if (colorIndex > -1) {
-//     chosenColors.value[colorIndex].quantity = Number(quantity)
-//   }
-// }
-
-
-
-// computed property to check if the quantity field is enabled for a specific color
-// const isQuantityFieldEnabled = color => {
-//   return !!chosenColors.value.find(c => c.id === color.id)
-// }
 
 
 const getId = warehouse => warehouse.id
@@ -145,9 +109,11 @@ function fileChange(event){
 const submit = async ()=>{
   const properties = fields.value.map(field => ({
     quantity: field.quantity,
-    discount: field.discount,
+    discount: Number(field.discount),
     brand: field.brand,
     warehouse_id: field.warehouse_id,
+    original_price: Number(field.original_price),
+    selling_price: Number(field.selling_price),
     color: field.color,
     size: field.size,
     status: field.status,
@@ -215,55 +181,8 @@ const submit = async ()=>{
         prepend-icon="mdi-package-variant-closed-plus"
       >
         <VCardText class="d-flex">
-          <!-- 👉 Avatar -->
-          <!--
-            <VAvatar
-            rounded="lg"
-            size="100"
-            class="me-6"
-            :image="productDataLocal.image"
-            /> 
-          -->
-
           <!-- 👉 Upload Photo -->
           <form class="d-flex flex-column justify-center gap-5">
-            <!--
-              <div class="d-flex flex-wrap gap-2">
-              <VBtn
-              color="primary"
-              @click="refInputEl?.click()"
-              >
-              <VIcon
-              icon="mdi-cloud-upload-outline"
-              class="d-sm-none"
-              />
-              <span class="d-none d-sm-block">Upload new photo</span>
-              </VBtn>
-
-              <input
-              :ref="refInputEl"
-              multiple
-              type="file"
-              name="file"
-              accept=".jpeg,.png,.jpg,GIF"
-              hidden
-              @input="changeAvatar"
-              >
-
-              <VBtn
-              type="reset"
-              color="error"
-              variant="tonal"
-              @click="resetAvatar"
-              >
-              <span class="d-none d-sm-block">Reset</span>
-              <VIcon
-              icon="mdi-refresh"
-              class="d-sm-none"
-              />
-              </VBtn>
-              </div> 
-            -->
             <!-- 👉 Image -->
             <VCol cols="20">
               <VFileInput
@@ -327,28 +246,6 @@ const submit = async ()=>{
                   :items="categoryList"
                   :item-title="formatName"
                   :item-value="getId"
-                />
-              </VCol>
-
-              <!-- 👉 Original Price -->
-              <VCol
-                md="6"
-                cols="12"
-              >
-                <VTextField
-                  v-model="productDataLocal.original_price"
-                  label="Original Price"
-                />
-              </VCol>
-
-              <!-- 👉 Selling Price -->
-              <VCol
-                md="6"
-                cols="12"
-              >
-                <VTextField
-                  v-model="productDataLocal.selling_price"
-                  label="Selling Price"
                 />
               </VCol>
 
@@ -450,6 +347,28 @@ const submit = async ()=>{
                       :items="brandList"
                       :item-title="formatName"
                       :item-value="getId"
+                    />
+                  </VCol>
+
+                  <!-- 👉 Original Price -->
+                  <VCol
+                    md="6"
+                    cols="12"
+                  >
+                    <VTextField
+                      v-model="field.original_price"
+                      label="Original Price"
+                    />
+                  </VCol>
+
+                  <!-- 👉 Selling Price -->
+                  <VCol
+                    md="6"
+                    cols="12"
+                  >
+                    <VTextField
+                      v-model="field.selling_price"
+                      label="Selling Price"
                     />
                   </VCol>
 

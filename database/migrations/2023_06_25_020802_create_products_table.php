@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->unsignedBigInteger('category');
             $table->text('description');
-            $table->decimal('original_price',12,2);
-            $table->decimal('selling_price',12,2);
             $table->integer('quantity');
             $table->date('imported_date');
             $table->string('delivered_from');

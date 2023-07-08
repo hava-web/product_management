@@ -13,8 +13,6 @@ class Product extends Model
         'name',
         'category',
         'description',
-        'original_price',
-        'selling_price',
         'quantity',
         'status',
         'imported_date',
@@ -33,6 +31,10 @@ class Product extends Model
 
     public function productProperty(){
         return $this->hasMany(ProductProperty::class,'product_id','id');
+    }
+
+    public function orderDetail(){
+        return $this->hasMany(OrderDetail::class,'product_id','id');
     }
 
 

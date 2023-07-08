@@ -4,7 +4,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ColorController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\WarehouseController;
@@ -91,6 +93,11 @@ Route::group(['prefix' => 'auth'], function () {
   Route::post('add_product', [ProductController::class, 'create']);
   Route::post('update/product/{id}', [ProductController::class, 'update']);
   Route::get('view_products',[ProductController::class, 'getByPage']);
+  Route::get('products',[ProductController::class, 'all']);
+  Route::get('product_brands/{id}',[ProductController::class, 'getBrandByProId']);
+  Route::get('product_brand_size/{id}/{brand_id}',[ProductController::class, 'getSizeByBrandPro']);
+  Route::get('product_brand_size_color/{id}/{brand_id}/{size_id}',[ProductController::class, 'getColorByBraProSiz']);
+  Route::get('get_discount/{id}/{brand_id}/{size_id}/{color_id}',[ProductController::class, 'getDiscount']);
   Route::get('view_properties/{id}/{warehouse_id}',[ProductController::class, 'getPropertiesAndWare']);
   Route::get('product_properties/{id}',[ProductController::class, 'getProperties']);
   Route::get('get_image/{id}',[ProductController::class, 'getImage']);
@@ -99,6 +106,28 @@ Route::group(['prefix' => 'auth'], function () {
   Route::get('product/{id}',[ProductController::class, 'getById']);
   Route::get('delete/product/{id}', [ProductController::class, 'destroy']);
   Route::get('product_colors/{id}',[ProductController::class, 'getColorByProductId']);
+  Route::get('total_product',[ProductController::class, 'totalProduct']);
+ });
+
+ Route::group(['middleware' => 'auth:sanctum'], function(){
+  Route::post('add_order', [OrderController::class, 'create']);
+  Route::post('update/order/{id}', [OrderController::class, 'update']);
+  Route::get('customers', [CustomerController::class, 'all']);
+  Route::get('customer/{id}', [CustomerController::class, 'getById']);
+  Route::get('view_orders', [OrderController::class, 'getByPage']);
+  Route::get('order_customer/{id}', [OrderController::class, 'getCustomer']);
+  Route::get('order_products/{id}', [OrderController::class, 'getProducts']);
+  Route::get('order/{id}', [OrderController::class, 'getById']);
+  Route::get('total_order', [OrderController::class, 'totalOrder']);
+  Route::get('revenue', [OrderController::class, 'revenue']);
+  Route::get('received_orders', [OrderController::class, 'getReceivedOrder']);
+ });
+
+ Route::group(['middleware' => 'auth:sanctum'], function(){
+  Route::get('total_customer', [CustomerController::class, 'totalCus']);
+  Route::get('view_customers', [CustomerController::class, 'getByPage']);
+  Route::get('chart_customer', [CustomerController::class, 'customers']);
+  Route::get('order_by_cus/{id}', [CustomerController::class, 'getOrders']);
  });
 
  

@@ -108,6 +108,27 @@ const upgradeBanner = computed(() => {
         }"
       />
 
+      <VerticalNavSectionTitle
+        :item="{
+          heading: 'Orders',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Create Order',
+          icon: 'mdi-package-up',
+          to: '/add_order',
+        }"
+      />
+
+      <VerticalNavLink
+        :item="{
+          title: 'View Orders',
+          icon: 'mdi-view-grid-compact',
+          to: '/view_order',
+        }"
+      />
+
       <!-- 👉 Warehouse -->
       <VerticalNavSectionTitle
         :item="{

@@ -31,3 +31,16 @@ export const alert = reactive({
   text: null,
   color: null,
 })
+
+export const payment = [
+  'Online Payment',
+  'Cash on Delivery',
+]
+
+export const orderStatus = [
+  'Ordered',
+  'Pending',
+  'Delivering',
+  'Received',
+  'Canceled',
+]
