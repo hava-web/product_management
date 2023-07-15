@@ -29,23 +29,25 @@ const tabs = [
 
 <template>
   <div>
-    <VTabs
+    <!--
+      <VTabs
       v-model="activeTab"
       show-arrows
-    >
-      <VTab
-        v-for="item in tabs"
-        :key="item.icon"
-        :value="item.tab"
       >
-        <VIcon
-          size="20"
-          start
-          :icon="item.icon"
-        />
-        {{ item.title }}
+      <VTab
+      v-for="item in tabs"
+      :key="item.icon"
+      :value="item.tab"
+      >
+      <VIcon
+      size="20"
+      start
+      :icon="item.icon"
+      />
+      {{ item.title }}
       </VTab>
-    </VTabs>
+      </VTabs> 
+    -->
     <VDivider />
 
     <VWindow
@@ -58,14 +60,18 @@ const tabs = [
       </VWindowItem>
 
       <!-- Security -->
-      <VWindowItem value="security">
+      <!--
+        <VWindowItem value="security">
         <AccountSettingsSecurity />
-      </VWindowItem>
+        </VWindowItem> 
+      -->
 
       <!-- Notification -->
-      <VWindowItem value="notification">
+      <!--
+        <VWindowItem value="notification">
         <AccountSettingsNotification />
-      </VWindowItem>
+        </VWindowItem> 
+      -->
     </VWindow>
   </div>
 </template>

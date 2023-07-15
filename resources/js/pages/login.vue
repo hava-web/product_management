@@ -119,13 +119,6 @@ const isPasswordVisible = ref(false)
                   v-model="form.remember"
                   label="Remember me"
                 />
-
-                <a
-                  class="ms-2 mb-1"
-                  href="javascript:void(0)"
-                >
-                  Forgot Password?
-                </a>
               </div>
 
               <!-- login button -->
@@ -142,9 +135,11 @@ const isPasswordVisible = ref(false)
               cols="12"
               class="d-flex align-center"
             >
-              <VDivider />
-              <span class="mx-4">or</span>
-              <VDivider />
+              <!--
+                <VDivider />
+                <span class="mx-4">or</span>
+                <VDivider /> 
+              -->
             </VCol>
 
             <!-- auth providers -->
@@ -152,7 +147,7 @@ const isPasswordVisible = ref(false)
               cols="12"
               class="text-center"
             >
-              <AuthProvider />
+              <!-- <AuthProvider /> -->
             </VCol>
           </VRow>
         </VForm>

@@ -42,6 +42,7 @@ Route::group(['prefix' => 'auth'], function () {
   Route::post('update/warehouse/{id}', [WarehouseController::class, 'updateWarehouse']);
   Route::get('delete/warehouse/{id}', [WarehouseController::class, 'deleteWarehouse']);
   Route::get('user/{id}', [AuthController::class, 'getUserById']);
+  Route::get('employees/{id}', [WarehouseController::class, 'getEmployee']);
  });
 
  Route::group(['middleware' => 'auth:sanctum'], function(){
@@ -51,6 +52,7 @@ Route::group(['prefix' => 'auth'], function () {
   Route::get('employee/{id}',[EmployeeController::class, 'getEmployeeById']);
   Route::post('update/employee/{id}',[AuthController::class, 'updateUser']);
   Route::get('delete/employee/{id}',[EmployeeController::class, 'destroy']);
+  Route::get('user_employee/{id}',[EmployeeController::class, 'getEmployeeByUser']);
  });
 
  Route::group(['middleware' => 'auth:sanctum'], function(){
@@ -107,6 +109,9 @@ Route::group(['prefix' => 'auth'], function () {
   Route::get('delete/product/{id}', [ProductController::class, 'destroy']);
   Route::get('product_colors/{id}',[ProductController::class, 'getColorByProductId']);
   Route::get('total_product',[ProductController::class, 'totalProduct']);
+  Route::get('inventories',[ProductController::class, 'inventories']);
+  Route::get('buy_most',[ProductController::class, 'productBuyMost']);
+  Route::get('product_date',[ProductController::class, 'productByDate']);
  });
 
  Route::group(['middleware' => 'auth:sanctum'], function(){
@@ -128,6 +133,7 @@ Route::group(['prefix' => 'auth'], function () {
   Route::get('view_customers', [CustomerController::class, 'getByPage']);
   Route::get('chart_customer', [CustomerController::class, 'customers']);
   Route::get('order_by_cus/{id}', [CustomerController::class, 'getOrders']);
+  Route::get('customers_month', [CustomerController::class, 'customerByMounth']);
  });
 
  

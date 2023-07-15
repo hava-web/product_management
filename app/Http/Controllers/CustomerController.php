@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PhpParser\Node\Expr\FuncCall;
+
 
 class CustomerController extends Controller
 {
@@ -58,8 +58,19 @@ class CustomerController extends Controller
     public function customers()
     {
         $customers = DB::table('customers AS c')
-            ->select('c.id', 'c.lastname', 'c.firstname', 'c.numbers_of_purchases')
-            ->distinct()
+            ->select(DB::raw('CONCAT(c.lastname, " ", c.firstname) AS x'), 'c.numbers_of_purchases AS y')
+            ->orderByDesc('c.numbers_of_purchases')
+            ->take(5)
+            ->get();
+
+        return response()->json($customers);
+    }
+
+    public function customerByMounth()
+    {
+        $customers = DB::table('customers AS c')
+            ->select(DB::raw('DATE(c.created_at) AS x'), DB::raw('COUNT(*) AS y'))
+            ->groupBy(DB::raw('DATE(c.created_at)'))
             ->get();
 
         return response()->json($customers);

@@ -246,7 +246,7 @@ watchEffect(() => {
                           </Transition>
                           <VCard
                             prepend-icon="mdi-store-edit"
-                            title=" Update Employee "
+                            title=" Update Brand "
                           >
                             <VCardText>
                               <!-- 👉 Form -->

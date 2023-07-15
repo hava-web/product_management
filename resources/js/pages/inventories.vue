@@ -11,10 +11,8 @@ const route = useRoute()
 const page = ref()
 const length = ref()
 const router = useRouter()
-const cancel = ref(false)
 const show = ref(true)
-const dialog = ref(false)
-const customerList = ref([])
+const inventoryList = ref([])
 
 
 const alert = reactive({
@@ -32,31 +30,31 @@ const error = reactive({
 })
 
 
-const getCustomerByPage = computed(()=>{
-  return store.getters.getCustomerByPage
+const getInventoryByPage = computed(()=>{
+  return store.getters.getInventoryByPage
 })
 
-const viewCustomer = id=>{
+const viewProduct = id=>{
   show.value = false
-  router.push({ name: 'customer', params: { id: id } })
+  router.push({ name: 'product', params: { id: id } })
 }
 
-// Call the action to retrieve the warehouse data and set the initial value of currentcustomerList to the result.
+// Call the action to retrieve the warehouse data and set the initial value of currentinventoryList to the result.
 
-store.dispatch('getCustomerByPage', page.value).then(() => {
-  customerList.value.push(...getCustomerByPage.value.data)
-  console.log(customerList.value)
-  length.value = Math.ceil(getCustomerByPage.value.total / getCustomerByPage.value.data.length)
+store.dispatch('getInventoryByPage', page.value).then(() => {
+  inventoryList.value.push(...getInventoryByPage.value.data)
+  console.log(inventoryList.value)
+  length.value = Math.ceil(getInventoryByPage.value.total / getInventoryByPage.value.data.length)
 })
 
 // Call this function whenever the "page" value changes.
-function updatecustomerList() {
-  store.dispatch('getCustomerByPage', page.value).then(() => {
-    customerList.value = getCustomerByPage.value.data
+function updateinventoryList() {
+  store.dispatch('getInventoryByPage', page.value).then(() => {
+    inventoryList.value = getInventoryByPage.value.data
   })
 }
 
-watch(page, updatecustomerList)
+watch(page, updateinventoryList)
 
 
 watchEffect(() => {
@@ -84,7 +82,7 @@ watchEffect(() => {
   <VRow v-if="show">
     <VCol cols="12">
       <VCard 
-        title="All Customers"
+        title="Inventories"
         prepend-icon="mdi-store-plus-outline"
       >
         <VDivider />
@@ -95,16 +93,19 @@ watchEffect(() => {
                 ID
               </th>
               <th class="text-uppercase text-center">
-                Last Name
+                Product
               </th>
               <th class="text-uppercase text-center">
-                Fisrt Name
+                Brand
               </th>
               <th class="text-uppercase text-center">
-                Created Time
+                Size
               </th>
               <th class="text-uppercase text-center">
-                Phone
+                Color
+              </th>
+              <th class="text-uppercase text-center">
+                Quantity
               </th>
               <th class="text-uppercase text-center">
                 Action
@@ -114,23 +115,34 @@ watchEffect(() => {
 
           <tbody>
             <tr
-              v-for="customer in customerList"
-              :key="customer.customerList"
+              v-for="product in inventoryList"
+              :key="product.inventoryList"
             >
               <td>
-                {{ customer.id }}
+                {{ product.id }}
               </td>
               <td class="text-center">
-                {{ customer.lastname }}
+                {{ product.product }}
               </td>
               <td class="text-center">
-                {{ customer.firstname }}
+                {{ product.brand }}
               </td>
               <td class="text-center">
-                {{ customer.created_at }}
+                {{ product.size }}
+              </td>
+              <td class="text-center ">
+                <VSheet
+                  :class="model"
+                  class="color"
+                  elevation="12"
+                  rounded="circle"
+                  :color="product.colors"
+                  height="50"
+                  width="50"
+                />
               </td>
               <td class="text-center">
-                {{ customer.phone }}
+                {{ product.quantity }}
               </td>
               <td class="text-center">
                 <VBtn
@@ -148,7 +160,7 @@ watchEffect(() => {
                         <VBtn 
                           icon="mdi-eye-outline"
                           color="none"
-                          @click="viewCustomer(customer.id)"
+                          @click="viewProduct(product.id)"
                         >
                           <VIcon icon="mdi-eye-outline" />
                           <VTooltip
@@ -177,7 +189,7 @@ watchEffect(() => {
       cols="12"
       class="d-flex"
     >
-      <AnalyticsNumberBuy :customers="customerList" />
+      <AnalyticsNumberBuy />
       <AnalyticsByMonth />
     </VCol>
   </VRow>
@@ -217,7 +229,7 @@ watchEffect(() => {
 }
 
 .color{
-    margin-left: 10px;
     align-items: center;
+    justify-content: center
 }
 </style>

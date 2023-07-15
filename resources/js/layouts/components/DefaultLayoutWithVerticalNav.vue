@@ -191,6 +191,13 @@ const upgradeBanner = computed(() => {
           to: '/view_product',
         }"
       />
+      <VerticalNavLink
+        :item="{
+          title: 'Inventories',
+          icon: 'mdi-package-down',
+          to: '/inventories',
+        }"
+      />
 
       <!-- 👉 Color -->
       <VerticalNavSectionTitle

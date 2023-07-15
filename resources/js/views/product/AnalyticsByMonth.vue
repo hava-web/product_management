@@ -4,35 +4,22 @@ import VueApexCharts from 'vue3-apexcharts'
 import { useTheme } from 'vuetify'
 import axiosIns from '@/plugins/axios'
 
+
 const vuetifyTheme = useTheme()
-const dataCus = ref([])
+const data = ref([])
 const labelCus = ref([])
 
 
 onMounted( async () => {
   const accessToken = localStorage.getItem('accessToken')
 
-  axiosIns.get('api/chart_customer/', {
+  await axiosIns.get('api/product_date', {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
   }).then(res=>{
-    dataCus.value.push(...res.data)
-    console.log(dataCus.value)
-  }).catch(err=>{
-    console.log(err.data)
-  })
-})
-
-onMounted( async () => {
-  const accessToken = localStorage.getItem('accessToken')
-
-  await axiosIns.get('api/customers_month', {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-    },
-  }).then(res=>{
-    console.log(res.data)
+    data.value.push(...res.data)
+    console.log(data.value)
   }).catch(err=>{
     console.log(err.data)
   })
@@ -49,47 +36,6 @@ const options = controlledComputed(() => vuetifyTheme.name.value, () => {
       parentHeightOffset: 0,
       toolbar: { show: false },
     },
-    plotOptions: {
-      bar: {
-        borderRadius: 9,
-        distributed: true,
-        columnWidth: '30%',
-        endingShape: 'rounded',
-        startingShape: 'rounded',
-      },
-    },
-    stroke: {
-      width: 2,
-      colors: [currentTheme.value.surface],
-    },
-    legend: { show: false },
-    grid: {
-      borderColor,
-      strokeDashArray: 7,
-      padding: {
-        top: -1,
-        right: 0,
-        left: -12,
-        bottom: 5,
-      },
-    },
-    dataLabels: { enabled: false },
-    colors: [
-      currentTheme.value.primary,
-    ],
-    states: {
-      hover: { filter: { type: 'none' } },
-      active: { filter: { type: 'none' } },
-    },
-    xaxis: {
-      categories: labelCus.value,
-      tickPlacement: 'on',
-      labels: { show: true },
-      crosshairs: { opacity: 0 },
-      axisTicks: { show: false },
-      axisBorder: { show: false },
-    },
-    
     tooltip: {
       enabled: true,
       enabledOnSeries: undefined,
@@ -114,7 +60,7 @@ const options = controlledComputed(() => vuetifyTheme.name.value, () => {
       y: {
         formatter: undefined,
         title: {
-          formatter: () => 'Number of purchases',
+          formatter: () => 'Number of product',
         },
       },
       z: {
@@ -134,6 +80,14 @@ const options = controlledComputed(() => vuetifyTheme.name.value, () => {
         offsetY: 0,
       },
     },
+    xaxis: {
+      categories: labelCus.value,
+      tickPlacement: 'on',
+      labels: { show: true },
+      crosshairs: { opacity: 0 },
+      axisTicks: { show: false },
+      axisBorder: { show: false },
+    },
     yaxis: {
       show: true,
       tickAmount: 4,
@@ -150,19 +104,42 @@ const options = controlledComputed(() => vuetifyTheme.name.value, () => {
 })
 
 const series = [{
-  data: dataCus.value,
+  data: data.value,
 }]
 </script>
 
 <template>
   <VCard>
     <VCardItem>
-      <VCardTitle>Customers Most Buy</VCardTitle>
+      <VCardTitle>Products Selled By Time</VCardTitle>
+      <!--
+        <template #append>
+        <div class="me-n3">
+        <VBtn
+        class="me-2"
+        icon="mdi-bell-outline"
+        color="none"
+        >
+        <VIcon icon="mdi-dots-vertical" />
+        <VMenu
+        activator="parent"
+        location="right"
+        >
+        <VList>
+        <VListItem class="btn">
+        Customers By Mouth
+        </VListItem>
+        </VList>
+        </VMenu>
+        </VBtn>
+        </div>
+        </template> 
+      -->
     </VCardItem>
 
     <VCardText>
       <VueApexCharts
-        type="bar"
+        type="line"
         :options="options"
         :series="series"
         :height="220"
@@ -171,3 +148,12 @@ const series = [{
     </VCardText>
   </VCard>
 </template>
+
+<style scoped>
+.btn{
+  cursor: pointer;
+}
+.btn:hover{
+  background-color: #ECEFF1;
+}
+</style>

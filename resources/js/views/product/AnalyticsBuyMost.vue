@@ -12,7 +12,7 @@ const labelCus = ref([])
 onMounted( async () => {
   const accessToken = localStorage.getItem('accessToken')
 
-  axiosIns.get('api/chart_customer/', {
+  axiosIns.get('api/buy_most', {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
@@ -24,19 +24,6 @@ onMounted( async () => {
   })
 })
 
-onMounted( async () => {
-  const accessToken = localStorage.getItem('accessToken')
-
-  await axiosIns.get('api/customers_month', {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-    },
-  }).then(res=>{
-    console.log(res.data)
-  }).catch(err=>{
-    console.log(err.data)
-  })
-})
 
 const options = controlledComputed(() => vuetifyTheme.name.value, () => {
   const currentTheme = ref(vuetifyTheme.current.value.colors)
@@ -82,7 +69,6 @@ const options = controlledComputed(() => vuetifyTheme.name.value, () => {
       active: { filter: { type: 'none' } },
     },
     xaxis: {
-      categories: labelCus.value,
       tickPlacement: 'on',
       labels: { show: true },
       crosshairs: { opacity: 0 },
@@ -157,9 +143,29 @@ const series = [{
 <template>
   <VCard>
     <VCardItem>
-      <VCardTitle>Customers Most Buy</VCardTitle>
+      <VCardTitle>Products Most Bought</VCardTitle>
+      <template #append>
+        <div class="me-n3">
+          <VBtn
+            class="me-2"
+            icon="mdi-bell-outline"
+            color="none"
+          >
+            <VIcon icon="mdi-dots-vertical" />
+            <VMenu
+              activator="parent"
+              location="right"
+            >
+              <VList>
+                <VListItem class="btn">
+                  Customers By Mouth
+                </VListItem>
+              </VList>
+            </VMenu>
+          </VBtn>
+        </div>
+      </template>
     </VCardItem>
-
     <VCardText>
       <VueApexCharts
         type="bar"
@@ -171,3 +177,12 @@ const series = [{
     </VCardText>
   </VCard>
 </template>
+
+<style scoped>
+.btn{
+  cursor: pointer;
+}
+.btn:hover{
+  background-color: #ECEFF1;
+}
+</style>

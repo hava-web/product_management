@@ -4,6 +4,8 @@ import axiosIns from '@/plugins/axios'
 import { reactive } from 'vue'
 
 const route = useRoute()
+const router = useRouter()
+const employeeList = ref([])
 
 const warehouse = reactive({
   id: '',
@@ -37,6 +39,21 @@ onMounted( async () => {
   })
 })
 
+onMounted( async () => {
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.get('/api/employees/' + id, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    employeeList.value.push(...res.data)
+    console.log(employeeList.value)
+  }).catch(err=>{
+    console.log(err)
+  })
+})
+
 watchEffect( async ()=>{
   const accessToken = localStorage.getItem('accessToken')
 
@@ -52,6 +69,10 @@ watchEffect( async ()=>{
     console.log(err)
   })
 }, { immediate: true })
+
+const viewEmployee = id =>{
+  router.push({ name: 'employee', params: { id: id } })
+}
 </script>
 
 <template>
@@ -153,6 +174,39 @@ watchEffect( async ()=>{
           title="Employees List" 
           prepend-icon="mdi-account-box"
         />
+        <VList>
+          <VCard
+            v-for="employee in employeeList"
+            :key="employee.id"
+            class="employee mx-3 my-2"
+            @click="viewEmployee(employee.id)"
+          >
+            <div class="d-flex">
+              <div class=" mx-5">
+                ID: {{ employee.id }}
+              </div>
+              <div class="mx-5">
+                Full Name: {{ employee.lastname + ' ' + employee.firstname }}
+              </div>
+              <div class="px-5">
+                <VImg
+                  :src="employee.image"
+                  width="50"
+                  height="50"
+                />
+              </div>
+              <div class="mx-5">
+                Date: {{ employee.date_of_birth }}
+              </div>
+              <div class="mx-5">
+                Phone: {{ employee.phone }}
+              </div>
+              <div class="mx-5">
+                Email: {{ employee.email }}
+              </div>
+            </div>
+          </VCard>
+        </VList>
       </VCard>
     </VCol>
   </VRow>
@@ -172,5 +226,11 @@ watchEffect( async ()=>{
 }
 .icon{
     margin-right: 10px;
+}
+.employee{
+  cursor: pointer;
+}
+.employee:hover{
+  background: #ECEFF1;
 }
 </style>

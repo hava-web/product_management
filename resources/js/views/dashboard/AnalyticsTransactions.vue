@@ -70,6 +70,8 @@ onMounted( async () => {
   })
 })
 
+
+
 const view = link=>{
   router.push(link)
 }

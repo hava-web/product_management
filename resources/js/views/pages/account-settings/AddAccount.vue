@@ -61,7 +61,7 @@ const submit = async ()=>{
       alert.status = true
       alert.text = 'Account Added Successfully'
       alert.color = 'rgba(39, 217, 11, 0.8)'
-      accountDataLocal.value = structuredClone(warehouseData)
+      accountDataLocal.value = structuredClone(accountData)
     }
     else{
       alert.title = 'Warning'
@@ -73,7 +73,7 @@ const submit = async ()=>{
     console.log(err)
     alert.title = 'Error'
     alert.status = true
-    alert.text = err.response.data.message
+    alert.text = err.response
     alert.color = 'rgba(222, 29, 29, 0.8)'
   })
 }

@@ -136,7 +136,7 @@ const submit = async ()=>{
     if(res.status === 201){
       alert.title = 'Successfully'
       alert.status = true
-      alert.text = 'Account Added Successfully'
+      alert.text = 'Product Added Successfully'
       alert.color = 'rgba(39, 217, 11, 0.8)'
       productDataLocal.value = structuredClone(productData)
       chosenColors.value = []

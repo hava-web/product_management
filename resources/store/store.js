@@ -22,6 +22,7 @@ const store = createStore({
       orderByPage: null,
       customerByPage: null,
       receivedOrderByPage: null,
+      inventoryByPage: null,
       warehouses: null,
       isAuthenticated: localStorage.getItem('isAuthenticated') || false,
     }
@@ -46,6 +47,7 @@ const store = createStore({
     getOrderByPage: state => state.orderByPage,
     getCustomerByPage: state => state.customerByPage,
     getReceivedOrderByPage: state => state.receivedOrderByPage,
+    getInventoryByPage: state => state.inventoryByPage,
     isAuthenticated: state => state.isAuthenticated,
   },
   mutations: {
@@ -106,6 +108,9 @@ const store = createStore({
     getReceivedOrderByPage(state, receivedOrderByPage){
       state.receivedOrderByPage = receivedOrderByPage
     },
+    getInventoryByPage(state, inventoryByPage){
+      state.inventoryByPage = inventoryByPage
+    },
     logout(state){
       state.user = null
       state.isAuthenticated = false
@@ -128,6 +133,7 @@ const store = createStore({
         .then(res=>{
           console.log(res)
           localStorage.setItem('user', JSON.stringify(res.data))
+          localStorage.setItem('user_id', JSON.stringify(res.data.id))
           user = JSON.parse(localStorage.getItem('user'))
           commit('getUser', user)
         })
@@ -420,6 +426,40 @@ const store = createStore({
         .then(res =>{
           console.log(res)
           commit('getReceivedOrderByPage', res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    async getReceivedOrderByPage({ commit }, page){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/received_orders?page=' + page, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res)
+          commit('getReceivedOrderByPage', res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    async getInventoryByPage({ commit }, page){
+      const accessToken = localStorage.getItem('accessToken')
+
+      await axiosIns.get('/api/inventories?page=' + page, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+        .then(res =>{
+          console.log(res)
+          commit('getInventoryByPage', res.data)
         })
         .catch(err => {
           console.log(err)

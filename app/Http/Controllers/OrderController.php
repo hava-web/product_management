@@ -211,7 +211,7 @@ class OrderController extends Controller
 
     public function revenue(){
         $totalPrice = Order::where('status', 'Received')->sum('total_price');
-        return response()->json($totalPrice);
+        return $totalPrice;
     }
 
     public function getReceivedOrder(){

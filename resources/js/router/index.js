@@ -105,6 +105,10 @@ const router = createRouter({
           ],
         },
         {
+          path: 'inventories',
+          component: () => import('../pages/inventories.vue'),
+        },
+        {
           path: 'revenue',
           component: () => import('../pages/revenue.vue'),
         },

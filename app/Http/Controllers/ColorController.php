@@ -29,7 +29,7 @@ class ColorController extends Controller
     }
 
     public function getByPage(){
-        $color = Color::paginate(3);
+        $color = Color::paginate(5);
         return response()->json($color);
     }
 

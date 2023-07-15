@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductProperty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use PhpParser\Node\Expr\FuncCall;
 
 class ProductController extends Controller
 {
@@ -339,9 +341,60 @@ class ProductController extends Controller
         }
     }
 
-    public function totalProduct(){
+    public function totalProduct()
+    {
         $totalProducts = Product::count('id');
         return response()->json($totalProducts);
+    }
+
+    public function inventories()
+    {
+        $products = ProductProperty::select(
+            'products.id AS id',
+            'products.name AS product',
+            'brands.name AS brand',
+            'sizes.name AS size',
+            'colors.code_color AS colors',
+            'product_properties.quantity',
+            DB::raw('DATEDIFF(product_properties.expired_date, CURDATE()) AS day_diff')
+        )
+            ->join('products', 'products.id', '=', 'product_properties.product_id')
+            ->join('brands', 'brands.id', '=', 'product_properties.brand_id')
+            ->join('sizes', 'sizes.id', '=', 'product_properties.size_id')
+            ->join('colors', 'colors.id', '=', 'product_properties.color_id')
+            ->whereRaw('DATEDIFF(product_properties.expired_date, CURDATE()) < 2000')
+            ->paginate(5);
+
+        return response()->json($products);
+    }
+
+    public function productBuyMost()
+    {
+        $products = OrderDetail::selectRaw('CONCAT(products.name, "-", brands.name, "-", sizes.name, "-", colors.name) AS x')
+            ->selectRaw('SUM(order_details.quantity) AS y')
+            ->join('products', 'products.id', '=', 'order_details.product_id')
+            ->join('brands', 'brands.id', '=', 'order_details.brand_id')
+            ->join('sizes', 'sizes.id', '=', 'order_details.size_id')
+            ->join('colors', 'colors.id', '=', 'order_details.color_id')
+            ->groupBy('order_details.product_id', 'order_details.brand_id', 'order_details.size_id', 'order_details.color_id')
+            ->orderByDesc(DB::raw('SUM(order_details.quantity)'))
+            ->limit(4)
+            ->get();
+        return response()->json($products);
+    }
+
+    public function productByDate()
+    {
+        $product = OrderDetail::selectRaw('DATE(order_details.created_at) AS x')
+            ->selectRaw('CAST(SUM(order_details.quantity) AS UNSIGNED) AS y')
+            ->join('products', 'products.id', '=', 'order_details.product_id')
+            ->join('brands', 'brands.id', '=', 'order_details.brand_id')
+            ->join('sizes', 'sizes.id', '=', 'order_details.size_id')
+            ->join('colors', 'colors.id', '=', 'order_details.color_id')
+            ->groupBy(DB::raw('DATE(order_details.created_at)'))
+            ->get();
+
+        return response()->json($product);
     }
 
     public function destroy($id)

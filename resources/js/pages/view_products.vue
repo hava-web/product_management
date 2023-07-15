@@ -4,6 +4,8 @@ import { useRouter, useRoute } from 'vue-router'
 import { reactive } from 'vue'
 import { productStatus } from '@/constants/roles'
 import axiosIns from '@/plugins/axios'
+import AnalyticsBuyMost from '@/views/product/AnalyticsBuyMost.vue'
+import AnalyticsByMonth from '../views/product/AnalyticsByMonth.vue'
 
 
 const store = useStore()
@@ -141,22 +143,7 @@ const closeDialog = () =>{
   productInfor.properties = []
 }
 
-// const getImageById = async id => {
-//   var image = ref()
-//   const accessToken = localStorage.getItem('accessToken')
 
-//   await axiosIns('/api/get_image/' + id, {
-//     headers: {
-//       'Authorization': `Bearer ${accessToken}`,
-//     },
-//   }).then(res=>{
-
-//     image.value = res.data.image
-    
-//   }).catch(err=>{
-//     console.log(err)
-//   })
-// }
 
 
 
@@ -470,44 +457,6 @@ watchEffect(() => {
 
                               <!-- 👉 Upload Photo -->
                               <form class="d-flex flex-column justify-center gap-5">
-                                <!--
-                                  <div class="d-flex flex-wrap gap-2">
-                                  <VBtn
-                                  color="primary"
-                                  @click="refInputEl?.click()"
-                                  >
-                                  <VIcon
-                                  icon="mdi-cloud-upload-outline"
-                                  class="d-sm-none"
-                                  />
-                                  <span class="d-none d-sm-block">Upload new photo</span>
-                                  </VBtn>
-
-                                  <input
-                                  :ref="refInputEl"
-                                  multiple
-                                  type="file"
-                                  name="file"
-                                  accept=".jpeg,.png,.jpg,GIF"
-                                  hidden
-                                  @input="changeAvatar"
-                                  >
-
-                                  <VBtn
-                                  type="reset"
-                                  color="error"
-                                  variant="tonal"
-                                  @click="resetAvatar"
-                                  >
-                                  <span class="d-none d-sm-block">Reset</span>
-                                  <VIcon
-                                  icon="mdi-refresh"
-                                  class="d-sm-none"
-                                  />
-                                  </VBtn>
-                                  </div> 
-                                -->
-                                <!-- 👉 Image -->
                                 <VCol cols="50">
                                   <VFileInput
                                     v-model="productInfor.images"
@@ -893,6 +842,13 @@ watchEffect(() => {
         :length="length"
         rounded="circle"
       />
+    </VCol>
+    <VCol
+      cols="12"
+      class="d-flex"
+    >
+      <AnalyticsBuyMost />
+      <AnalyticsByMonth />
     </VCol>
   </VRow>
 </template>
