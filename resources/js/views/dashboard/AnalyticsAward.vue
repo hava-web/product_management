@@ -10,8 +10,8 @@ const triangleBg = computed(() => global.name.value === 'light' ? triangleLight 
 
 <template>
   <VCard
-    title="Congratulations ! 🎉"
-    subtitle="Best seller of the month"
+    title="Chào mừng !🎉"
+    subtitle="Thu nhập hôm nay"
     class="position-relative"
   >
     <VCardText>
@@ -20,7 +20,7 @@ const triangleBg = computed(() => global.name.value === 'light' ? triangleLight 
       </h5>
       <p></p>
       <VBtn size="small">
-        View Sales
+        Xem các đơn hàng 
       </VBtn>
     </VCardText>
 

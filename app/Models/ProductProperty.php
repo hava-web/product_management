@@ -12,6 +12,7 @@ class ProductProperty extends Model
     protected $fillable = [
         'product_id',
         'warehouse_id',
+        'agent_id',
         'color_id',
         'brand_id',
         'size_id',

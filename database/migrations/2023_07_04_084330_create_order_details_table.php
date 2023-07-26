@@ -18,6 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('brand_id');
             $table->unsignedBigInteger('size_id');
             $table->unsignedBigInteger('color_id');
+            $table->unsignedBigInteger('warehouse_id');
+            $table->unsignedBigInteger('agent_id');
             $table->bigInteger('quantity');
             $table->integer('discount');
             $table->decimal('price',12,2);
@@ -26,6 +28,8 @@ return new class extends Migration
             $table->foreign('brand_id')->references('id')->on('brands');
             $table->foreign('size_id')->references('id')->on('sizes');
             $table->foreign('color_id')->references('id')->on('colors');
+            $table->foreign('warehouse_id')->references('id')->on('warehouses');
+            $table->foreign('agent_id')->references('id')->on('agents');
             $table->timestamps();
         });
     }

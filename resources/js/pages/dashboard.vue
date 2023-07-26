@@ -5,8 +5,11 @@ import AnalyticsDepositWithdraw from '@/views/dashboard/AnalyticsDepositWithdraw
 import AnalyticsSalesByCountries from '@/views/dashboard/AnalyticsSalesByCountries.vue'
 import AnalyticsTotalEarning from '@/views/dashboard/AnalyticsTotalEarning.vue'
 import AnalyticsTotalProfitLineCharts from '@/views/dashboard/AnalyticsTotalProfitLineCharts.vue'
+import CustomerArea from '@/views/customer/areachart.vue'
+import OrderArea from '@/views/order/areachart.vue'
 import AnalyticsTransactions from '@/views/dashboard/AnalyticsTransactions.vue'
 import AnalyticsUserTable from '@/views/dashboard/AnalyticsUserTable.vue'
+import AnalyticsOrders from '@/views/dashboard/AnalyticsOrders.vue'
 import AnalyticsWeeklyOverview from '@/views/dashboard/AnalyticsWeeklyOverview.vue'
 import CardStatisticsVertical from '@core/components/cards/CardStatisticsVertical.vue'
 
@@ -31,81 +34,91 @@ const newProject = {
 
 <template>
   <VRow class="match-height">
-    <VCol
+    <!--
+      <VCol
       cols="12"
       md="4"
-    >
+      >
       <AnalyticsAward />
-    </VCol>
+      </VCol> 
+    -->
 
     <VCol
       cols="12"
-      md="8"
+      md="12"
     >
       <AnalyticsTransactions />
     </VCol>
 
-    <VCol
+    <!--
+      <VCol
       cols="12"
       md="4"
-    >
+      >
       <AnalyticsWeeklyOverview />
-    </VCol>
+      </VCol>
 
-    <VCol
+      <VCol
       cols="12"
       md="4"
-    >
+      >
       <AnalyticsTotalEarning />
-    </VCol>
+      </VCol>
 
-    <VCol
+      <VCol
       cols="12"
       md="4"
-    >
+      >
       <VRow class="match-height">
-        <VCol
-          cols="12"
-          sm="6"
-        >
-          <AnalyticsTotalProfitLineCharts />
-        </VCol>
+      <VCol
+      cols="12"
+      sm="6"
+      >
+      <AnalyticsTotalProfitLineCharts />
+      </VCol>
 
-        <VCol
-          cols="12"
-          sm="6"
-        >
-          <CardStatisticsVertical v-bind="totalProfit" />
-        </VCol>
+      <VCol
+      cols="12"
+      sm="6"
+      >
+      <CardStatisticsVertical v-bind="totalProfit" />
+      </VCol>
 
-        <VCol
-          cols="12"
-          sm="6"
-        >
-          <CardStatisticsVertical v-bind="newProject" />
-        </VCol>
+      <VCol
+      cols="12"
+      sm="6"
+      >
+      <CardStatisticsVertical v-bind="newProject" />
+      </VCol>
 
-        <VCol
-          cols="12"
-          sm="6"
-        >
-          <AnalyticsBarCharts />
-        </VCol>
+      <VCol
+      cols="12"
+      sm="6"
+      >
+      <AnalyticsBarCharts />
+      </VCol>
       </VRow>
-    </VCol>
+      </VCol>
 
-    <VCol
+      <VCol
       cols="12"
       md="4"
-    >
+      >
       <AnalyticsSalesByCountries />
-    </VCol>
+      </VCol>
 
-    <VCol
+      <VCol
       cols="12"
       md="8"
-    >
+      >
       <AnalyticsDepositWithdraw />
+      </VCol> 
+    --> 
+    <VCol cols="12">
+      <CustomerArea />
+    </VCol>
+    <VCol cols="12">
+      <OrderArea />
     </VCol>
 
     <VCol cols="12">

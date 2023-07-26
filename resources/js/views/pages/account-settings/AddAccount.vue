@@ -57,21 +57,21 @@ const submit = async ()=>{
   }).then(res=>{
     console.log(res)
     if(res.status === 201){
-      alert.title = 'Successfully'
+      alert.title = 'Thành công'
       alert.status = true
-      alert.text = 'Account Added Successfully'
+      alert.text = 'Tạo thêm tài khoản thành công'
       alert.color = 'rgba(39, 217, 11, 0.8)'
       accountDataLocal.value = structuredClone(accountData)
     }
     else{
-      alert.title = 'Warning'
+      alert.title = 'Cảnh Báo'
       alert.status = true
-      alert.text = 'Something went wrong'
+      alert.text = 'Có lỗi đang xảy ra'
       alert.color = 'rgba(234, 223, 30, 0.8)'
     }
   }).catch(err=>{
     console.log(err)
-    alert.title = 'Error'
+    alert.title = 'Lỗi'
     alert.status = true
     alert.text = err.response
     alert.color = 'rgba(222, 29, 29, 0.8)'
@@ -113,7 +113,10 @@ const resetAvatar = () => {
   </Transition>
   <VRow>
     <VCol cols="12">
-      <VCard title="Create Account">
+      <VCard
+        title="Tạo tài khoản"
+        prepend-icon="mdi-account-plus"
+      >
         <VCardText class="d-flex">
           <!-- 👉 Avatar -->
           <VAvatar
@@ -134,7 +137,7 @@ const resetAvatar = () => {
                   icon="mdi-cloud-upload-outline"
                   class="d-sm-none"
                 />
-                <span class="d-none d-sm-block">Upload new photo</span>
+                <span class="d-none d-sm-block">Thêm ảnh mới</span>
               </VBtn>
 
               <input
@@ -160,9 +163,11 @@ const resetAvatar = () => {
               </VBtn>
             </div>
 
-            <p class="text-body-1 mb-0">
+            <!--
+              <p class="text-body-1 mb-0">
               Allowed JPG, GIF or PNG. Max size of 800K
-            </p>
+              </p> 
+            -->
           </form>
         </VCardText>
 
@@ -179,7 +184,7 @@ const resetAvatar = () => {
               >
                 <VTextField
                   v-model="accountDataLocal.firstname"
-                  label="First Name"
+                  label="Tên"
                 />
               </VCol>
               <!-- 👉 Last Name -->
@@ -189,7 +194,7 @@ const resetAvatar = () => {
               >
                 <VTextField
                   v-model="accountDataLocal.lastname"
-                  label="Last Name"
+                  label="Họ"
                 />
               </VCol>
 
@@ -200,7 +205,7 @@ const resetAvatar = () => {
               >
                 <VTextField
                   v-model="accountDataLocal.name"
-                  label="User Name"
+                  label="Tên người dùng"
                 />
               </VCol>
 
@@ -212,7 +217,7 @@ const resetAvatar = () => {
                 <VTextField
                   v-model="accountDataLocal.password"
                   type="password"
-                  label="Password"
+                  label="Mật khẩu"
                 />
               </VCol>
 
@@ -235,7 +240,7 @@ const resetAvatar = () => {
               >
                 <VSelect
                   v-model="accountDataLocal.warehouse_id"
-                  label="Warehouse"
+                  label="Kho"
                   :items="warehouseList"
                   :item-title="formatName"
                   :item-value="getId"
@@ -249,7 +254,7 @@ const resetAvatar = () => {
               >
                 <VTextField
                   v-model="accountDataLocal.phone"
-                  label="Phone Number"
+                  label="Số điện thoại"
                 />
               </VCol>
 
@@ -261,7 +266,7 @@ const resetAvatar = () => {
                 <VTextField
                   v-model="accountDataLocal.date_of_birth"
                   type="date"
-                  label="Date Of Bitrh"
+                  label="Ngày sinh"
                 />
               </VCol>
 
@@ -272,7 +277,7 @@ const resetAvatar = () => {
               >
                 <VSelect
                   v-model="accountDataLocal.role"
-                  label="Role"
+                  label="Chức vụ"
                   :items="roles"
                 />
               </VCol>
@@ -284,7 +289,7 @@ const resetAvatar = () => {
               >
                 <VTextField
                   v-model="accountDataLocal.salary"
-                  label="Salary"
+                  label="Lương"
                 />
               </VCol>
               
@@ -295,7 +300,7 @@ const resetAvatar = () => {
               >
                 <VSelect
                   v-model="accountDataLocal.city"
-                  label="City"
+                  label="Thành Phố"
                   :items="city"
                 />
               </VCol>
@@ -307,7 +312,7 @@ const resetAvatar = () => {
               >
                 <VTextField
                   v-model="accountDataLocal.address"
-                  label="Address"
+                  label="Địa chỉ"
                 />
               </VCol>
 
@@ -320,7 +325,7 @@ const resetAvatar = () => {
                 class="d-flex flex-wrap gap-4"
               >
                 <VBtn @click="submit">
-                  Create Account
+                  Thêm tài khoản 
                 </VBtn>
 
                 <VBtn

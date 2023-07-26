@@ -2,22 +2,50 @@
 import avatar1 from '@images/avatars/avatar-1.png'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 const store = useStore()
 const user = ref()
+const employee_id = ref()
 const router = useRouter()
+
+const getUser = computed(()=> store.state.user)
 
 onMounted( async () => {
   console.log(store)
   await store.dispatch('getUser')
-  watchEffect(() => {
-    const getUser = store.state.user
+  user.value = getUser.value
+  console.log(user.value)
 
-    user.value = getUser
-    
-    console.log(user.value)
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axios.get('api/user_employee/' + user.value.id, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    console.log(res.data)
+    employee_id.value = res.data.id
+  }).catch(err=>{
+    console.log(err.data)
   })
+
+  // watchEffect(() => {
+  //   const getUser = store.state.user
+
+  //   user.value = getUser
+    
+  //   console.log(user.value)
+  // })
 })
+
+const setting = ()=>{
+  router.push('/account-settings')
+}
+
+const profile = () =>{
+  router.push({ name: 'employee', params: { id: employee_id.value } })
+}
 
 const logout = async ()=>{
   await store.dispatch('logout')
@@ -87,7 +115,9 @@ const logout = async ()=>{
               />
             </template>
 
-            <VListItemTitle>Profile</VListItemTitle>
+            <VListItemTitle @click="profile">
+              Profile
+            </VListItemTitle>
           </VListItem>
 
           <!-- 👉 Settings -->
@@ -100,7 +130,9 @@ const logout = async ()=>{
               />
             </template>
 
-            <VListItemTitle>Settings</VListItemTitle>
+            <VListItemTitle @click="setting">
+              Settings
+            </VListItemTitle>
           </VListItem>
 
           <!-- 👉 Pricing -->

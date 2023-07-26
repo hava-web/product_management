@@ -40,7 +40,15 @@ const sizeInfor = reactive({
   status: null,
 })
 
-const format = size => size.status == 0 ? "Non Visible" : "Visible"
+const searchQuery = ref('')
+
+const filteredItems = computed(() => {
+  return sizeList.value.filter(item => {
+    return item.name.toLowerCase().includes(searchQuery.value.toLowerCase()) 
+  })
+})
+
+const format = size => size.status == 0 ? "Không hiển thị" : "Hiển thị"
 
 
 
@@ -71,8 +79,8 @@ const update = async id=>{
     console.log(res)
     dialog.value = false
     alert.status = true
-    alert.title = 'Updated Successfully'
-    alert.text = 'size Updated Successfully'
+    alert.title = 'Cập nhật thành công'
+    alert.text = 'Kích thước đã được Cập nhật thành công'
     alert.color = 'rgba(39, 217, 11, 0.8)'
   }).catch(err=>{
     console.log(sizeInfor)
@@ -100,8 +108,8 @@ const deleteSize = id=>{
     console.log(res)
     cancel.value = false
     alert.status = true
-    alert.title = 'Deleted Successfully'
-    alert.text = 'Size deleted Successfully'
+    alert.title = 'Xóa thành công'
+    alert.text = 'Kích thước đã được Xóa thành công'
     alert.color = 'rgba(39, 217, 11, 0.8)'
 
     const index = sizeList.value.findIndex(cat => cat.id === id)
@@ -158,6 +166,22 @@ watchEffect(() => {
         title="All Sizes"
         prepend-icon="mdi-store-plus-outline"
       >
+        <template #append>
+          <div class="me-n3 tool">
+            <VCol
+              cols="auto"
+              class="d-flex"
+            >
+              <VTextField
+                v-model="searchQuery"
+                title="Search"
+                class="mx-3"
+                prepend-inner-icon="mdi-magnify"
+                placeholder="Search"
+              />
+            </VCol>
+          </div>
+        </template> 
         <VDivider />
         <VTable>
           <thead>
@@ -166,23 +190,23 @@ watchEffect(() => {
                 ID
               </th>
               <th class="text-uppercase text-center">
-                Size
+                Kích thước
               </th>
               <th class="text-uppercase text-center">
-                Created Time
+                Ngày tạo
               </th>
               <th class="text-uppercase text-center">
-                Status
+                Trạng thái
               </th>
               <th class="text-uppercase text-center">
-                Action
+                Cài đặt
               </th>
             </tr>
           </thead>
 
           <tbody>
             <tr
-              v-for="size in sizeList"
+              v-for="size in filteredItems"
               :key="size.sizeList"
             >
               <td>
@@ -246,7 +270,7 @@ watchEffect(() => {
                           </Transition>
                           <VCard
                             prepend-icon="mdi-store-edit"
-                            title=" Update Size "
+                            title="Cập nhật kích thước"
                           >
                             <VCardText>
                               <!-- 👉 Form -->
@@ -260,7 +284,7 @@ watchEffect(() => {
                                     <VTextField
                                       v-model="sizeInfor.name"
                                       prepend-icon="mdi-rename"
-                                      label="Size Name"
+                                      label="Tên kích thước"
                                     />
                                   </VCol>
 
@@ -274,7 +298,7 @@ watchEffect(() => {
                                       :true-value="1"
                                       :false-value="0"
                                       prepend-icon="mdi-list-status"
-                                      label="Status"
+                                      label="Trạng thái"
                                       color="primary"
                                       :value="status"
                                       hide-details
@@ -292,7 +316,7 @@ watchEffect(() => {
                                 prepend-icon="mdi-close"
                                 @click="dialog = false"
                               >
-                                Cancel
+                                Hủy bỏ
                               </VBtn>
                               <VBtn
                                 color="primary"
@@ -300,7 +324,7 @@ watchEffect(() => {
                                 prepend-icon="mdi-pencil-outline"
                                 @click="update(size.id)"
                               >
-                                Update
+                                Cập nhật
                               </VBtn>
                             </VCardActions>
                           </VCard>
@@ -329,10 +353,10 @@ watchEffect(() => {
                           </template>
                           <VCard
                             prepend-icon="mdi-alert"
-                            title="Do you want delete this warehouse ?"
+                            title="Xóa kích thước"
                           >
                             <VCardText>
-                              Once you delete this warehouse you can not get this warehouse information again. Are you sure you want delete this ?
+                              Bạn có chắc chắn là bạn muốn xóa thông tin này không ?
                             </VCardText>
                             <VCardActions>
                               <VSpacer />
@@ -342,7 +366,7 @@ watchEffect(() => {
                                 variant="elevated"
                                 @click="cancel = false"
                               >
-                                Cancel
+                                Hủy bỏ
                               </VBtn>
                               <VBtn
                                 color="red"
@@ -350,7 +374,7 @@ watchEffect(() => {
                                 variant="elevated"
                                 @click="deleteSize(size.id)"
                               >
-                                Delete
+                                Xóa
                               </VBtn>
                             </VCardActions>
                           </VCard>
@@ -409,5 +433,8 @@ watchEffect(() => {
 .color{
     margin-left: 10px;
     align-items: center;
+}
+.tool{
+  width: 400px;
 }
 </style>

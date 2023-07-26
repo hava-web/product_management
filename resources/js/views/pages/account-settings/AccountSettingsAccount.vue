@@ -10,26 +10,20 @@ const accountData = {
   firstname: '',
   lastname: '',
   name: '',
-  password: '',
-  email: '',
-  warehouse_id: null,
   phone: '',
   date_of_birth: '',
-  role: null,
-  salary: null,
   address: '',
 }
 
 const warehouseList = ref([])
 
 const store = useStore()
+const user_id = localStorage.getItem('user_id')
 
 const refInputEl = ref()
 const accountDataLocal = ref(structuredClone(accountData))
 
-const resetForm = () => {
-  accountDataLocal.value = structuredClone(accountData)
-}
+
 
 const getAllWarehouse = computed(()=> store.getters.getAllWarehouse)
 
@@ -39,15 +33,8 @@ onMounted(async () => {
   console.log(getAllWarehouse.value)
 })
 
-const getId = warehouse => warehouse.id
-
-const formatName = warehouse=>{
-  return warehouse.id + ' - ' + warehouse.name
-}
-
 onMounted(() => {
   const accessToken = localStorage.getItem('accessToken')
-  const user_id = localStorage.getItem('user_id')
 
   axiosIns.get('api/user_employee/' + user_id, {
     headers: {
@@ -74,28 +61,27 @@ const submit = async ()=>{
 
   const accessToken = localStorage.getItem('accessToken')
 
-  await axiosIns.post('/api/auth/register', accountDataLocal.value, {
+  await axiosIns.post('/api/update_employee/' + user_id, accountDataLocal.value, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
   }).then(res=>{
     console.log(res)
-    if(res.status === 201){
-      alert.title = 'Successfully'
+    if(res.status === 200){
+      alert.title = 'Cập nhật thành công'
       alert.status = true
-      alert.text = 'Account Added Successfully'
+      alert.text = 'Tài khoản đã được Cập nhật thành công'
       alert.color = 'rgba(39, 217, 11, 0.8)'
-      accountDataLocal.value = structuredClone(accountData)
     }
     else{
-      alert.title = 'Warning'
+      alert.title = 'Cảnh báo'
       alert.status = true
-      alert.text = 'Something went wrong'
+      alert.text = 'Có lỗi gì đó'
       alert.color = 'rgba(234, 223, 30, 0.8)'
     }
   }).catch(err=>{
     console.log(err)
-    alert.title = 'Error'
+    alert.title = 'Lỗi'
     alert.status = true
     alert.text = err.response
     alert.color = 'rgba(222, 29, 29, 0.8)'
@@ -137,7 +123,10 @@ const resetAvatar = () => {
   </Transition>
   <VRow>
     <VCol cols="12">
-      <VCard title="Account Settings">
+      <VCard
+        title="Cập nhật tài khoản"
+        prepend-icon="mdi-account-edit"
+      >
         <VCardText class="d-flex">
           <!-- 👉 Avatar -->
           <VAvatar
@@ -158,7 +147,7 @@ const resetAvatar = () => {
                   icon="mdi-cloud-upload-outline"
                   class="d-sm-none"
                 />
-                <span class="d-none d-sm-block">Upload new photo</span>
+                <span class="d-none d-sm-block">Thêm ảnh mới</span>
               </VBtn>
 
               <input
@@ -184,9 +173,11 @@ const resetAvatar = () => {
               </VBtn>
             </div>
 
-            <p class="text-body-1 mb-0">
+            <!--
+              <p class="text-body-1 mb-0">
               Allowed JPG, GIF or PNG. Max size of 800K
-            </p>
+              </p> 
+            -->
           </form>
         </VCardText>
 
@@ -203,7 +194,7 @@ const resetAvatar = () => {
               >
                 <VTextField
                   v-model="accountDataLocal.firstname"
-                  label="First Name"
+                  label="Tên"
                 />
               </VCol>
               <!-- 👉 Last Name -->
@@ -213,7 +204,7 @@ const resetAvatar = () => {
               >
                 <VTextField
                   v-model="accountDataLocal.lastname"
-                  label="Last Name"
+                  label="Họ"
                 />
               </VCol>
 
@@ -224,7 +215,7 @@ const resetAvatar = () => {
               >
                 <VTextField
                   v-model="accountDataLocal.name"
-                  label="User Name"
+                  label="Tên tài khoản"
                 />
               </VCol>
 
@@ -235,7 +226,7 @@ const resetAvatar = () => {
               >
                 <VTextField
                   v-model="accountDataLocal.phone"
-                  label="Phone Number"
+                  label="Số điện thoại"
                 />
               </VCol>
 
@@ -247,7 +238,7 @@ const resetAvatar = () => {
                 <VTextField
                   v-model="accountDataLocal.date_of_birth"
                   type="date"
-                  label="Date Of Bitrh"
+                  label="Ngày sinh"
                 />
               </VCol>
               
@@ -258,7 +249,7 @@ const resetAvatar = () => {
               >
                 <VSelect
                   v-model="accountDataLocal.city"
-                  label="City"
+                  label="Thành Phố"
                   :items="city"
                 />
               </VCol>
@@ -267,7 +258,7 @@ const resetAvatar = () => {
               <VCol cols="12">
                 <VTextField
                   v-model="accountDataLocal.address"
-                  label="Address"
+                  label="Địa Chỉ"
                 />
               </VCol>
 
@@ -280,7 +271,7 @@ const resetAvatar = () => {
                 class="d-flex flex-wrap gap-4"
               >
                 <VBtn @click="submit">
-                  Update Information
+                  Cập nhật thông tin
                 </VBtn>
               </VCol>
             </VRow>

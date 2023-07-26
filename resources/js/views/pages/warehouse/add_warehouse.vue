@@ -73,21 +73,21 @@ const submit = async ()=>{
   })
     .then(res=>{
       if(res.status === 201){
-        alert.title = 'Successfully'
+        alert.title = 'Thành công '
         alert.status = true
-        alert.text = 'Warehouse Added Successfully'
+        alert.text = 'Kho hàng đã được tạo thành công'
         alert.color = 'rgba(39, 217, 11, 0.8)'
         accountDataLocal.value = structuredClone(warehouseData)
       }
       else{
-        alert.title = 'Warning'
+        alert.title = 'Cảnh báo '
         alert.status = true
-        alert.text = 'Something went wrong'
+        alert.text = 'Có lỗi gì đó'
         alert.color = 'rgba(234, 223, 30, 0.8)'
       }
     })
     .catch(err=>{
-      alert.title = 'Error'
+      alert.title = 'Lỗi'
       alert.status = true
       alert.text = err.response.data.message
       alert.color = 'rgba(222, 29, 29, 0.8)'
@@ -129,7 +129,7 @@ const resetAvatar = () => {
   <VRow>
     <VCol cols="12">
       <VCard 
-        title="Add Warehouse"
+        title="Thêm kho"
         prepend-icon="mdi-store-plus-outline"
       >
         <VDivider />
@@ -145,7 +145,7 @@ const resetAvatar = () => {
               >
                 <VTextField
                   v-model="accountDataLocal.name"
-                  label="Warehouse Name"
+                  label="Tên kho"
                 />
               </VCol>
 
@@ -159,7 +159,7 @@ const resetAvatar = () => {
                   :items="managerList"
                   :item-value="getId"
                   :item-title="formatName"
-                  label="Manager"
+                  label="Quản lý"
                 />
               </VCol>
 
@@ -171,7 +171,7 @@ const resetAvatar = () => {
                 <VSelect
                   v-model="accountDataLocal.city"
                   :items="city"
-                  label="City"
+                  label="Thành phố"
                 />
               </VCol>
 
@@ -183,7 +183,7 @@ const resetAvatar = () => {
                 <VSelect
                   v-model="accountDataLocal.status"
                   :items="status"
-                  label="Status"
+                  label="Trạng thái"
                 />
               </VCol>
 
@@ -191,7 +191,7 @@ const resetAvatar = () => {
               <VCol cols="12">
                 <VTextField
                   v-model="accountDataLocal.address"
-                  label="Address"
+                  label="Địa chỉ"
                 />
               </VCol>
 
@@ -201,7 +201,7 @@ const resetAvatar = () => {
                 class="d-flex flex-wrap gap-4"
               >
                 <VBtn @click="submit">
-                  Add Warehouse
+                  Thêm Kho
                 </VBtn>
 
                 <VBtn

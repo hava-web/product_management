@@ -1,6 +1,6 @@
 <script setup>
 import { useStore } from 'vuex'
-import { alert } from '@/constants/cities'
+import { alert, city } from '@/constants/cities'
 import { productStatus } from '../constants/roles'
 import axiosIns from '@/plugins/axios'
 
@@ -8,10 +8,10 @@ const productData = {
   images: [],
   name: '',
   category: null,
+  product_code: '',
   description: '',
   properties: [],
   imported_date: null,
-  delivered_from: null, 
 }
 
 const warehouseList = ref([])
@@ -22,6 +22,7 @@ const categoryList = ref([])
 const colorList = ref([])
 const brandList = ref([])
 const sizeList = ref([])
+const agentList = ref([])
 const fields = ref([])
 
 const store = useStore()
@@ -42,6 +43,7 @@ const addField = () => {
     selling_price: null,
     color: null,
     status: null,
+    agent: null,
     size: null,
     expired_date: null,
   })
@@ -52,6 +54,7 @@ const getCategories = computed(()=> store.getters.getCategories)
 const getBrands = computed(()=> store.getters.getBrands)
 const getColors = computed(() => store.getters.getColors)
 const getSizes = computed(() => store.getters.getSizes)
+const getAgents = computed(() => store.getters.getAgents)
 
 onMounted(async () => {
   await store.dispatch('getAllWarehouse')
@@ -83,6 +86,11 @@ onMounted(async () => {
   console.log(getSizes.value)
 })
 
+onMounted(async () => {
+  await store.dispatch('getAgents')
+  agentList.value.push(...getAgents.value)
+  console.log(getAgents.value)
+})
 
 const chosenColors = ref([])
 
@@ -108,6 +116,7 @@ function fileChange(event){
 
 const submit = async ()=>{
   const properties = fields.value.map(field => ({
+    agent: field.agent,
     quantity: field.quantity,
     discount: Number(field.discount),
     brand: field.brand,
@@ -177,7 +186,7 @@ const submit = async ()=>{
   <VRow>
     <VCol cols="12">
       <VCard
-        title="Add Product"
+        title="Thêm sản phẩm"
         prepend-icon="mdi-package-variant-closed-plus"
       >
         <VCardText class="d-flex">
@@ -191,7 +200,7 @@ const submit = async ()=>{
                 multiple="true"
                 chips
                 prepend-icon="mdi-camera"
-                label="Select Image"
+                label="Thêm ảnh"
                 accept="image/*"
                 @click:clear="productDataLocal.value.images = []"
                 @change="fileChange"
@@ -214,7 +223,7 @@ const submit = async ()=>{
 
 
             <p class="text-body-1 mb-0">
-              Allowed JPG, GIF or PNG. Max size of 800K
+             Bạn có thể thêm nhiều ảnh
             </p>
           </form>
         </VCardText>
@@ -232,9 +241,21 @@ const submit = async ()=>{
               >
                 <VTextField
                   v-model="productDataLocal.name"
-                  label="Product Name"
+                  label="Tên sản phẩm"
                 />
               </VCol>
+
+              <!-- 👉 Product code -->
+              <VCol
+                md="6"
+                cols="12"
+              >
+                <VTextField
+                  v-model="productDataLocal.product_code"
+                  label="Mã nhập"
+                />
+              </VCol>
+
               <!-- 👉 Category -->
               <VCol
                 cols="12"
@@ -242,22 +263,10 @@ const submit = async ()=>{
               >
                 <VSelect
                   v-model="productDataLocal.category"
-                  label="Category"
+                  label="Danh mục"
                   :items="categoryList"
                   :item-title="formatName"
                   :item-value="getId"
-                />
-              </VCol>
-
-              <!-- 👉 Quantity -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="productDataLocal.quantity"
-                  label="Quantity"
-                  @input="check"
                 />
               </VCol>
 
@@ -269,15 +278,16 @@ const submit = async ()=>{
                 <VTextField
                   v-model="productDataLocal.imported_date"
                   type="date"
-                  label="Imported Date"
+                  label="Ngày nhập"
                 />
               </VCol>
 
-              <!-- 👉 Delivered From -->
+              <!-- 👉 Quantity -->
               <VCol cols="12">
                 <VTextField
-                  v-model="productDataLocal.delivered_from"
-                  label="Delivered From"
+                  v-model="productDataLocal.quantity"
+                  label="Số lượng"
+                  @input="check"
                 />
               </VCol>
 
@@ -285,7 +295,7 @@ const submit = async ()=>{
               <VCol cols="12">
                 <VTextarea
                   v-model="productDataLocal.description"
-                  label="Description"
+                  label="Mô tả"
                 />
               </VCol>
               
@@ -299,7 +309,7 @@ const submit = async ()=>{
                     class="d-flex flex-wrap gap-4"
                   >
                     <VIcon icon="mdi-atom-variant" />
-                    Properties
+                    Các thuộc tính
                   </VCardTitle>
                   <VBtn
                     variant="tonal"
@@ -307,7 +317,7 @@ const submit = async ()=>{
                     prepend-icon="mdi-plus"
                     @click="addField"
                   >
-                    Add
+                    Thêm
                   </VBtn>
                 </div>
 
@@ -318,10 +328,13 @@ const submit = async ()=>{
                   class="d-flex flex-wrap form"
                 >
                   <!-- 👉 Quantity -->
-                  <VCol cols="12">
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
                     <VTextField
                       v-model="field.quantity"
-                      label="Quantity"
+                      label="Số lượng"
                     />
                   </VCol>
 
@@ -332,7 +345,21 @@ const submit = async ()=>{
                   >
                     <VTextField
                       v-model="field.discount"
-                      label="Discount"
+                      label="Triết khấu"
+                    />
+                  </VCol>
+
+                  <!-- 👉 Agent -->
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
+                    <VSelect
+                      v-model="field.agent"
+                      label="Chi nhánh"
+                      :items="agentList"
+                      :item-title="formatName"
+                      :item-value="getId"
                     />
                   </VCol>
 
@@ -343,7 +370,7 @@ const submit = async ()=>{
                   >
                     <VSelect
                       v-model="field.brand"
-                      label="Brand"
+                      label="Thương hiệu"
                       :items="brandList"
                       :item-title="formatName"
                       :item-value="getId"
@@ -357,7 +384,7 @@ const submit = async ()=>{
                   >
                     <VTextField
                       v-model="field.original_price"
-                      label="Original Price"
+                      label="Giá gốc"
                     />
                   </VCol>
 
@@ -368,7 +395,7 @@ const submit = async ()=>{
                   >
                     <VTextField
                       v-model="field.selling_price"
-                      label="Selling Price"
+                      label="Giá bán"
                     />
                   </VCol>
 
@@ -379,7 +406,7 @@ const submit = async ()=>{
                   >
                     <VSelect
                       v-model="field.warehouse_id"
-                      label="Warehouse"
+                      label="Kho hàng"
                       :items="warehouseList"
                       :item-title="formatName"
                       :item-value="getId"
@@ -393,7 +420,7 @@ const submit = async ()=>{
                   >
                     <VSelect
                       v-model="field.size"
-                      label="Size"
+                      label="Kích thước"
                       :items="sizeList"
                       :item-title="formatName"
                       :item-value="getId"
@@ -407,7 +434,7 @@ const submit = async ()=>{
                   >
                     <VSelect
                       v-model="field.status"
-                      label="Status"
+                      label="Trạng thái"
                       :items="productStatus"
                     />
                   </VCol>
@@ -420,7 +447,7 @@ const submit = async ()=>{
                     <VTextField
                       v-model="field.expired_date"
                       type="date"
-                      label="Expired Date"
+                      label="Ngày hết hạn"
                     />
                   </VCol>
                   <div class="d-flex flex-wrap color ">
@@ -484,7 +511,7 @@ const submit = async ()=>{
                 class="d-flex flex-wrap gap-4"
               >
                 <VBtn @click="submit">
-                  Add Product
+                  Thêm sản phẩm
                 </VBtn>
 
                 <VBtn

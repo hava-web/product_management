@@ -14,6 +14,8 @@ class OrderDetail extends Model
         'product_id',
         'brand_id',
         'size_id',
+        'warehouse_id',
+        'agent_id',
         'color_id',
         'quantity',
         'discount',

@@ -32,6 +32,14 @@ const error = reactive({
   color: '',
 })
 
+const searchQuery = ref('')
+
+const filteredItems = computed(() => {
+  return categoryList.value.filter(item => {
+    return item.name.toLowerCase().includes(searchQuery.value.toLowerCase()) 
+  })
+})
+
 
 const getCategoryByPage = computed(()=>{
   return store.getters.getCategoryByPage
@@ -89,8 +97,8 @@ const update = async id=>{
     console.log(res)
     dialog.value = false
     alert.status = true
-    alert.title = 'Updated Successfully'
-    alert.text = 'Categoty Updated Successfully'
+    alert.title = 'Cập nhật thành công'
+    alert.text = 'Danh mục đã được cập nhật thành công'
     alert.color = 'rgba(39, 217, 11, 0.8)'
   }).catch(err=>{
     console.log(categoryInfo)
@@ -118,8 +126,8 @@ const deleteCat = id=>{
     console.log(res)
     cancel.value = false
     alert.status = true
-    alert.title = 'Deleted Successfully'
-    alert.text = 'Category deleted Successfully'
+    alert.title = 'Xóa thành công '
+    alert.text = 'Danh mục đã đước xóa thành công'
     alert.color = 'rgba(39, 217, 11, 0.8)'
 
     const index = categoryList.value.findIndex(cat => cat.id === id)
@@ -173,9 +181,25 @@ watchEffect(() => {
   <VRow v-if="show">
     <VCol cols="12">
       <VCard 
-        title="All Employees"
+        title="Tất cả danh mục"
         prepend-icon="mdi-store-plus-outline"
       >
+        <template #append>
+          <div class="me-n3 tool">
+            <VCol
+              cols="auto"
+              class="d-flex"
+            >
+              <VTextField
+                v-model="searchQuery"
+                title="Search"
+                class="mx-3"
+                prepend-inner-icon="mdi-magnify"
+                placeholder="Search"
+              />
+            </VCol>
+          </div>
+        </template> 
         <VDivider />
         <VTable>
           <thead>
@@ -184,23 +208,23 @@ watchEffect(() => {
                 ID
               </th>
               <th class="text-uppercase text-center">
-                Name
+                Tên danh mục 
               </th>
               <th class="text-uppercase text-center">
-                Created Time
+                Thời gian tạo
               </th>
               <th class="text-uppercase text-center">
-                Image
+                Ảnh
               </th>
               <th class="text-uppercase text-center">
-                Action
+                Cài đặt
               </th>
             </tr>
           </thead>
 
           <tbody>
             <tr
-              v-for="category in categoryList"
+              v-for="category in filteredItems"
               :key="category.categoryList"
             >
               <td>
@@ -345,7 +369,7 @@ watchEffect(() => {
                                 prepend-icon="mdi-close"
                                 @click="dialog = false"
                               >
-                                Cancel
+                                Hủy bỏ 
                               </VBtn>
                               <VBtn
                                 color="primary"
@@ -353,7 +377,7 @@ watchEffect(() => {
                                 prepend-icon="mdi-pencil-outline"
                                 @click="update(category.id)"
                               >
-                                Update
+                                Cập nhật
                               </VBtn>
                             </VCardActions>
                           </VCard>
@@ -382,10 +406,10 @@ watchEffect(() => {
                           </template>
                           <VCard
                             prepend-icon="mdi-alert"
-                            title="Do you want delete this warehouse ?"
+                            title="Xóa danh mục"
                           >
                             <VCardText>
-                              Once you delete this warehouse you can not get this warehouse information again. Are you sure you want delete this ?
+                              Bạn có chắc chắn là bạn muốn xóa thông tin này không ?
                             </VCardText>
                             <VCardActions>
                               <VSpacer />
@@ -395,7 +419,7 @@ watchEffect(() => {
                                 variant="elevated"
                                 @click="cancel = false"
                               >
-                                Cancel
+                                Hủy bỏ
                               </VBtn>
                               <VBtn
                                 color="red"
@@ -403,7 +427,7 @@ watchEffect(() => {
                                 variant="elevated"
                                 @click="deleteCat(category.id)"
                               >
-                                Delete
+                                Xóa
                               </VBtn>
                             </VCardActions>
                           </VCard>
@@ -458,5 +482,8 @@ watchEffect(() => {
 }
 .item-image{
   margin: 10px;
+}
+.tool{
+  width: 400px;
 }
 </style>

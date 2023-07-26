@@ -2,6 +2,9 @@
 import { useStore } from 'vuex'
 import { useRoute, useRouter } from 'vue-router'
 import { reactive } from 'vue'
+import { orderStatus } from '@/constants/cities'
+import Barchart from '@/views/order/barchart.vue'
+import Areachart from '@/views/order/areachart.vue'
 import axiosIns from '@/plugins/axios'
 
 
@@ -9,10 +12,11 @@ const store = useStore()
 const route = useRoute()
 const page = ref()
 const length = ref()
-const cancel = ref(false)
 const show = ref(true)
-const dialog = ref(false)
 const orderList = ref([])
+
+
+const isActive = ref(false)
 
 const router = useRouter()
 
@@ -31,21 +35,50 @@ const error = reactive({
   color: '',
 })
 
+const order = reactive({
+  status: null,
+  from: null,
+  to: null,
+})
+
 const viewOrder = id =>{
   show.value = false
   router.push({ name: 'order', params: { id: id } })
   console.log(id)
 }
 
+const reset = () =>{
+  order.status = null
+  order.from = null
+  order.to = null
+}
+
+const confirm = () =>{
+  console.log(order)
+
+  const accessToken = localStorage.getItem('accessToken')
+
+  axiosIns.post(`api/orders_filter?page=${page.value}`, order, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    isActive.value = false
+    orderList.value = []
+    orderList.value = res.data.data
+    console.log(res.data)
+  }).catch(err=>{
+    console.log(err.data)
+    error.status = true
+    error.title = 'You have some errors'
+    error.text = err.response.data.message
+    error.color = 'rgba(222, 29, 29, 0.8)'
+  })
+}
+
 const getOrderByPage = computed(()=>{
   return store.getters.getOrderByPage
 })
-
-const colorInfor = reactive({
-  name: '',
-  code_color: '',
-})
-
 
 // Call the action to retrieve the warehouse data and set the initial value of currentorderList to the result.
 
@@ -63,6 +96,8 @@ function updateorderList() {
 }
 
 watch(page, updateorderList)
+
+watch(page, confirm)
 
 
 watchEffect(() => {
@@ -90,9 +125,112 @@ watchEffect(() => {
   <VRow v-if="show">
     <VCol cols="12">
       <VCard 
-        title="All Orders"
+        title="Tất cả đơn hàng"
         prepend-icon="mdi-store-plus-outline"
       >
+        <template #append>
+          <div class="me-n3 tool">
+            <VCol
+              cols="auto"
+              class="d-flex"
+            >
+              <VDialog
+                v-model="isActive"
+                transition="dialog-bottom-transition"
+              >
+                <template #activator="{ props }">
+                  <VBtn
+                    color="none"
+                    v-bind="props"
+                    icon="mdi-clock-time-eight-outline"
+                  >
+                    <VIcon icon="mdi-filter" />
+                  </VBtn>
+                </template>
+                <Transition name="slide-fade">
+                  <VAlert 
+                    v-if="error.status"
+                    :color="error.color"
+                    icon="mdi-alert"
+                    :title="error.title"
+                    closable
+                    class="alert"
+                    max-width="400px"
+                    :text="error.text"
+                    @click:close="error.status = false"
+                  />
+                </Transition>
+                <VCard>
+                  <VToolbar
+                    color="primary"
+                    title="Lọc đơn hàng"
+                  />
+                  <VCardText>
+                    <VForm class="mt-6">
+                      <VRow>
+                        <!-- 👉 Status -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VSelect
+                            v-model="order.status"
+                            label="Trạng thái"
+                            :items="orderStatus"
+                          />
+                        </VCol>
+
+                        <!-- 👉 From -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VTextField
+                            v-model="order.from"
+                            type="date"
+                            label="Từ ngày"
+                          />
+                        </VCol>
+
+                        <!-- 👉 To -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VTextField
+                            v-model="order.to"
+                            type="date"
+                            label="Đên ngày"
+                          />
+                        </VCol>
+                      </VRow>
+                    </VForm>
+                  </VCardText>
+                  <VCardActions class="justify-end">
+                    <VBtn
+                      variant="text"
+                      @click="isActive = false"
+                    >
+                      Đóng
+                    </VBtn>
+                    <VBtn
+                      variant="text"
+                      @click="reset"
+                    >
+                      Reset
+                    </VBtn>
+                    <VBtn
+                      variant="text"
+                      @click="confirm"
+                    >
+                      Xác nhận
+                    </VBtn>
+                  </VCardActions>
+                </VCard>
+              </VDialog>
+            </VCol>
+          </div>
+        </template> 
         <VDivider />
         <VTable>
           <thead>
@@ -101,16 +239,16 @@ watchEffect(() => {
                 ID
               </th>
               <th class="text-uppercase text-center">
-                Total price
+                Tổng giá trị
               </th>
               <th class="text-uppercase text-center">
-                Created Time
+                Thời gian tạo
               </th>
               <th class="text-uppercase text-center">
-                Status
+                Trạng thái 
               </th>
               <th class="text-uppercase text-center">
-                Action
+                Cài đặt
               </th>
             </tr>
           </thead>
@@ -124,7 +262,7 @@ watchEffect(() => {
                 {{ order.id }}
               </td>
               <td class="text-center">
-                ${{ order.total_price }}
+                {{ order.total_price }} VND
               </td>
               <td class="text-center">
                 {{ order.created_at }}
@@ -172,6 +310,12 @@ watchEffect(() => {
         :length="length"
         rounded="circle"
       />
+    </VCol>
+    <VCol>
+      <div class="d-flex">
+        <Barchart class="w-50" />
+        <Areachart class="w-50" />
+      </div>
     </VCol>
   </VRow>
 </template>

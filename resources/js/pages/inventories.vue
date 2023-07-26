@@ -93,22 +93,22 @@ watchEffect(() => {
                 ID
               </th>
               <th class="text-uppercase text-center">
-                Product
+                Tên sản phẩm
               </th>
               <th class="text-uppercase text-center">
-                Brand
+                Thương hiệu
               </th>
               <th class="text-uppercase text-center">
-                Size
+                Kích thước
               </th>
               <th class="text-uppercase text-center">
-                Color
+                Màu sắc
               </th>
               <th class="text-uppercase text-center">
-                Quantity
+                Số lượng
               </th>
               <th class="text-uppercase text-center">
-                Action
+                Cài đặt
               </th>
             </tr>
           </thead>
@@ -189,8 +189,10 @@ watchEffect(() => {
       cols="12"
       class="d-flex"
     >
-      <AnalyticsNumberBuy />
-      <AnalyticsByMonth />
+      <!--
+        <AnalyticsNumberBuy />
+        <AnalyticsByMonth /> 
+      -->
     </VCol>
   </VRow>
 </template>

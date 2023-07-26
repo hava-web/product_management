@@ -44,3 +44,8 @@ export const orderStatus = [
   'Received',
   'Canceled',
 ]
+
+export const agentStatus = [
+  'Cooperating',
+  'Stopped',
+]

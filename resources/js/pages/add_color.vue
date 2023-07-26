@@ -32,23 +32,23 @@ const submit = async ()=>{
   })
     .then(res=>{
       if(res.status === 201){
-        alert.title = 'Successfully'
+        alert.title = 'Thêm thành công'
         alert.status = true
-        alert.text = 'Color Added Successfully'
+        alert.text = 'Màu sắc đã được thêm thành công'
         alert.color = 'rgba(39, 217, 11, 0.8)'
         accountDataLocal.value = structuredClone(colorData)
         console.log(res)
       }
       else{
-        alert.title = 'Warning'
+        alert.title = 'Cảnh báo'
         alert.status = true
-        alert.text = 'Something went wrong'
+        alert.text = 'Có lỗi gì đó'
         alert.color = 'rgba(234, 223, 30, 0.8)'
         console.log(res)
       }
     })
     .catch(err=>{
-      alert.title = 'Error'
+      alert.title = 'Lỗi'
       alert.status = true
       alert.text = err.response.data.message
       alert.color = 'rgba(222, 29, 29, 0.8)'
@@ -81,7 +81,7 @@ const resetForm = () => {
   <VRow>
     <VCol cols="12">
       <VCard 
-        title="Add Color"
+        title="Thêm màu"
         prepend-icon="mdi-format-color-fill"
       >
         <VDivider />
@@ -98,7 +98,7 @@ const resetForm = () => {
                 <VTextField
                   v-model="accountDataLocal.name"
                   prepend-icon="mdi-rename"
-                  label="Color Name"
+                  label="Tên màu"
                 />
               </VCol>
 
@@ -110,7 +110,7 @@ const resetForm = () => {
                 <VTextField
                   v-model="accountDataLocal.code_color"
                   prepend-icon="mdi-code-brackets"
-                  label="Color Code"
+                  label="Mã màu"
                 />
               </VCol>
 
@@ -120,7 +120,7 @@ const resetForm = () => {
                 class="d-flex flex-wrap gap-4"
               >
                 <VBtn @click="submit">
-                  Add Color
+                  Thêm màu
                 </VBtn>
 
                 <VBtn

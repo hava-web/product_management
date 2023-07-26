@@ -32,20 +32,24 @@ const upgradeBanner = computed(() => {
         </IconBtn>
 
         <!-- 👉 Search -->
-        <div
+        <!--
+          <div
           class="d-flex align-center cursor-pointer"
           style="user-select: none;"
-        >
-          <!-- 👉 Search Trigger button -->
+          > 
+        -->
+        <!-- 👉 Search Trigger button -->
+        <!--
           <IconBtn>
-            <VIcon icon="mdi-magnify" />
+          <VIcon icon="mdi-magnify" />
           </IconBtn>
 
           <span class="d-none d-md-flex align-center text-disabled">
-            <span class="me-3">Search</span>
-            <span class="meta-key">&#8984;K</span>
+          <span class="me-3">Search</span>
+          <span class="meta-key">&#8984;K</span>
           </span>
-        </div>
+          </div> 
+        -->
 
         <VSpacer />
 
@@ -60,9 +64,11 @@ const upgradeBanner = computed(() => {
           </IconBtn> 
         -->
 
-        <IconBtn class="me-2">
+        <!--
+          <IconBtn class="me-2">
           <VIcon icon="mdi-bell-outline" />
-        </IconBtn>
+          </IconBtn> 
+        -->
 
         <NavbarThemeSwitcher class="me-2" />
 
@@ -73,14 +79,14 @@ const upgradeBanner = computed(() => {
     <template #vertical-nav-content>
       <VerticalNavLink
         :item="{
-          title: 'Dashboard',
+          title: 'Trang chủ',
           icon: 'mdi-home-outline',
           to: '/dashboard',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Account Settings',
+          title: 'Cài đặt tài khoản',
           icon: 'mdi-account-cog-outline',
           to: '/account-settings',
         }"
@@ -89,12 +95,12 @@ const upgradeBanner = computed(() => {
       <!-- 👉 Users -->
       <VerticalNavSectionTitle
         :item="{
-          heading: 'Users',
+          heading: 'Người dùng',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Create Account',
+          title: 'Thêm Tài khoản',
           icon: 'mdi-account-plus',
           to: '/create_account',
         }"
@@ -102,7 +108,7 @@ const upgradeBanner = computed(() => {
 
       <VerticalNavLink
         :item="{
-          title: 'View Employee',
+          title: 'Nhân Viên',
           icon: 'mdi-account-card',
           to: '/view_employee',
         }"
@@ -110,12 +116,12 @@ const upgradeBanner = computed(() => {
 
       <VerticalNavSectionTitle
         :item="{
-          heading: 'Orders',
+          heading: 'Đơn Hàng',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Create Order',
+          title: 'Tạo Đơn Hàng',
           icon: 'mdi-package-up',
           to: '/add_order',
         }"
@@ -123,7 +129,7 @@ const upgradeBanner = computed(() => {
 
       <VerticalNavLink
         :item="{
-          title: 'View Orders',
+          title: 'Đơn Hàng',
           icon: 'mdi-view-grid-compact',
           to: '/view_order',
         }"
@@ -132,19 +138,40 @@ const upgradeBanner = computed(() => {
       <!-- 👉 Warehouse -->
       <VerticalNavSectionTitle
         :item="{
-          heading: 'Warehouse',
+          heading: 'Chi Nhánh',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Add Warehouse',
+          title: 'Thêm Chi Nhánh',
+          icon: 'mdi-face-agent',
+          to: '/add_agent',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Chi Nhánh',
+          icon: 'mdi-garage-variant',
+          to: '/view_agent',
+        }"
+      />
+
+      <!-- 👉 Warehouse -->
+      <VerticalNavSectionTitle
+        :item="{
+          heading: 'Kho Hàng',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Thêm Kho',
           icon: 'mdi-store-plus-outline',
           to: '/add_warehouse',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'View Warehouse',
+          title: 'Kho Hàng',
           icon: 'mdi-store-search-outline',
           to: '/view_warehouse',
         }"
@@ -153,19 +180,19 @@ const upgradeBanner = computed(() => {
       <!-- 👉 Category -->
       <VerticalNavSectionTitle
         :item="{
-          heading: 'Category',
+          heading: 'Danh Mục',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Add Category',
+          title: 'Thêm Danh Mục',
           icon: 'mdi-card-plus',
           to: '/add_category',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'View Category',
+          title: 'Danh Mục',
           icon: 'mdi-card-text',
           to: '/view_category',
         }"
@@ -174,47 +201,54 @@ const upgradeBanner = computed(() => {
       <!-- 👉 Product -->
       <VerticalNavSectionTitle
         :item="{
-          heading: 'Product',
+          heading: 'Sản Phẩm',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Add Product',
+          title: 'Thêm Sản Phẩm',
           icon: 'mdi-package-variant-closed-plus',
           to: '/add_product',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'View Product',
+          title: 'Sản Phẩm',
           icon: 'mdi-package-variant-closed',
           to: '/view_product',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Inventories',
+          title: 'Hàng Tồn Kho',
           icon: 'mdi-package-down',
           to: '/inventories',
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Toàn bộ sản phẩm',
+          icon: 'mdi-package-up',
+          to: '/all_products',
         }"
       />
 
       <!-- 👉 Color -->
       <VerticalNavSectionTitle
         :item="{
-          heading: 'Color',
+          heading: 'Màu sắc',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Add Color',
+          title: 'Thêm Màu',
           icon: 'mdi-brush-outline',
           to: '/add_color',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'View Color',
+          title: 'Màu Sắc',
           icon: 'mdi-palette-outline',
           to: '/view_color',
         }"
@@ -223,19 +257,19 @@ const upgradeBanner = computed(() => {
       <!-- 👉 Brand -->
       <VerticalNavSectionTitle
         :item="{
-          heading: 'Brand',
+          heading: 'Thương Hiệu',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Add Brand',
+          title: 'Thêm Thương Hiệu',
           icon: 'mdi-tag-plus-outline',
           to: '/add_brand',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'View Brand',
+          title: 'Thương Hiệu',
           icon: 'mdi-tag-text',
           to: '/view_brands',
         }"
@@ -244,19 +278,19 @@ const upgradeBanner = computed(() => {
       <!-- 👉 Size -->
       <VerticalNavSectionTitle
         :item="{
-          heading: 'Size',
+          heading: 'Kích Thước',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'Add Size',
+          title: 'Thêm kích thước ',
           icon: 'mdi-weight',
           to: '/add_size',
         }"
       />
       <VerticalNavLink
         :item="{
-          title: 'View Size',
+          title: 'Kích Thước',
           icon: 'mdi-format-line-weight',
           to: '/view_sizes',
         }"

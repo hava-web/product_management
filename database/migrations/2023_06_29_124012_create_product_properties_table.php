@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('color_id');
             $table->unsignedBigInteger('brand_id');
             $table->unsignedBigInteger('size_id');
+            $table->unsignedBigInteger('agent_id');
             $table->date('expired_date');
             $table->string('status');
             $table->decimal('original_price',12,2);
@@ -29,6 +30,7 @@ return new class extends Migration
             $table->foreign('color_id')->references('id')->on('colors');
             $table->foreign('brand_id')->references('id')->on('brands');
             $table->foreign('size_id')->references('id')->on('sizes');
+            $table->foreign('agent_id')->references('id')->on('agents');
             $table->timestamps();
         });
     }

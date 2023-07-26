@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { reactive } from 'vue'
 import AnalyticsNumberBuy from '../views/customer/AnalyticsNumberBuy.vue'
 import AnalyticsByMonth from '../views/customer/AnalyticsByMonth.vue'
-
+import Areachart from '@/views/customer/areachart.vue'
 
 const store = useStore()
 const route = useRoute()
@@ -29,6 +29,17 @@ const error = reactive({
   title: '',
   text: '',
   color: '',
+})
+
+const searchQuery = ref('')
+
+const filteredItems = computed(() => {
+  return customerList.value.filter(item => {
+    const  firstname = item.firstname.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const  lastname = item.lastname.toLowerCase().includes(searchQuery.value.toLowerCase())
+    
+    return firstname || lastname
+  })
 })
 
 
@@ -84,9 +95,25 @@ watchEffect(() => {
   <VRow v-if="show">
     <VCol cols="12">
       <VCard 
-        title="All Customers"
+        title="Tất cả khách hàng"
         prepend-icon="mdi-store-plus-outline"
       >
+        <template #append>
+          <div class="me-n3 tool">
+            <VCol
+              cols="auto"
+              class="d-flex"
+            >
+              <VTextField
+                v-model="searchQuery"
+                title="Search"
+                class="mx-3"
+                prepend-inner-icon="mdi-magnify"
+                placeholder="Search"
+              />
+            </VCol>
+          </div>
+        </template> 
         <VDivider />
         <VTable>
           <thead>
@@ -95,26 +122,26 @@ watchEffect(() => {
                 ID
               </th>
               <th class="text-uppercase text-center">
-                Last Name
+                Họ
               </th>
               <th class="text-uppercase text-center">
-                Fisrt Name
+                Tên
               </th>
               <th class="text-uppercase text-center">
-                Created Time
+                Số lần mua
               </th>
               <th class="text-uppercase text-center">
-                Phone
+                Số điện thoại
               </th>
               <th class="text-uppercase text-center">
-                Action
+                Cài đặt
               </th>
             </tr>
           </thead>
 
           <tbody>
             <tr
-              v-for="customer in customerList"
+              v-for="customer in filteredItems"
               :key="customer.customerList"
             >
               <td>
@@ -127,7 +154,7 @@ watchEffect(() => {
                 {{ customer.firstname }}
               </td>
               <td class="text-center">
-                {{ customer.created_at }}
+                {{ customer.numbers_of_purchases }}
               </td>
               <td class="text-center">
                 {{ customer.phone }}
@@ -180,6 +207,9 @@ watchEffect(() => {
       <AnalyticsNumberBuy :customers="customerList" />
       <AnalyticsByMonth />
     </VCol>
+    <VCol cols="12">
+      <Areachart />
+    </VCol>
   </VRow>
 </template>
 
@@ -219,5 +249,8 @@ watchEffect(() => {
 .color{
     margin-left: 10px;
     align-items: center;
+}
+.tool{
+  width: 400px;
 }
 </style>

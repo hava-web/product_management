@@ -16,9 +16,10 @@ const orderData = {
   total_price: null,
 }
 
-const warehouseList = ref([])
+
 const attachment = ref([])
 const productList = ref([])
+const agentList = ref([])
 const customerList = ref([])
 const cusAvai = ref()
 
@@ -57,21 +58,17 @@ const addField = () => {
     quantity: null,
     price: 0,
     discount: null,
+    warehouse: null,
+    agent: null,
     brand: null,
     color: null,
     size: null,
   })
 }
 
-const getAllWarehouse = computed(()=> store.getters.getAllWarehouse)
 const getProducts = computed(() => store.getters.getProducts)
 const getCustomers = computed(() => store.getters.getCustomers)
 
-onMounted(async () => {
-  await store.dispatch('getAllWarehouse')
-  warehouseList.value.push(...getAllWarehouse.value)
-  console.log(getAllWarehouse.value)
-})
 
 onMounted(async () => {
   await store.dispatch('getCustomers')
@@ -245,13 +242,49 @@ const getColorByBraSiz = field => {
   })
 }
 
+const getWarehouseByProperties = field =>{
+  const accessToken = localStorage.getItem('accessToken')
+
+  field.warehouseList = []
+  axiosIns.get('api/product_brand_size_color_warehouse/' + field.product.id + '/' + field.brand + '/' + field.size  + '/' + field.color, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    console.log(res.data)
+    field.warehouseList = res.data
+    console.log(field.warehouseList)
+    console.log(res.data)
+  }).catch(err=>{
+    console.log(err.data)
+  })
+}
+
+const getAgentsByProperties = field =>{
+  const accessToken = localStorage.getItem('accessToken')
+
+  field.agentList = []
+  axiosIns.get('api/product_brand_size_color_warehouse_agent/' + field.product.id + '/' + field.brand + '/' + field.size  + '/' + field.color + '/' + field.warehouse, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    console.log(res.data)
+    field.agentList = res.data
+    console.log(field.agentList)
+    console.log(res.data)
+  }).catch(err=>{
+    console.log(err.data)
+  })
+}
+
 const getDiscount = field =>{
   const accessToken = localStorage.getItem('accessToken')
 
   field.discount = null
   field.selling_price = null
   field.product_quantity = null
-  axiosIns.get('api/get_discount/' + field.product.id + '/' + field.brand + '/' + field.size + '/' + field.color, {
+  axiosIns.get('api/get_discount/' + field.product.id + '/' + field.brand + '/' + field.size + '/' + field.color + '/' + field.warehouse + '/' + field.agent, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
@@ -304,6 +337,8 @@ const submit = async ()=>{
     quantity: Number(field.quantity),
     brand: field.brand,
     price: field.price,
+    warehouse: field.warehouse,
+    agent: field.agent,
     discount: field.discount,
     color: field.color,
     size: field.size,
@@ -331,22 +366,22 @@ const submit = async ()=>{
   }).then(res=>{
     console.log(res)
     if(res.status === 201){
-      alert.title = 'Successfully'
+      alert.title = 'Thành Công '
       alert.status = true
-      alert.text = 'Account Added Successfully'
+      alert.text = 'Đơn hàng đã được tạo thành công'
       alert.color = 'rgba(39, 217, 11, 0.8)'
       orderDataLocal.value = structuredClone(orderData)
       fields.value = []
     }
     else{
-      alert.title = 'Warning'
+      alert.title = 'Cảnh báo '
       alert.status = true
-      alert.text = 'Something went wrong'
+      alert.text = 'Có lỗi gì đó'
       alert.color = 'rgba(234, 223, 30, 0.8)'
     }
   }).catch(err=>{
     console.log(err)
-    alert.title = 'Error'
+    alert.title = 'Lỗi'
     alert.status = true
     alert.text = err.response.data.message
     alert.color = 'rgba(222, 29, 29, 0.8)'
@@ -373,13 +408,13 @@ const submit = async ()=>{
   <VRow>
     <VCol cols="12">
       <VCard
-        title="Create Order"
+        title="Tạo Đơn Hàng"
         prepend-icon="mdi-package-variant-closed-plus"
       >
         <VDivider />
         <VCardTitle class="d-flex">
           <VIcon icon="mdi-account" />
-          Customer Information
+          Thông tin khách hàng
           <div
             v-if="showButton"
             class="button-list"
@@ -389,7 +424,7 @@ const submit = async ()=>{
               prepend-icon="mdi-account-multiple-plus-outline"
               @click="showCreateForm"
             >
-              Create New Customer
+              Tạo mới khách hàng
             </VBtn>
             <VBtn
               class="button text-uppercase"
@@ -398,7 +433,7 @@ const submit = async ()=>{
               variant="tonal"
               @click="showCusAvail"
             >
-              Use Available Customers
+              Sử dụng khách hàng sẵn có
             </VBtn>
           </div>
         </VCardTitle>
@@ -414,7 +449,7 @@ const submit = async ()=>{
               >
                 <VTextField
                   v-model="orderDataLocal.firstname"
-                  label="First Name"
+                  label="Tên "
                 />
               </VCol>
 
@@ -425,7 +460,7 @@ const submit = async ()=>{
               >
                 <VTextField
                   v-model="orderDataLocal.lastname"
-                  label="Last Name"
+                  label="Họ"
                 />
               </VCol>
               <!-- 👉 Phone -->
@@ -435,7 +470,7 @@ const submit = async ()=>{
               >
                 <VTextField
                   v-model="orderDataLocal.phone"
-                  label="Phone Number"
+                  label="Số điện thoại"
                 />
               </VCol>
 
@@ -458,7 +493,7 @@ const submit = async ()=>{
               >
                 <VSelect
                   v-model="orderDataLocal.payment_mode"
-                  label="Payment Mode"
+                  label="Phương thức thanh toán"
                   :items="payment"
                 />
               </VCol>
@@ -470,7 +505,7 @@ const submit = async ()=>{
               >
                 <VTextField
                   v-model="orderDataLocal.address"
-                  label="Address"
+                  label="Địa chỉ"
                 />
               </VCol>
             </VRow>
@@ -492,16 +527,16 @@ const submit = async ()=>{
               <VCard class="w-100">
                 <div class="mx-5 my-5">
                   <div class="text-uppercase">
-                    Full Name : {{ cusAvaiInfo.lastname + ' ' + cusAvaiInfo.firstname }}
+                    Họ và tên: {{ cusAvaiInfo.lastname + ' ' + cusAvaiInfo.firstname }}
                   </div>
                   <div class="text-uppercase">
-                    Phone Number : {{ cusAvaiInfo.phone }} 
+                    Số điện thoại : {{ cusAvaiInfo.phone }} 
                   </div>
                   <div class="text-uppercase">
                     Email : {{ cusAvaiInfo.email }} 
                   </div>
                   <div class="text-uppercase">
-                    Address : {{ cusAvaiInfo.address }} 
+                    Địa chỉ nhân hàng : {{ cusAvaiInfo.address }} 
                   </div>
                 </div>
               </VCard>
@@ -509,7 +544,7 @@ const submit = async ()=>{
               <VCol cols="12">
                 <VSelect
                   v-model="cusAvaiInfo.payment_mode"
-                  label="Payment Mode"
+                  label="Phương thức thanh toán"
                   :items="payment"
                 />
               </VCol>
@@ -524,7 +559,7 @@ const submit = async ()=>{
                     class="d-flex flex-wrap gap-4"
                   >
                     <VIcon icon="mdi-package-variant" />
-                    Products
+                    Sản phẩm sẵn có 
                   </VCardTitle>
                   <VBtn
                     variant="tonal"
@@ -532,7 +567,7 @@ const submit = async ()=>{
                     prepend-icon="mdi-plus"
                     @click="addField"
                   >
-                    Add
+                    Thêm 
                   </VBtn>
                 </div>
 
@@ -551,7 +586,7 @@ const submit = async ()=>{
                       v-model="field.product"
                       clearable
                       chips
-                      label="Product"
+                      label="Sản phẩm"
                       :items="productList"
                       :item-title="formatName"
                       :item-value="getId(field.product)"
@@ -568,7 +603,7 @@ const submit = async ()=>{
                   >
                     <VTextField
                       v-model="field.quantity"
-                      label="Quantity"
+                      label="Số lượng"
                     />
                   </VCol>
 
@@ -579,7 +614,7 @@ const submit = async ()=>{
                   >
                     <VSelect
                       v-model="field.brand"
-                      label="Brand"
+                      label="Thương hiệu"
                       :items="field.brandList"
                       :item-title="formatName"
                       :item-value="getId"
@@ -594,7 +629,7 @@ const submit = async ()=>{
                   >
                     <VSelect
                       v-model="field.size"
-                      label="Size"
+                      label="Kích thước"
                       :items="field.sizeList"
                       :item-title="formatName"
                       :item-value="getId"
@@ -607,7 +642,7 @@ const submit = async ()=>{
                       v-model="field.color"
                       inline
                       class="group"
-                      @update:model-value="getDiscount(field)"
+                      @update:model-value="getWarehouseByProperties(field)"
                     >
                       <VCol
                         v-for="color in field.colorList"
@@ -637,8 +672,37 @@ const submit = async ()=>{
                       </VCol>
                     </VRadioGroup>
                   </div>
+                  <!-- 👉 Warehouse -->
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
+                    <VSelect
+                      v-model="field.warehouse"
+                      label="Kho"
+                      :items="field.warehouseList"
+                      :item-title="formatName"
+                      :item-value="getId"
+                      @update:model-value="getAgentsByProperties(field)"
+                    />
+                  </VCol>
+
+                  <!-- 👉 Agent -->
+                  <VCol
+                    cols="12"
+                    md="6"
+                  >
+                    <VSelect
+                      v-model="field.agent"
+                      label="Chi nhánh"
+                      :items="field.agentList"
+                      :item-title="formatName"
+                      :item-value="getId"
+                      @update:model-value="getDiscount(field)"
+                    />
+                  </VCol>
                   <div class="discout w-100 text-uppercase font-weight-regular">
-                    Product Quantity: {{ field.product_quantity }} 
+                    Số lượng sản phẩm: {{ field.product_quantity }} 
                     <VSheet
                       v-if="field.status"
                       :color="field.colorProduct"
@@ -649,17 +713,17 @@ const submit = async ()=>{
                     </VSheet>
                   </div>
                   <div class="discout w-100 text-uppercase font-weight-regular">
-                    Selling Price: ${{ field.selling_price }}
+                    Giá Bán Gốc: {{ field.selling_price }}vnd
                   </div>
                   <div class="discout w-100 text-uppercase font-weight-regular">
-                    discount: {{ field.discount }}%
+                    Triết khấu: {{ field.discount }}%
                   </div>
                   <div class="font-weight-bold price-item text-uppercase">
-                    Price: ${{ itemPrice(field) == NaN ? 0 : itemPrice(field) }}
+                    Giá sau triết khấu: {{ itemPrice(field) == NaN ? 0 : itemPrice(field) }}VND
                   </div>
                   <div class="remove justify-end w-100">
                     <VBtn @click="remove(field)">
-                      Remove
+                      Xóa
                     </VBtn>
                   </div>
                 </div>
@@ -667,7 +731,7 @@ const submit = async ()=>{
               <div class="w-100 d-flex justify-end">
                 <VCardTitle class="">
                   <VIcon icon="mdi-currency-usd" />
-                  Total Price: ${{ totalPrice() }}
+                  Tổng tiền: {{ totalPrice() }}VND
                 </VCardTitle>
               </div>
 
@@ -677,7 +741,7 @@ const submit = async ()=>{
                 class="d-flex flex-wrap gap-4"
               >
                 <VBtn @click="submit">
-                  Add Product
+                  Tạo đơn hàng
                 </VBtn>
 
                 <VBtn

@@ -68,8 +68,8 @@ const update = async id=>{
     console.log(res)
     dialog.value = false
     alert.status = true
-    alert.title = 'Updated Successfully'
-    alert.text = 'Categoty Updated Successfully'
+    alert.title = 'Cập nhật thành công'
+    alert.text = 'Màu sắc đã được Cập nhật thành công'
     alert.color = 'rgba(39, 217, 11, 0.8)'
   }).catch(err=>{
     console.log(colorInfor)
@@ -97,8 +97,8 @@ const deleteCol = id=>{
     console.log(res)
     cancel.value = false
     alert.status = true
-    alert.title = 'Deleted Successfully'
-    alert.text = 'Category deleted Successfully'
+    alert.title = 'Xóa thành công'
+    alert.text = 'Màu sắc đã được Xóa thành công'
     alert.color = 'rgba(39, 217, 11, 0.8)'
 
     const index = colorList.value.findIndex(cat => cat.id === id)
@@ -163,16 +163,16 @@ watchEffect(() => {
                 ID
               </th>
               <th class="text-uppercase text-center">
-                Name
+                Tên màu
               </th>
               <th class="text-uppercase text-center">
-                Created Time
+                Ngày tạo
               </th>
               <th class="text-uppercase text-center">
-                Color
+                Màu
               </th>
               <th class="text-uppercase text-center">
-                Action
+                Cài đặt
               </th>
             </tr>
           </thead>
@@ -251,7 +251,7 @@ watchEffect(() => {
                           </Transition>
                           <VCard
                             prepend-icon="mdi-store-edit"
-                            title=" Update Employee "
+                            title="Cập nhật nàu sắc"
                           >
                             <VCardText>
                               <!-- 👉 Form -->
@@ -265,7 +265,7 @@ watchEffect(() => {
                                     <VTextField
                                       v-model="colorInfor.name"
                                       prepend-icon="mdi-rename"
-                                      label="Color Name"
+                                      label="Tên màu"
                                     />
                                   </VCol>
 
@@ -277,27 +277,8 @@ watchEffect(() => {
                                     <VTextField
                                       v-model="colorInfor.code_color"
                                       prepend-icon="mdi-code-brackets"
-                                      label="Color Code"
+                                      label="Mã màu"
                                     />
-                                  </VCol>
-
-                                  <!-- 👉 Form Actions -->
-                                  <VCol
-                                    cols="12"
-                                    class="d-flex flex-wrap gap-4"
-                                  >
-                                    <VBtn @click="submit">
-                                      Add Color
-                                    </VBtn>
-
-                                    <VBtn
-                                      color="secondary"
-                                      variant="tonal"
-                                      type="reset"
-                                      @click.prevent="resetForm"
-                                    >
-                                      Reset
-                                    </VBtn>
                                   </VCol>
                                 </VRow>
                               </VForm>
@@ -311,7 +292,7 @@ watchEffect(() => {
                                 prepend-icon="mdi-close"
                                 @click="dialog = false"
                               >
-                                Cancel
+                                Hủy bỏ
                               </VBtn>
                               <VBtn
                                 color="primary"
@@ -319,7 +300,7 @@ watchEffect(() => {
                                 prepend-icon="mdi-pencil-outline"
                                 @click="update(color.id)"
                               >
-                                Update
+                                Cập nhật
                               </VBtn>
                             </VCardActions>
                           </VCard>
@@ -348,10 +329,10 @@ watchEffect(() => {
                           </template>
                           <VCard
                             prepend-icon="mdi-alert"
-                            title="Do you want delete this warehouse ?"
+                            title="Xóa màu sắc"
                           >
                             <VCardText>
-                              Once you delete this warehouse you can not get this warehouse information again. Are you sure you want delete this ?
+                              Bạn có chắc chắn là bạn muốn xóa thông tin này không ?
                             </VCardText>
                             <VCardActions>
                               <VSpacer />
@@ -361,7 +342,7 @@ watchEffect(() => {
                                 variant="elevated"
                                 @click="cancel = false"
                               >
-                                Cancel
+                                Hủy bỏ
                               </VBtn>
                               <VBtn
                                 color="red"
@@ -369,7 +350,7 @@ watchEffect(() => {
                                 variant="elevated"
                                 @click="deleteCol(color.id)"
                               >
-                                Delete
+                                Xóa 
                               </VBtn>
                             </VCardActions>
                           </VCard>

@@ -150,14 +150,14 @@ const update = async id=>{
       'Authorization': `Bearer ${accessToken}`,
     },
   }).then(res=>{
-    alert.title = 'Successfully'
+    alert.title = 'Thành công '
     alert.status = true
-    alert.text = 'Account Added Successfully'
+    alert.text = 'Đơn hàng đã cập nhật thành công '
     alert.color = 'rgba(39, 217, 11, 0.8)'
     console.log(res.data)
 
   }).catch(err=>{
-    alert.title = 'Error'
+    alert.title = 'Lỗi '
     alert.status = true
     alert.text = err.response.data
     alert.color = 'rgba(222, 29, 29, 0.8)'
@@ -183,7 +183,7 @@ const update = async id=>{
   <VRow>
     <VCol cols="12">
       <VCard 
-        :title="'ORDER ' + id"
+        :title="'Mã đơn hàng ' + id"
         prepend-icon="mdi-package-variant-closed"
       >
         <VDivider />
@@ -192,7 +192,7 @@ const update = async id=>{
             icon="mdi-account"
             class="icon-header"
           />
-          <VCardTitle>CUSTOMER INFORMATION</VCardTitle>
+          <VCardTitle>Thông tin khách hàng</VCardTitle>
           <VCol
             md="3"
             cols="6"
@@ -200,7 +200,7 @@ const update = async id=>{
           >
             <VSelect
               v-model="order.status"
-              label="Select"
+              label="Trạng thái"
               :items="orderStatus"
             />
           </VCol>
@@ -208,7 +208,7 @@ const update = async id=>{
             class="my-5"
             @click="update(id)"
           >
-            Update
+            Cập nhật
           </VBtn>
         </div>
         <VTable>
@@ -219,7 +219,7 @@ const update = async id=>{
                   class="icon"
                   icon="mdi-id-card"
                 />
-                Customer ID:
+                Mã khách hàng:
               </div>
               <div class="infor">
                 {{ customer.id }}
@@ -231,7 +231,7 @@ const update = async id=>{
                   class="icon"
                   icon="mdi-ab-testing"
                 />
-                Full Name:
+                Họ và tên:
               </div>
               <div class="infor">
                 {{ customer.lastname + ' ' + customer.firstname }}
@@ -245,7 +245,7 @@ const update = async id=>{
                   class="icon"
                   icon="mdi-phone"
                 />
-                Phone Number:
+                Số điện thoại:
               </div>
               <div class="infor">
                 {{ customer.phone }}
@@ -271,7 +271,7 @@ const update = async id=>{
                   class="icon"
                   icon="mdi-map-marker"
                 />
-                Address:
+                Địa chỉ nhận hàng:
               </div>
               <div class="infor">
                 {{ customer.address }}
@@ -283,7 +283,7 @@ const update = async id=>{
                   class="icon"
                   icon="mdi-bank"
                 />
-                Payment Mode:
+                Phương thức thanh toán:
               </div>
               <div class="infor">
                 {{ order.payment_mode }}
@@ -296,7 +296,7 @@ const update = async id=>{
             icon="mdi-package-variant"
             class="icon-header"
           />
-          <VCardTitle>ORDER DETAIL</VCardTitle>
+          <VCardTitle>Chi tiết đơn hàng</VCardTitle>
         </div>
         <VList>
           <VListItem
@@ -334,17 +334,17 @@ const update = async id=>{
                 X{{ product.quantity }}
               </div>
               <div class="mx-3 ">
-                <h5>Discount: {{ product.discount }}%</h5> 
+                <h5>Giảm giá: {{ product.discount }}%</h5> 
               </div>
               <div class="mx-3 price">
-                <h5>Price: ${{ product.price }}</h5>
+                <h5>Giá: {{ product.price }}VND</h5>
               </div>
             </VCard>
           </VListItem>
         </VList>
         <div class="d-flex flex-row-reverse total-price py-4">
           <h3 class="">
-            Total Price: ${{ order.total_price }}
+            Thành tiền: {{ order.total_price }}VND
           </h3>
         </div>
         <VTimeline direction="horizontal">

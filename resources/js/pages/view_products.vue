@@ -24,6 +24,8 @@ const brandList = ref([])
 const colorList = ref([])
 const sizeList = ref([])
 const imageList = ref([])
+const agentList = ref([])
+const searchQuery = ref('')
 
 
 const alert = reactive({
@@ -40,6 +42,19 @@ const error = reactive({
   color: '',
 })
 
+const product = reactive({
+  brand: null,
+  size: null,
+  color: null,
+  agent: null,
+  warehouse: null,
+  category: null,
+  from: null,
+  to: null,
+}) 
+
+const isActive = ref(false)
+
 const productInfor = reactive({
   id: null,
   images: [],
@@ -48,7 +63,7 @@ const productInfor = reactive({
   properties: [],
   quantity: null,
   imported_date: null,
-  delivered_from: '',
+  product_code: '',
   description: '',
 })
 
@@ -61,6 +76,7 @@ const getAllWarehouse = computed(()=> store.getters.getAllWarehouse)
 const getBrands = computed(()=> store.getters.getBrands)
 const getColors = computed(() => store.getters.getColors)
 const getSizes = computed(() => store.getters.getSizes)
+const getAgents = computed(() => store.getters.getAgents)
 
 
 onMounted(async () => {
@@ -93,10 +109,39 @@ onMounted(async () => {
   console.log(getSizes.value)
 })
 
+onMounted(async () => {
+  await store.dispatch('getAgents')
+  agentList.value.push(...getAgents.value)
+  console.log(getAgents.value)
+})
+
 const getId = category => category.id
 
 const formatName = category=>{
   return  category.id + ' - ' + category.name
+}
+
+const confirm = () =>{
+  console.log(product)
+
+  const accessToken = localStorage.getItem('accessToken')
+
+  axiosIns.post(`api/filter_product_page?page=${page.value}`, product, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    isActive.value = false
+    productList.value = []
+    productList.value = res.data.data
+    console.log(res.data)
+  }).catch(err=>{
+    console.log(err.data)
+    error.status = true
+    error.title = 'You have some errors'
+    error.text = err.response.data.message
+    error.color = 'rgba(222, 29, 29, 0.8)'
+  })
 }
 
 
@@ -106,6 +151,7 @@ const addField = () => {
     sale_percentage: null,
     original_price: null,
     selling_price: null,
+    agent: null,
     brand_id: null,
     warehouse_id: null,
     color_id: null,
@@ -115,19 +161,6 @@ const addField = () => {
   })
 }
 
-// function onFileChange(event){
-//   haveImg.value = true
-//   productInfor.image = event.target.files[0]
-//   let reader = new FileReader()
-//   reader.addEventListener("load", function(){
-//     imagePreview.value = reader.result
-//   }.bind(), false)
-
-//   if(productInfor.image &&  /\.(jpe?g|png|gif)$/i.test( productInfor.image.name)){
-//     reader.readAsDataURL(productInfor.image)
-//   }
-
-// }
 
 const viewProduct = id =>{
   show.value = false
@@ -142,11 +175,6 @@ const closeDialog = () =>{
   fields.value = []
   productInfor.properties = []
 }
-
-
-
-
-
 
 const updateForm = async id=>{
   const accessToken = localStorage.getItem('accessToken')
@@ -163,7 +191,7 @@ const updateForm = async id=>{
     productInfor.selling_price = Number(res.data.selling_price)
     productInfor.quantity = res.data.quantity
     productInfor.imported_date = res.data.imported_date
-    productInfor.delivered_from = res.data.delivered_from
+    productInfor.product_code = res.data.product_code
     productInfor.description = res.data.description
 
     // imagePreview.value = 'storage/images/' + productInfor.image
@@ -204,6 +232,7 @@ const updateForm = async id=>{
 
 const update = async id=>{
   const properties = fields.value.map(field => ({
+    agent_id: field.agent_id,
     quantity: Number(field.quantity),
     sale_percentage: Number(field.sale_percentage),
     brand_id: field.brand_id,
@@ -228,8 +257,8 @@ const update = async id=>{
     console.log(res)
     dialog.value = false
     alert.status = true
-    alert.title = 'Updated Successfully'
-    alert.text = 'Categoty Updated Successfully'
+    alert.title = 'Cập nhật thành công'
+    alert.text = 'Sản phẩm đã được Cập nhật thành công'
     alert.color = 'rgba(39, 217, 11, 0.8)'
     productInfor.images = []
     imageList.value = []
@@ -261,8 +290,8 @@ const deletePro = id=>{
     console.log(res)  
     cancel.value = false
     alert.status = true
-    alert.title = 'Deleted Successfully'
-    alert.text = 'product deleted Successfully'
+    alert.title = 'Xóa thành công'
+    alert.text = 'Sản phẩm đã được Xóa thành công'
     alert.color = 'rgba(39, 217, 11, 0.8)'
 
     const index = productList.value.findIndex(cat => cat.id === id)
@@ -272,6 +301,15 @@ const deletePro = id=>{
     console.log(err)
   })
 }
+
+const filteredItems = computed(() => {
+  return productList.value.filter(item => {
+    const  productName = item.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const productCode = item.product_code && typeof item.product_code === 'string' && item.product_code.toString().includes(searchQuery.value)
+
+    return productName || productCode
+  })
+})
 
 // Call the action to retrieve the warehouse data and set the initial value of currentproductList to the result.
 
@@ -289,6 +327,8 @@ function updateproductList() {
 }
 
 watch(page, updateproductList)
+
+watch(page, confirm)
 
 
 watchEffect(() => {
@@ -316,9 +356,207 @@ watchEffect(() => {
   <VRow v-if="show">
     <VCol cols="12">
       <VCard 
-        title="All Products"
+        title="Toàn bộ sản phẩm"
         prepend-icon="mdi-store-plus-outline"
       >
+        <template #append>
+          <div class="me-n3 tool">
+            <VCol
+              cols="auto"
+              class="d-flex"
+            >
+              <VTextField
+                v-model="searchQuery"
+                title="Search"
+                class="mx-3"
+                prepend-inner-icon="mdi-magnify"
+                placeholder="Search"
+              />
+              <VDialog
+                v-model="isActive"
+                transition="dialog-bottom-transition"
+              >
+                <template #activator="{ props }">
+                  <VBtn
+                    color="none"
+                    v-bind="props"
+                    icon="mdi-clock-time-eight-outline"
+                  >
+                    <VIcon icon="mdi-filter" />
+                  </VBtn>
+                </template>
+                <Transition name="slide-fade">
+                  <VAlert 
+                    v-if="error.status"
+                    :color="error.color"
+                    icon="mdi-alert"
+                    :title="error.title"
+                    closable
+                    class="alert"
+                    max-width="400px"
+                    :text="error.text"
+                    @click:close="error.status = false"
+                  />
+                </Transition>
+                <VCard>
+                  <VToolbar
+                    color="primary"
+                    title="Lọc sản phẩm"
+                  />
+                  <VCardText>
+                    <VForm class="mt-6">
+                      <VRow>
+                        <!-- 👉 Category -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VSelect
+                            v-model="product.category"
+                            label="Danh mục"
+                            :items="categoryList"
+                            :item-title="formatName"
+                            :item-value="getId"
+                          />
+                        </VCol>
+
+                        <!-- 👉 brand -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VSelect
+                            v-model="product.brand"
+                            label="Thương Hiệu"
+                            :items="brandList"
+                            :item-title="formatName"
+                            :item-value="getId"
+                          />
+                        </VCol>
+
+                        <!-- 👉 size -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VSelect
+                            v-model="product.size"
+                            label="Kích thước"
+                            :items="sizeList"
+                            :item-title="formatName"
+                            :item-value="getId"
+                          />
+                        </VCol>
+                        <div class="d-flex flex-wrap color ">
+                          <VRadioGroup
+                            v-model="product.color"
+                            inline
+                            class="group"
+                          >
+                            <VCol
+                              v-for="color in colorList"
+                              :key="color.colorList"
+                              md="3"
+                              cols="2"
+                            >
+                              <div class="d-flex">
+                                <VSheet
+                                  class="mt-2 mb-2 "
+                                  elevation="12"
+                                  rounded="circle"
+                                  :color="color.code_color"
+                                  height="50"
+                                  width="50"
+                                />
+                                <div class="lable pa-4">
+                                  <div class="lable-title">
+                                    {{ color.name }}
+                                  </div>
+                                  <VRadio
+                                    class="pe-2"
+                                    :value="color.id"
+                                  />
+                                </div>
+                              </div>
+                            </VCol>
+                          </VRadioGroup>
+                        </div>
+                        <!-- 👉 warehouse -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VSelect
+                            v-model="product.warehouse"
+                            label="Kho hàng"
+                            :items="warehouseList"
+                            :item-title="formatName"
+                            :item-value="getId"
+                          />
+                        </VCol>
+                        <!-- 👉 Agent -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VSelect
+                            v-model="product.agent"
+                            label="Chi nhánh"
+                            :items="agentList"
+                            :item-title="formatName"
+                            :item-value="getId"
+                          />
+                        </VCol>
+                        <!-- 👉 From -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VTextField
+                            v-model="product.from"
+                            type="date"
+                            label="Từ ngày"
+                          />
+                        </VCol>
+                        <!-- 👉 To -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VTextField
+                            v-model="product.to"
+                            type="date"
+                            label="Đến ngày"
+                          />
+                        </VCol>
+                      </VRow>
+                    </VForm>
+                  </VCardText>
+                  <VCardActions class="justify-end">
+                    <VBtn
+                      variant="text"
+                      @click="isActive = false"
+                    >
+                      Đóng
+                    </VBtn>
+                    <VBtn
+                      variant="text"
+                      @click="reset"
+                    >
+                      Reset
+                    </VBtn>
+                    <VBtn
+                      variant="text"
+                      @click="confirm"
+                    >
+                      Xác nhận
+                    </VBtn>
+                  </VCardActions>
+                </VCard>
+              </VDialog>
+            </VCol>
+          </div>
+        </template> 
         <VDivider />
         <VTable>
           <thead>
@@ -327,26 +565,26 @@ watchEffect(() => {
                 ID
               </th>
               <th class="text-uppercase text-center">
-                Name
+                Tên sản phẩm
               </th>
               <th class="text-uppercase text-center">
-                Quantity
+                Số lượng
               </th>
               <th class="text-uppercase text-center">
-                Status
+                Mã nhập
               </th>
               <th class="text-uppercase text-center">
-                Imported Date
+                Ngày nhập
               </th>
               <th class="text-uppercase text-center">
-                Action
+                Cài đặt
               </th>
             </tr>
           </thead>
 
           <tbody>
             <tr
-              v-for="product in productList"
+              v-for="product in filteredItems"
               :key="product.productList"
             >
               <td>
@@ -359,7 +597,7 @@ watchEffect(() => {
                 {{ product.quantity }}
               </td>
               <td class="text-center">
-                {{ product.status }}
+                {{ product.product_code }}
               </td>
               <td class="text-center">
                 <!--
@@ -441,7 +679,7 @@ watchEffect(() => {
                             />
                           </Transition>
                           <VCard
-                            title="Add Product"
+                            title="Cập nhật sản phẩm"
                             prepend-icon="mdi-package-variant-closed-plus"
                           >
                             <VCardText class="d-flex">
@@ -490,7 +728,7 @@ watchEffect(() => {
 
 
                                 <p class="text-body-1 mb-0">
-                                  Allowed JPG, GIF or PNG. Max size of 800K
+                                  Bạn có thể thêm nhiều ảnh
                                 </p>
                               </form>
                             </VCardText>
@@ -508,7 +746,28 @@ watchEffect(() => {
                                   >
                                     <VTextField
                                       v-model="productInfor.name"
-                                      label="Product Name"
+                                      label="Tên sản phẩm"
+                                    />
+                                  </VCol>
+                                  <!-- 👉 Product code -->
+                                  <VCol
+                                    cols="12"
+                                    md="6"
+                                  >
+                                    <VTextField
+                                      v-model="productInfor.product_code"
+                                      label="Mã nhập"
+                                    />
+                                  </VCol>
+                                  <!-- 👉 Import Date -->
+                                  <VCol
+                                    cols="12"
+                                    md="6"
+                                  >
+                                    <VTextField
+                                      v-model="productInfor.imported_date"
+                                      type="date"
+                                      label="Ngày nhập"
                                     />
                                   </VCol>
                                   <!-- 👉 Category -->
@@ -518,7 +777,7 @@ watchEffect(() => {
                                   >
                                     <VSelect
                                       v-model="productInfor.category"
-                                      label="Category"
+                                      label="Danh mục"
                                       :items="categoryList"
                                       :item-title="formatName"
                                       :item-value="getId"
@@ -526,41 +785,19 @@ watchEffect(() => {
                                   </VCol>
 
                                   <!-- 👉 Quantity -->
-                                  <VCol
-                                    cols="12"
-                                    md="6"
-                                  >
-                                    <VTextField
-                                      v-model="productInfor.quantity"
-                                      label="Quantity"
-                                    />
-                                  </VCol>
-
-                                  <!-- 👉 Import Date -->
-                                  <VCol
-                                    cols="12"
-                                    md="6"
-                                  >
-                                    <VTextField
-                                      v-model="productInfor.imported_date"
-                                      type="date"
-                                      label="Imported Date"
-                                    />
-                                  </VCol>
-
-                                  <!-- 👉 Delivered From -->
                                   <VCol cols="12">
                                     <VTextField
-                                      v-model="productInfor.delivered_from"
-                                      label="Delivered From"
+                                      v-model="productInfor.quantity"
+                                      label="Số lượng"
                                     />
                                   </VCol>
+
 
                                   <!-- 👉 Description -->
                                   <VCol cols="12">
                                     <VTextarea
                                       v-model="productInfor.description"
-                                      label="Description"
+                                      label="Mô tả"
                                     />
                                   </VCol>
               
@@ -574,7 +811,7 @@ watchEffect(() => {
                                         class="d-flex flex-wrap gap-4"
                                       >
                                         <VIcon icon="mdi-atom-variant" />
-                                        Properties
+                                        Thuộc tính
                                       </VCardTitle>
                                       <VBtn
                                         variant="tonal"
@@ -582,7 +819,7 @@ watchEffect(() => {
                                         prepend-icon="mdi-plus"
                                         @click="addField"
                                       >
-                                        Add
+                                        Thêm 
                                       </VBtn>
                                     </div>
 
@@ -593,11 +830,28 @@ watchEffect(() => {
                                       class="d-flex flex-wrap form"
                                     >
                                       <!-- 👉 Quantity -->
-                                      <VCol cols="12">
+                                      <VCol
+                                        cols="12"
+                                        md="6"
+                                      >
                                         <VTextField
                                           v-model="field.quantity"
                                           type="number"
-                                          label="Quantity"
+                                          label="Số lượng"
+                                        />
+                                      </VCol>
+
+                                      <!-- 👉 Agent -->
+                                      <VCol
+                                        cols="12"
+                                        md="6"
+                                      >
+                                        <VSelect
+                                          v-model="field.agent_id"
+                                          label="Chi nhánh"
+                                          :items="agentList"
+                                          :item-title="formatName"
+                                          :item-value="getId"
                                         />
                                       </VCol>
 
@@ -608,7 +862,7 @@ watchEffect(() => {
                                       >
                                         <VTextField
                                           v-model="field.sale_percentage"
-                                          label="Discount"
+                                          label="Triết khấu"
                                         />
                                       </VCol>
 
@@ -619,7 +873,7 @@ watchEffect(() => {
                                       >
                                         <VSelect
                                           v-model="field.brand_id"
-                                          label="Brand"
+                                          label="Thương hiệu"
                                           :items="brandList"
                                           :item-title="formatName"
                                           :item-value="getId"
@@ -633,7 +887,7 @@ watchEffect(() => {
                                       >
                                         <VTextField
                                           v-model="field.original_price"
-                                          label="Original Price"
+                                          label="Giá gốc"
                                         />
                                       </VCol>
 
@@ -644,7 +898,7 @@ watchEffect(() => {
                                       >
                                         <VTextField
                                           v-model="field.selling_price"
-                                          label="Selling Price"
+                                          label="Gía bán"
                                         />
                                       </VCol>
 
@@ -656,7 +910,7 @@ watchEffect(() => {
                                       >
                                         <VSelect
                                           v-model="field.warehouse_id"
-                                          label="Warehouse"
+                                          label="Kho hàng"
                                           :items="warehouseList"
                                           :item-title="formatName"
                                           :item-value="getId"
@@ -670,7 +924,7 @@ watchEffect(() => {
                                       >
                                         <VSelect
                                           v-model="field.size_id"
-                                          label="Size"
+                                          label="Kích thước"
                                           :items="sizeList"
                                           :item-title="formatName"
                                           :item-value="getId"
@@ -684,7 +938,7 @@ watchEffect(() => {
                                       >
                                         <VSelect
                                           v-model="field.status"
-                                          label="Status"
+                                          label="Trạng thái"
                                           :items="productStatus"
                                         />
                                       </VCol>
@@ -697,7 +951,7 @@ watchEffect(() => {
                                         <VTextField
                                           v-model="field.expired_date"
                                           type="date"
-                                          label="Expired Date"
+                                          label="Ngày hết hạn"
                                         />
                                       </VCol>
                                       <div class="w-100 d-flex flex-wrap color ">
@@ -761,7 +1015,7 @@ watchEffect(() => {
                                     class="d-flex flex-wrap gap-4"
                                   >
                                     <VBtn @click="update(product.id)">
-                                      Update Product
+                                      Cập nhật sản phẩm
                                     </VBtn>
 
                                     <VBtn
@@ -770,7 +1024,7 @@ watchEffect(() => {
                                       type="reset"
                                       @click="closeDialog"
                                     >
-                                      Cancel
+                                      Hủy bỏ
                                     </VBtn>
                                   </VCol>
                                 </VRow>
@@ -802,10 +1056,10 @@ watchEffect(() => {
                           </template>
                           <VCard
                             prepend-icon="mdi-alert"
-                            title="Do you want delete this warehouse ?"
+                            title="Xóa sản phẩm"
                           >
                             <VCardText>
-                              Once you delete this warehouse you can not get this warehouse information again. Are you sure you want delete this ?
+                              Bạn có chắc chắn là bạn muốn xóa thông tin này không ?
                             </VCardText>
                             <VCardActions>
                               <VSpacer />
@@ -815,7 +1069,7 @@ watchEffect(() => {
                                 variant="elevated"
                                 @click="cancel = false"
                               >
-                                Cancel
+                                Hủy bỏ
                               </VBtn>
                               <VBtn
                                 color="red"
@@ -823,7 +1077,7 @@ watchEffect(() => {
                                 variant="elevated"
                                 @click="deletePro(product.id)"
                               >
-                                Delete
+                                Xóa
                               </VBtn>
                             </VCardActions>
                           </VCard>
@@ -890,5 +1144,8 @@ watchEffect(() => {
   position: absolute;
   right: 30px;
 
+}
+.tool{
+  width: 400px;
 }
 </style>

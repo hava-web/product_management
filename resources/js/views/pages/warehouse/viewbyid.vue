@@ -1,6 +1,11 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
 import axiosIns from '@/plugins/axios'
+import Piechart from '../warehouse/piechart.vue'
+import Barchart from './barchart.vue'
+import Products from './products.vue'
+import Linechart from './linechart.vue'
+import Employee from './employee.vue'
 import { reactive } from 'vue'
 
 const route = useRoute()
@@ -79,7 +84,7 @@ const viewEmployee = id =>{
   <VRow>
     <VCol cols="12">
       <VCard 
-        title="Warehouse"
+        :title="'Mã kho hàng ' + id"
         prepend-icon="mdi-store-plus-outline"
       >
         <VDivider />
@@ -106,7 +111,7 @@ const viewEmployee = id =>{
                   icon="mdi-warehouse"
                 />
                 <div class="">
-                  Warehouse Name:
+                  Tên kho:
                 </div>
               </div>
             </td>
@@ -120,7 +125,7 @@ const viewEmployee = id =>{
                   icon="mdi-account-tie"
                 />
                 <div class="">
-                  Manager:
+                  Quản lý:
                 </div>
               </div>
             </td>
@@ -134,7 +139,7 @@ const viewEmployee = id =>{
                   icon="mdi-city-variant"
                 />
                 <div class="">
-                  City:
+                  Thành phố:
                 </div>
               </div>
             </td>
@@ -148,7 +153,7 @@ const viewEmployee = id =>{
                   icon="mdi-bulletin-board"
                 />
                 <div class="">
-                  Status:
+                  Trạng thái:
                 </div>
               </div>
             </td>
@@ -162,7 +167,7 @@ const viewEmployee = id =>{
                   icon="mdi-map-marker"
                 />
                 <div class="">
-                  Address:
+                  Địa chỉ:
                 </div>
               </div>
             </td>
@@ -170,44 +175,60 @@ const viewEmployee = id =>{
           </tr>
         </VTable>
         <VDivider />
-        <VCard
-          title="Employees List" 
-          prepend-icon="mdi-account-box"
-        />
-        <VList>
+        <Employee :id="id" />
+        <!--
+          <VList>
           <VCard
-            v-for="employee in employeeList"
-            :key="employee.id"
-            class="employee mx-3 my-2"
-            @click="viewEmployee(employee.id)"
+          v-for="employee in employeeList"
+          :key="employee.id"
+          class="employee mx-3 my-2"
+          @click="viewEmployee(employee.id)"
           >
-            <div class="d-flex">
-              <div class=" mx-5">
-                ID: {{ employee.id }}
-              </div>
-              <div class="mx-5">
-                Full Name: {{ employee.lastname + ' ' + employee.firstname }}
-              </div>
-              <div class="px-5">
-                <VImg
-                  :src="employee.image"
-                  width="50"
-                  height="50"
-                />
-              </div>
-              <div class="mx-5">
-                Date: {{ employee.date_of_birth }}
-              </div>
-              <div class="mx-5">
-                Phone: {{ employee.phone }}
-              </div>
-              <div class="mx-5">
-                Email: {{ employee.email }}
-              </div>
-            </div>
+          <div class="d-flex">
+          <div class=" mx-5">
+          ID: {{ employee.id }}
+          </div>
+          <div class="mx-5">
+          Full Name: {{ employee.lastname + ' ' + employee.firstname }}
+          </div>
+          <div class="px-5">
+          <VImg
+          :src="employee.image"
+          width="50"
+          height="50"
+          />
+          </div>
+          <div class="mx-5">
+          Date: {{ employee.date_of_birth }}
+          </div>
+          <div class="mx-5">
+          Phone: {{ employee.phone }}
+          </div>
+          <div class="mx-5">
+          Email: {{ employee.email }}
+          </div>
+          </div>
           </VCard>
-        </VList>
-      </VCard>
+          </VList> 
+        -->
+        <VCard
+          title="Phân tích"
+          prepend-icon="mdi-chart-areaspline"
+        >
+          <div class="d-flex">
+            <Piechart
+              :id="id"
+              class="w-50"
+            />
+            <Barchart
+              :id="id"
+              class="w-50"
+            />
+          </div>
+          <Linechart :id="id" />
+        </VCard>
+        <Products :id="id" />
+      </vcard>
     </VCol>
   </VRow>
 </template>

@@ -81,7 +81,7 @@ const viewOrder = id =>{
   <VRow>
     <VCol cols="12">
       <VCard 
-        :title="'CUSTOMER ' + id"
+        :title="'Mã khách hàng ' + id"
         prepend-icon="mdi-package-variant-closed"
       >
         <VDivider />
@@ -90,7 +90,7 @@ const viewOrder = id =>{
             icon="mdi-account"
             class="icon-header"
           />
-          <VCardTitle>CUSTOMER INFORMATION</VCardTitle>
+          <VCardTitle>Thông tin khách hàng</VCardTitle>
         </div>
         <VTable>
           <tr class="d-flex">
@@ -100,7 +100,7 @@ const viewOrder = id =>{
                   class="icon"
                   icon="mdi-id-card"
                 />
-                Customer ID:
+                Mã khách hàng:
               </div>
               <div class="infor">
                 {{ customer.id }}
@@ -112,7 +112,7 @@ const viewOrder = id =>{
                   class="icon"
                   icon="mdi-ab-testing"
                 />
-                Full Name:
+                Họ và tên:
               </div>
               <div class="infor">
                 {{ customer.lastname + ' ' + customer.firstname }}
@@ -126,7 +126,7 @@ const viewOrder = id =>{
                   class="icon"
                   icon="mdi-phone"
                 />
-                Phone Number:
+                Số điên thoại:
               </div>
               <div class="infor">
                 {{ customer.phone }}
@@ -152,7 +152,7 @@ const viewOrder = id =>{
                   class="icon"
                   icon="mdi-map-marker"
                 />
-                Address:
+                Địa chỉ nhận hàng:
               </div>
               <div class="infor">
                 {{ customer.address }}
@@ -165,7 +165,7 @@ const viewOrder = id =>{
             icon="mdi-package-variant"
             class="icon-header"
           />
-          <VCardTitle>ORDER LIST</VCardTitle>
+          <VCardTitle>Danh sách đơn hàng</VCardTitle>
         </div>
         <VList>
           <VListItem
@@ -180,13 +180,13 @@ const viewOrder = id =>{
                 {{ order.id }}
               </div>
               <div class="mx-3 product-name">
-                Total Price: ${{ order.total_price }}
+                Tổng giá: {{ order.total_price }}VND
               </div>
               <div class="mx-3 product-name">
-                Status: {{ order.status }}
+                Trạng thái: {{ order.status }}
               </div>
               <div class="mx-3 color-name">
-                Payment Mode: {{ order.payment_mode }}
+                Phương thức thanh toán: {{ order.payment_mode }}
               </div>
             </VCard>
           </VListItem>

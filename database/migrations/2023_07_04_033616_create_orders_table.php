@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('customer_id');
             $table->decimal('total_price',12,2);
+            $table->unsignedBigInteger('user_id');
             $table->string('status');
             $table->string('payment_mode');
             $table->foreign('customer_id')->references('id')->on('customers');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }

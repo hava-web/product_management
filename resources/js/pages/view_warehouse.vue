@@ -30,6 +30,50 @@ const error = reactive({
   color: '',
 })
 
+const warehouse = reactive({
+  status: null,
+  from: null,
+  to: null,
+})
+
+const isActive = ref(false)
+const searchQuery = ref('')
+
+const filteredItems = computed(() => {
+  return warehouseList.value.filter(item => {
+    return item.name.toLowerCase().includes(searchQuery.value.toLowerCase()) 
+  })
+})
+
+const confirm = () =>{
+  console.log(warehouse)
+
+  const accessToken = localStorage.getItem('accessToken')
+
+  axiosIns.post(`api/warehouses_filter?page=${page.value}`, warehouse, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    isActive.value = false
+    warehouseList.value = []
+    warehouseList.value = res.data.data
+    console.log(res.data)
+  }).catch(err=>{
+    console.log(err.data)
+    error.status = true
+    error.title = 'You have some errors'
+    error.text = err.response.data.message
+    error.color = 'rgba(222, 29, 29, 0.8)'
+  })
+}
+
+const reset = () =>{
+  warehouse.status = null
+  warehouse.from = null
+  warehouse.to = null
+}
+
 const getAllUser = computed(() => store.getters.getAllUser)
 
 onMounted( async () => {
@@ -120,13 +164,13 @@ const update = async id=>{
     console.log(res)
     dialog.value = false
     alert.status = true
-    alert.title = 'Updated Successfully'
-    alert.text = 'Warehouse Updated Successfully'
+    alert.title = 'Cập nhật thành công'
+    alert.text = 'Kho hàng đã được Cập nhật thành công'
     alert.color = 'rgba(39, 217, 11, 0.8)'
   }).catch(err=>{
     console.log(err)
     error.status = true
-    error.title = 'You have some errors'
+    error.title = 'Bạn có lỗi'
     error.text = err.response.data.message
     error.color = 'rgba(222, 29, 29, 0.8)'
   })
@@ -147,8 +191,8 @@ const deleteWarehouse = id=>{
     console.log(res)
     cancel.value = false
     alert.status = true
-    alert.title = 'Deleted Successfully'
-    alert.text = 'Warehouse deleted Successfully'
+    alert.title = 'Xóa thành công'
+    alert.text = 'Kho hàng đã được Xóa thành công'
     alert.color = 'rgba(39, 217, 11, 0.8)'
   }).catch(err=>{
     console.log(err)
@@ -171,6 +215,8 @@ function updateWarehouseList() {
 }
 
 watch(page, updateWarehouseList)
+
+watch(page, confirm)
 
 const viewwarehouse = id =>{
   show.value = false
@@ -202,9 +248,119 @@ watchEffect(() => {
   <VRow v-if="show">
     <VCol cols="12">
       <VCard 
-        title="All Warehouse"
+        title="Tất cả kho hàng"
         prepend-icon="mdi-store-plus-outline"
       >
+        <template #append>
+          <div class="me-n3 tool">
+            <VCol
+              cols="auto"
+              class="d-flex"
+            >
+              <VTextField
+                v-model="searchQuery"
+                title="Search"
+                class="mx-3"
+                prepend-inner-icon="mdi-magnify"
+                placeholder="Search"
+              />
+              <VDialog
+                v-model="isActive"
+                transition="dialog-bottom-transition"
+              >
+                <template #activator="{ props }">
+                  <VBtn
+                    color="none"
+                    v-bind="props"
+                    icon="mdi-clock-time-eight-outline"
+                  >
+                    <VIcon icon="mdi-filter" />
+                  </VBtn>
+                </template>
+                <Transition name="slide-fade">
+                  <VAlert 
+                    v-if="error.status"
+                    :color="error.color"
+                    icon="mdi-alert"
+                    :title="error.title"
+                    closable
+                    class="alert"
+                    max-width="400px"
+                    :text="error.text"
+                    @click:close="error.status = false"
+                  />
+                </Transition>
+                <VCard>
+                  <VToolbar
+                    color="primary"
+                    title="Lọc kho hàng"
+                  />
+                  <VCardText>
+                    <VForm class="mt-6">
+                      <VRow>
+                        <!-- 👉 Status -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VSelect
+                            v-model="warehouse.status"
+                            label="Trạng thái"
+                            :items="status"
+                          />
+                        </VCol>
+
+                        <!-- 👉 From -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VTextField
+                            v-model="warehouse.from"
+                            type="date"
+                            label="Từ ngày"
+                          />
+                        </VCol>
+
+                        <!-- 👉 To -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VTextField
+                            v-model="warehouse.to"
+                            type="date"
+                            label="Đến ngày"
+                          />
+                        </VCol>
+                      </VRow>
+                    </VForm>
+                  </VCardText>
+                  <VCardActions class="justify-end">
+                    <VBtn
+                      variant="text"
+                      @click="isActive = false"
+                    >
+                      Đóng
+                    </VBtn>
+                    <VBtn
+                      variant="text"
+                      @click="reset"
+                    >
+                      Reset
+                    </VBtn>
+                    <VBtn
+                      variant="text"
+                      @click="confirm"
+                    >
+                      Xác nhận
+                    </VBtn>
+                  </VCardActions>
+                </VCard>
+              </VDialog>
+            </VCol>
+          </div>
+        </template> 
         <VDivider />
         <VTable>
           <thead>
@@ -213,23 +369,23 @@ watchEffect(() => {
                 ID
               </th>
               <th class="text-uppercase text-center">
-                Name
+                Tên Kho
               </th>
               <th class="text-uppercase text-center">
-                Setup Time
+                Thời gian tạo kho
               </th>
               <th class="text-uppercase text-center">
-                Status
+                Trạng thái 
               </th>
               <th class="text-uppercase text-center">
-                Action
+                Cài đặt 
               </th>
             </tr>
           </thead>
 
           <tbody>
             <tr
-              v-for="warehouse in warehouseList"
+              v-for="warehouse in filteredItems"
               :key="warehouse.warehouseList"
             >
               <td>
@@ -308,7 +464,7 @@ watchEffect(() => {
                           </Transition>
                           <VCard
                             prepend-icon="mdi-store-edit"
-                            title=" Update Warehouse "
+                            title=" Cập nhật kho hàng "
                           >
                             <VDivider />
 
@@ -323,7 +479,7 @@ watchEffect(() => {
                                   >
                                     <VTextField 
                                       v-model="warehouseInfo.name"
-                                      label="Warehouse Name"
+                                      label="Tên kho"
                                     />
                                   </VCol>
 
@@ -337,7 +493,7 @@ watchEffect(() => {
                                       :items="managerList"
                                       :item-value="getId"
                                       :item-title="formatName"
-                                      label="Manager"
+                                      label="Quản lý"
                                     />
                                   </VCol>
 
@@ -349,7 +505,7 @@ watchEffect(() => {
                                     <VSelect
                                       v-model="warehouseInfo.city"
                                       :items="city"
-                                      label="City"
+                                      label="Thành phố"
                                     />
                                   </VCol>
 
@@ -361,7 +517,7 @@ watchEffect(() => {
                                     <VSelect
                                       v-model="warehouseInfo.status"
                                       :items="status"
-                                      label="Status"
+                                      label="Trạng thái"
                                     />
                                   </VCol>
 
@@ -369,7 +525,7 @@ watchEffect(() => {
                                   <VCol cols="12">
                                     <VTextField 
                                       v-model="warehouseInfo.address"
-                                      label="Address"
+                                      label="Địa chỉ"
                                     />
                                   </VCol>
                                 </VRow>
@@ -384,7 +540,7 @@ watchEffect(() => {
                                 prepend-icon="mdi-close"
                                 @click="dialog = false"
                               >
-                                Cancel
+                                Hủy bỏ
                               </VBtn>
                               <VBtn
                                 color="primary"
@@ -392,7 +548,7 @@ watchEffect(() => {
                                 prepend-icon="mdi-pencil-outline"
                                 @click="update(warehouseInfo.id)"
                               >
-                                Update
+                                Cập nhật
                               </VBtn>
                             </VCardActions>
                           </VCard>
@@ -421,10 +577,10 @@ watchEffect(() => {
                           </template>
                           <VCard
                             prepend-icon="mdi-alert"
-                            title="Do you want delete this warehouse ?"
+                            title="Xóa kho hàng"
                           >
                             <VCardText>
-                              Once you delete this warehouse you can not get this warehouse information again. Are you sure you want delete this ?
+                              Bạn có chắc chắn là bạn muốn xóa thông tin này không ?
                             </VCardText>
                             <VCardActions>
                               <VSpacer />
@@ -489,5 +645,8 @@ watchEffect(() => {
 .slide-fade-leave-to {
   transform: translateX(20px);
   opacity: 0;
+}
+.tool{
+  width: 400px;
 }
 </style>

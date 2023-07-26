@@ -2,6 +2,10 @@
 import { useRouter, useRoute } from 'vue-router'
 import axiosIns from '@/plugins/axios'
 import { reactive } from 'vue'
+import Barchart from './barchart.vue'
+import Areachart from './areachart.vue'
+import Orders from './orders.vue'
+import RevenueEmp from './revenueEmp.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -88,7 +92,7 @@ watchEffect( async ()=>{
   <VRow>
     <VCol cols="12">
       <VCard 
-        title="Employee"
+        :title="'Mã nhân viên: ' + id"
         prepend-icon="mdi-badge-account-outline"
       >
         <VDivider />
@@ -97,7 +101,7 @@ watchEffect( async ()=>{
             icon="mdi-information-outline"
             class="icon-header"
           />
-          <VCardTitle>BASIC INFORMATION</VCardTitle>
+          <VCardTitle>Thông tin cơ bản</VCardTitle>
         </div>
         <VCardText class="d-flex">
           <!-- 👉 Avatar -->
@@ -134,7 +138,7 @@ watchEffect( async ()=>{
                     icon="mdi-account-credit-card"
                   />
                   <div class="">
-                    First Name:
+                    Tên:
                   </div>
                 </div>
               </td>
@@ -150,7 +154,7 @@ watchEffect( async ()=>{
                     icon="mdi-account-credit-card-outline"
                   />
                   <div class="">
-                    Last Name:
+                    Họ:
                   </div>
                 </div>
               </td>
@@ -166,7 +170,7 @@ watchEffect( async ()=>{
                     icon="mdi-cake-variant"
                   />
                   <div class="">
-                    Date Of Birth:
+                    Ngày sinh:
                   </div>
                 </div>
               </td>
@@ -182,7 +186,7 @@ watchEffect( async ()=>{
                     icon="mdi-city"
                   />
                   <div class="">
-                    City:
+                    Thành phố:
                   </div>
                 </div>
               </td>
@@ -198,7 +202,7 @@ watchEffect( async ()=>{
                     icon="mdi-map-marker"
                   />
                   <div class="">
-                    Address:
+                    Địa chỉ:
                   </div>
                 </div>
               </td>
@@ -233,7 +237,7 @@ watchEffect( async ()=>{
                   icon="mdi-warehouse"
                 />
                 <div class="">
-                  Warehouse Name:
+                  Kho hàng:
                 </div>
               </div>
             </td>
@@ -252,7 +256,7 @@ watchEffect( async ()=>{
                   icon="mdi-account-tie"
                 />
                 <div class="">
-                  Role:
+                  Chức vụ:
                 </div>
               </div>
             </td>
@@ -268,7 +272,7 @@ watchEffect( async ()=>{
                   icon="mdi-phone"
                 />
                 <div class="">
-                  Phone:
+                  Số điện thoại:
                 </div>
               </div>
             </td>
@@ -284,7 +288,7 @@ watchEffect( async ()=>{
                   icon="mdi-cash-multiple"
                 />
                 <div class="">
-                  Salary:
+                  Lương:
                 </div>
               </div>
             </td>
@@ -294,11 +298,22 @@ watchEffect( async ()=>{
           </tr>
         </VTable>
         <VDivider />
-        <VCard
-          title="Employees List" 
-          prepend-icon="mdi-account-box"
-        />
       </VCard>
+    </VCol>
+    <VCol
+      cols="12"
+      md="6"
+    >
+      <Barchart :id="id" />
+    </VCol>
+    <VCol
+      cols="12"
+      md="6"
+    >
+      <Areachart :id="id" />
+    </VCol>
+    <VCol cols="24">
+      <Orders :id="id" />
     </VCol>
   </VRow>
 </template>

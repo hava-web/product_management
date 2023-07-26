@@ -30,6 +30,7 @@ class OrderController extends Controller
                 $order = new Order();
                 $order->customer_id = $request->id;
                 $order->total_price = $request->total_price;
+                $order->user_id = auth()->id();
                 $order->status = 'Ordered';
                 $order->payment_mode = $request->payment_mode;
 
@@ -54,6 +55,8 @@ class OrderController extends Controller
                         $orderDetail = OrderDetail::create([
                             'order_id' => $order->id,
                             'product_id' => intval($product['product']),
+                            'agent_id' => intval($product['agent']),
+                            'warehouse_id' => intval($product['warehouse']),
                             'brand_id' => intval($product['brand']),
                             'size_id' => intval($product['size']),
                             'color_id' => intval($product['color']),
@@ -95,6 +98,7 @@ class OrderController extends Controller
                 $order = new Order();
                 $order->customer_id = $customer->id;
                 $order->total_price = $request->total_price;
+                $order->user_id = auth()->id();
                 $order->status = 'Ordered';
                 $order->payment_mode = $request->payment_mode;
 
@@ -118,6 +122,8 @@ class OrderController extends Controller
                         $orderDetail = OrderDetail::create([
                             'order_id' => $order->id,
                             'product_id' => intval($product['product']),
+                            'agent_id' => intval($product['agent']),
+                            'warehouse_id' => intval($product['warehouse']),
                             'brand_id' => intval($product['brand']),
                             'size_id' => intval($product['size']),
                             'color_id' => intval($product['color']),
@@ -155,12 +161,12 @@ class OrderController extends Controller
         return response()->json($orders);
     }
 
-    public function getById($id){
+    public function getById($id)
+    {
         $order = Order::find($id);
-        if($order){
+        if ($order) {
             return response()->json($order);
-        }
-        else{
+        } else {
             return response()->json([
                 'message' => 'order does not exits'
             ]);
@@ -171,7 +177,8 @@ class OrderController extends Controller
     {
         $customer = DB::table('orders AS o')
             ->join('customers AS c', 'c.id', '=', 'o.customer_id')
-            ->select('c.id', 'c.firstname', 'c.lastname', 'c.phone', 'c.email', 'c.address')
+            ->join('employees AS e', 'e.user_id', '=', 'o.user_id')
+            ->select('c.id', 'c.firstname', 'c.lastname', 'c.phone', 'c.email', 'c.address', 'e.id as employee_id' , 'e.firstname as emp_firstname', 'e.lastname as emp_lastname')
             ->where('o.id', $order_id)
             ->first();
 
@@ -204,18 +211,21 @@ class OrderController extends Controller
         }
     }
 
-    public function totalOrder(){
+    public function totalOrder()
+    {
         $totalOrders = Order::count('id');
         return response()->json($totalOrders);
     }
 
-    public function revenue(){
+    public function revenue()
+    {
         $totalPrice = Order::where('status', 'Received')->sum('total_price');
         return $totalPrice;
     }
 
-    public function getReceivedOrder(){
-        $orders = Order::where('status','Received')->paginate(5);
+    public function getReceivedOrder()
+    {
+        $orders = Order::where('status', 'Received')->paginate(5);
         if ($orders->isEmpty()) {
             return response()->json([
                 'message' => 'No orders found '
@@ -225,30 +235,126 @@ class OrderController extends Controller
         }
     }
 
-    public function update(Request $request, $id){
+    public function orderDate()
+    {
+        $results = DB::table('orders')
+            ->select(DB::raw('DATE(created_at) AS x'), DB::raw('COUNT(*) AS y'))
+            ->where('status', 'Received')
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->get();
+        return response()->json($results);
+    }
+
+    public function orderByWeek()
+    {
+        $results = DB::table('orders')
+            ->select(DB::raw("CONCAT('Week ', WEEK(created_at)) AS x"), DB::raw('COUNT(*) AS y'))
+            ->where('status', 'Received')
+            ->whereYear('created_at', '=', date('Y'))
+            ->groupBy(DB::raw('WEEK(created_at)'))
+            ->get();
+        return response()->json($results);
+    }
+
+    public function orderByMonth()
+    {
+        $result = DB::table('orders')
+            ->select(DB::raw('MONTHNAME(created_at) as x'), DB::raw('COUNT(*) as y'))
+            ->where('status', 'Received')
+            ->whereYear('created_at', '=', date('Y'))
+            ->groupBy(DB::raw('MONTH(created_at)'))
+            ->get();
+        return response()->json($result);
+    }
+
+    public function orderByYear()
+    {
+        $result = DB::table('orders')
+            ->select(DB::raw('YEAR(created_at) as x'), DB::raw('COUNT(*) as y'))
+            ->where('status', 'Received')
+            ->groupBy(DB::raw('YEAR(created_at)'))
+            ->get();
+        return response()->json($result);
+    }
+
+    public function orderDateInterval(Request $request)
+    {
+        $request->validate([
+            'from' => 'required|date',
+            'to' => 'required|date'
+        ]);
+        $result = DB::table('orders')
+            ->select(DB::raw('DATE(created_at) as x'), DB::raw('COUNT(*) as y'))
+            ->where('status', '=', 'Received')
+            ->whereBetween(DB::raw('DATE(created_at)'), [$request->from, $request->to])
+            ->groupBy(DB::raw('YEAR(created_at)'))
+            ->get();
+
+        return response()->json($result);
+    }
+
+    public function orderFilter(Request $request)
+    {
+        $request->validate([
+            'status' => 'required|string',
+            'from' => 'required|date',
+            'to' => 'required|date'
+        ]);
+        $query = DB::table('orders');
+
+        if ($request->status != null) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->from != null && $request->to != null) {
+            $query->whereBetween('created_at', [$request->from, $request->to]);
+        } elseif ($request->from != null) {
+            $query->whereDate('created_at', $request->from);
+        } elseif ($request->to != null) {
+            $query->whereDate('created_at', $request->to);
+        }
+
+        $results = $query->paginate(5);
+
+        return response()->json($results);
+    }
+
+    public function revenueInterval(Request $request)
+    {
+        $request->validate([
+            'from' => 'required|date',
+            'to' => 'required|date'
+        ]);
+        $result = DB::table('orders AS o')
+            ->select(DB::raw('SUM(o.total_price) AS revenue'))
+            ->where('o.status', 'Received')
+            ->whereBetween(DB::raw('date(o.created_at)'), [$request->from, $request->to])
+            ->first();
+        return response()->json($result);
+    }
+
+    public function update(Request $request, $id)
+    {
         $validatedData = $request->validate([
             'status' => 'required|string',
         ]);
         $order = Order::find($id);
-        if($order){
+        if ($order) {
             $order->status = $validatedData['status'];
 
-            if($order->save()){
+            if ($order->save()) {
                 return response()->json([
                     'message' => 'Order Updated Successfully'
                 ]);
-            }
-            else{
+            } else {
                 return response()->json([
                     'message' => 'Something went wrong'
-                ],500);
+                ], 500);
             }
-        }
-        else{
+        } else {
             return response()->json([
                 'message' => 'Order does not exits'
-            ],404);
+            ], 404);
         }
-
     }
 }

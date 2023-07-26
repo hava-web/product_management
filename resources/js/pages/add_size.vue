@@ -30,23 +30,23 @@ const submit = async ()=>{
   })
     .then(res=>{
       if(res.status === 201){
-        alert.title = 'Successfully'
+        alert.title = 'Thêm thành công'
         alert.status = true
-        alert.text = 'Size Added Successfully'
+        alert.text = 'Kích thước đã được thêm thành công'
         alert.color = 'rgba(39, 217, 11, 0.8)'
         accountDataLocal.value = structuredClone(sizeData)
         console.log(res)
       }
       else{
-        alert.title = 'Warning'
+        alert.title = 'Cảnh báo'
         alert.status = true
-        alert.text = 'Something went wrong'
+        alert.text = 'Có lỗi gì đó'
         alert.color = 'rgba(234, 223, 30, 0.8)'
         console.log(res)
       }
     })
     .catch(err=>{
-      alert.title = 'Error'
+      alert.title = 'Lỗi'
       alert.status = true
       alert.text = err.response.data.message
       alert.color = 'rgba(222, 29, 29, 0.8)'
@@ -78,7 +78,7 @@ const resetForm = () => {
   <VRow>
     <VCol cols="12">
       <VCard 
-        title="Add Size"
+        title="Thêm kích thước"
         prepend-icon="mdi-weight"
       >
         <VDivider />
@@ -95,7 +95,7 @@ const resetForm = () => {
                 <VTextField
                   v-model="accountDataLocal.name"
                   prepend-icon="mdi-rename"
-                  label="Size"
+                  label="Kích thước"
                 />
               </VCol>
 
@@ -109,7 +109,7 @@ const resetForm = () => {
                   :true-value="1"
                   :false-value="0"
                   prepend-icon="mdi-list-status"
-                  label="Status"
+                  label="Trạng thái"
                   color="primary"
                   :value="status"
                   hide-details
@@ -122,7 +122,7 @@ const resetForm = () => {
                 class="d-flex flex-wrap gap-4"
               >
                 <VBtn @click="submit">
-                  Add Size
+                  Thêm kích thước
                 </VBtn>
 
                 <VBtn

@@ -37,7 +37,7 @@ const viewWarehouse = () => {
         <VCardItem>
           <VCardTitle>
             <VIcon icon="mdi-warehouse" /> 
-            Warehouse {{ props.id }}
+            Mã kho hàng {{ props.id }}
           </VCardTitle>
         </VCardItem>
 
@@ -62,41 +62,47 @@ const viewWarehouse = () => {
                   <div class="d-flex">
                     <div class="w-100 font-weight-bold mb-3">
                       <VIcon icon="mdi-palette-swatch" />
-                      Color Name:  <span class="font-weight-normal">{{ property.color_name }}</span>
+                      Tên màu:  <span class="font-weight-normal">{{ property.color_name }}</span>
                     </div>
                     <div class="w-100 font-weight-bold mb-3">
                       <VIcon icon="mdi-view-list-outline" />
-                      Quantity: <span class="font-weight-normal">{{ property.quantity }}</span>
+                      Số lượng: <span class="font-weight-normal">{{ property.quantity }}</span>
                     </div>
                   </div>
                   <div class="d-flex">
                     <div class="w-100 font-weight-bold mb-3">
                       <VIcon icon="mdi-weight" />
-                      Size: <span class="font-weight-normal">{{ property.size_name }}</span>
+                      Kich thước: <span class="font-weight-normal">{{ property.size_name }}</span>
                     </div>
                     <div class="w-100 font-weight-bold mb-3">
                       <VIcon icon="mdi-eye-outline" />
-                      Status: <span class="font-weight-normal">{{ property.status }}</span>
+                      Trạng thái: <span class="font-weight-normal">{{ property.status }}</span>
                     </div>
                   </div>
                   <div class="d-flex">
                     <div class="w-100 font-weight-bold mb-3">
                       <VIcon icon="mdi-watermark" />
-                      Brand: <span class="font-weight-normal">{{ property.brand_name }}</span>
+                      Thương Hiệu: <span class="font-weight-normal">{{ property.brand_name }}</span>
                     </div>
                     <div class="w-100 font-weight-bold mb-3">
                       <VIcon icon="mdi-clipboard-text-clock-outline" />
-                      Expired Date: <span class="font-weight-normal">{{ property.expired_date }}</span>
+                      Ngày hết hạn: <span class="font-weight-normal">{{ property.expired_date }}</span>
                     </div>
                   </div>
                   <div class="d-flex">
                     <div class="w-100 font-weight-bold mb-3">
                       <VIcon icon="mdi-currency-usd" />
-                      Original Price: <span class="font-weight-normal">{{ property.original_price }}</span>
+                      Giá gốc: <span class="font-weight-normal">{{ property.original_price }}</span>
                     </div>
                     <div class="w-100 font-weight-bold mb-3">
                       <VIcon icon="mdi-cash-multiple" />
-                      Selling Price: <span class="font-weight-normal">{{ property.selling_price }}</span>
+                      Giá bán: <span class="font-weight-normal">{{ property.selling_price }}</span>
+                    </div>
+                  </div>
+                  <div class="d-flex">
+                    <div class="w-100 font-weight-bold mb-3">
+                      <VIcon icon="mdi-face-agent" />
+                      Chi nhánh: <span class="font-weight-normal">{{ property.agent }}</span>
                     </div>
                   </div>
                 </div>
@@ -106,10 +112,10 @@ const viewWarehouse = () => {
         </VCardText>
       </VCol>
       <VBtn
-        class="mt-8"
+        class="mx-5 my-5"
         @click="viewWarehouse"
       >
-        View Warehouse
+        Xem kho
       </VBtn>
     </VRow>
   </VCard>

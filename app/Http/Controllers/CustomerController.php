@@ -66,13 +66,72 @@ class CustomerController extends Controller
         return response()->json($customers);
     }
 
+    public function customerByMostByInterval(Request $request)
+    {
+        $request->validate([
+            'from' => 'required|date',
+            'to' => 'required|date'
+        ]);
+        $results = DB::table('customers as c')
+            ->select(DB::raw('CONCAT(c.lastname, " ", c.firstname) AS x'), 'c.numbers_of_purchases AS y')
+            ->whereBetween('c.updated_at', [$request->from, $request->to])
+            ->orderByDesc('c.numbers_of_purchases')
+            ->limit(5)
+            ->get();
+        return response()->json($results);
+    }
+
+    public function customerByWeek()
+    {
+        $results = DB::table('customers as c')
+            ->select(DB::raw("CONCAT('Week ', WEEK(c.created_at)) AS x"), DB::raw('COUNT(*) AS y'))
+            ->whereYear('c.created_at', '=', date('Y'))
+            ->groupBy('x')
+            ->get();
+        return response()->json($results);
+    }
+
     public function customerByMounth()
     {
-        $customers = DB::table('customers AS c')
-            ->select(DB::raw('DATE(c.created_at) AS x'), DB::raw('COUNT(*) AS y'))
+        $customers = DB::table('customers as c')
+            ->select(DB::raw("MONTHNAME(c.created_at) AS x"), DB::raw('COUNT(*) AS y'))
+            ->whereYear('c.created_at', '=', date('Y'))
             ->groupBy(DB::raw('DATE(c.created_at)'))
             ->get();
 
         return response()->json($customers);
+    }
+
+    public function customerByYear()
+    {
+        $results = DB::table('customers as c')
+            ->select(DB::raw('YEAR(c.created_at) AS x'), DB::raw('COUNT(*) AS y'))
+            ->groupBy('x')
+            ->get();
+
+        return response()->json($results);
+    }
+
+    public function customerByDate()
+    {
+        $results = DB::table('customers as c')
+            ->select(DB::raw('DATE(c.created_at) AS x'), DB::raw('COUNT(*) AS y'))
+            ->groupBy('x')
+            ->get();
+        return response()->json($results);
+    }
+
+    public function cusNumberByInterval(Request $request)
+    {
+        $request->validate([
+            'from' => 'required|date',
+            'to' => 'required|date'
+        ]);
+        $results = DB::table('customers as c')
+            ->select(DB::raw('DATE(c.created_at) AS x'), DB::raw('COUNT(*) AS y'))
+            ->whereBetween(DB::raw('DATE(c.created_at)'), [$request->from, $request->to])
+            ->groupBy('x')
+            ->get();
+        return response()->json($results);
     }
 }

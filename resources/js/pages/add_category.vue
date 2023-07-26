@@ -60,24 +60,24 @@ const submit = async ()=>{
   })
     .then(res=>{
       if(res.status === 201){
-        alert.title = 'Successfully'
+        alert.title = 'Thành công'
         alert.status = true
-        alert.text = 'Warehouse Added Successfully'
+        alert.text = 'Danh mục đã được thêm thành công '
         alert.color = 'rgba(39, 217, 11, 0.8)'
         accountDataLocal.value = structuredClone(warehouseData)
         imagePreview.value = null
         haveImg.value = false
       }
       else{
-        alert.title = 'Warning'
+        alert.title = 'Cảnh báo'
         alert.status = true
-        alert.text = 'Something went wrong'
+        alert.text = 'Có lỗi gì đó'
         alert.color = 'rgba(234, 223, 30, 0.8)'
         console.log(res.data)
       }
     })
     .catch(err=>{
-      alert.title = 'Error'
+      alert.title = 'Lỗi'
       alert.status = true
       alert.text = err.response.data.message
       alert.color = 'rgba(222, 29, 29, 0.8)'
@@ -118,7 +118,7 @@ const resetAvatar = () => {
   <VRow>
     <VCol cols="12">
       <VCard 
-        title="Add Category"
+        title="Thêm danh mục"
         prepend-icon="mdi-card-text-outline"
       >
         <VDivider />
@@ -133,7 +133,7 @@ const resetAvatar = () => {
                   v-model="accountDataLocal.name"
                   prepend-icon="mdi-rename"
                   pre
-                  label="Category Name"
+                  label="Tên danh mục"
                 />
               </VCol>
 
@@ -146,7 +146,7 @@ const resetAvatar = () => {
                   v-model="accountDataLocal.image"
                   clearable
                   prepend-icon="mdi-camera"
-                  label="Select Image"
+                  label="Thêm ảnh"
                   accept="image/*"
                   @click:clear="haveImg = false"
                   @change="onFileChange"
@@ -176,7 +176,7 @@ const resetAvatar = () => {
                   :true-value="1"
                   :false-value="0"
                   prepend-icon="mdi-list-status"
-                  label="Status"
+                  label="Trạng thái"
                   color="primary"
                   :value="status"
                   hide-details
@@ -190,7 +190,7 @@ const resetAvatar = () => {
                 class="d-flex flex-wrap gap-4"
               >
                 <VBtn @click="submit">
-                  Add Category
+                  Thêm danh mục
                 </VBtn>
 
                 <VBtn

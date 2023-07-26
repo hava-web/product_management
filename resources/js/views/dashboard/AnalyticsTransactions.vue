@@ -96,28 +96,28 @@ function abbreviateNumber(value) {
 
 const statistics = [
   {
-    title: 'Sales',
+    title: 'Đơn hàng',
     stats: abbreviateNumber(total_order),
     icon: 'mdi-trending-up',
     color: 'primary',
     link: '/view_order',
   },
   {
-    title: 'Customers',
+    title: 'Khách hàng',
     stats: abbreviateNumber(total_customer),
     icon: 'mdi-account-outline',
     color: 'success',
     link: '/view_customer',
   },
   {
-    title: 'Product',
+    title: 'Sản phẩm',
     stats: abbreviateNumber(total_product),
     icon: 'mdi-cellphone-link',
     color: 'warning',
     link: '/view_product',
   },
   {
-    title: 'Revenue',
+    title: 'Doanh thu',
     stats: abbreviateNumber(revenue),
     icon: 'mdi-currency-usd',
     color: 'info',
@@ -129,20 +129,24 @@ const statistics = [
 <template>
   <VCard>
     <VCardItem>
-      <VCardTitle>Transactions</VCardTitle>
+      <VCardTitle>Quản lý</VCardTitle>
 
-      <template #append>
+      <!--
+        <template #append>
         <div class="me-n3">
-          <MoreBtn />
+        <MoreBtn />
         </div>
-      </template>
+        </template> 
+      -->
     </VCardItem>
 
     <VCardText>
-      <h6 class="text-sm font-weight-medium mb-12">
+      <!--
+        <h6 class="text-sm font-weight-medium mb-12">
         <span>Total 48.5% Growth 😎</span>
         <span class="font-weight-regular"> this month</span>
-      </h6>
+        </h6> 
+      -->
 
       <VRow>
         <VCol

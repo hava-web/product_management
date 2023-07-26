@@ -25,11 +25,58 @@ onMounted( async () => {
   })
 })
 
+const customersByWeek = ()=>{
+  const accessToken = localStorage.getItem('accessToken')
+
+  axiosIns.get('api/customers_week', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    dataCus.value = []
+    dataCus.value.push(...res.data)
+    console.log(dataCus.value)
+  }).catch(err=>{
+    console.log(err.data)
+  })
+}
+
+const customersByMonth = ()=>{
+  const accessToken = localStorage.getItem('accessToken')
+
+  axiosIns.get('api/customers_month', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    dataCus.value = []
+    dataCus.value.push(...res.data)
+    console.log(dataCus.value)
+  }).catch(err=>{
+    console.log(err.data)
+  })
+}
+
+const customersByYear = ()=>{
+  const accessToken = localStorage.getItem('accessToken')
+
+  axiosIns.get('api/customers_year', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    dataCus.value = []
+    dataCus.value.push(...res.data)
+    console.log(dataCus.value)
+  }).catch(err=>{
+    console.log(err.data)
+  })
+}
+
 const options = controlledComputed(() => vuetifyTheme.name.value, () => {
   const currentTheme = ref(vuetifyTheme.current.value.colors)
   const variableTheme = ref(vuetifyTheme.current.value.variables)
   const disabledColor = `rgba(${ hexToRgb(currentTheme.value['on-surface']) },${ variableTheme.value['disabled-opacity'] })`
-  const borderColor = `rgba(${ hexToRgb(String(variableTheme.value['border-color'])) },${ variableTheme.value['border-opacity'] })`
   
   return {
     chart: {
@@ -37,8 +84,6 @@ const options = controlledComputed(() => vuetifyTheme.name.value, () => {
       toolbar: { show: false },
     },
     xaxis: {
-      categories: labelCus.value,
-      type: 'datetime',
       tickPlacement: 'on',
       labels: { show: true },
       crosshairs: { opacity: 0 },
@@ -54,49 +99,66 @@ const options = controlledComputed(() => vuetifyTheme.name.value, () => {
           colors: disabledColor,
           fontSize: '12px',
         },
-        formatter: value => `${ value > 999 ? `${ (value / 1000).toFixed(0) }` : value }`,
+
+        // formatter: value => `${ value > 999 ? `${ (value / 1).toFixed(0) }` : value }`,
       },
     },
   }
 })
 
-const series = [{
-  data: dataCus.value,
-}]
+const series = computed(() => {
+  return [{
+    data: dataCus.value,
+  }]
+})
 </script>
 
 <template>
   <VCard>
     <VCardItem>
-      <VCardTitle>Customers By Time</VCardTitle>
-      <!--
-        <template #append>
+      <VCardTitle>Khách hàng theo thời gian</VCardTitle>
+      
+      <template #append>
         <div class="me-n3">
-        <VBtn
-        class="me-2"
-        icon="mdi-bell-outline"
-        color="none"
-        >
-        <VIcon icon="mdi-dots-vertical" />
-        <VMenu
-        activator="parent"
-        location="right"
-        >
-        <VList>
-        <VListItem class="btn">
-        Customers By Mouth
-        </VListItem>
-        </VList>
-        </VMenu>
-        </VBtn>
+          <VBtn
+            class="me-2"
+            icon="mdi-bell-outline"
+            color="none"
+          >
+            <VIcon icon="mdi-dots-vertical" />
+            <VMenu
+              activator="parent"
+              location="right"
+            >
+              <VList>
+                <VListItem
+                  class="btn"
+                  @click="customersByWeek"
+                >
+                  Khách theo tuần
+                </VListItem>
+                <VListItem
+                  class="btn"
+                  @click="customersByMonth"
+                >
+                  Khách theo tháng
+                </VListItem>
+                <VListItem
+                  class="btn"
+                  @click="customersByYear"
+                >
+                  Khách theo năm
+                </VListItem>
+              </VList>
+            </VMenu>
+          </VBtn>
         </div>
-        </template> 
-      -->
+      </template>
     </VCardItem>
 
     <VCardText>
       <VueApexCharts
-        type="line"
+        type="bar"
         :options="options"
         :series="series"
         :height="220"

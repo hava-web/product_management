@@ -1,6 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '../../store/store'
 
+const isAuthenticated = (to, from, next) => {
+  // Get the user data from local storage
+  const user = JSON.parse(localStorage.getItem('user'))
+  
+  // Check if the user has the role "Admin"
+  if (user && user.role === 'Admin') {
+    // Allow access to the route
+    next()
+  } else {
+    // Redirect to another route or show an error message
+    next('/404')
+  }
+}
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -20,6 +34,7 @@ const router = createRouter({
         {
           path: 'create_account',
           component: () => import('../pages/create_account.vue'),
+          beforeEnter: isAuthenticated,
         },
         {
           path: 'add_warehouse',
@@ -35,6 +50,14 @@ const router = createRouter({
               component: ()=> import('../views/pages/warehouse/viewbyid.vue'),
             },
           ],
+        },
+        {
+          path: 'add_agent',
+          component: () => import('../pages/add_agent.vue'),
+        },
+        {
+          path: 'view_agent',
+          component: () => import('../pages/view_agents.vue'),
         },
         {
           path: 'view_employee',
@@ -107,6 +130,10 @@ const router = createRouter({
         {
           path: 'inventories',
           component: () => import('../pages/inventories.vue'),
+        },
+        {
+          path: 'all_products',
+          component: () => import('../pages/all_products.vue'),
         },
         {
           path: 'revenue',

@@ -9,13 +9,11 @@ const store = useStore()
 const route = useRoute()
 const page = ref()
 const length = ref()
-const cancel = ref(false)
 const show = ref(true)
-const dialog = ref(false)
 const orderList = ref([])
+const revenue = ref()
 
 const router = useRouter()
-
 
 const alert = reactive({
   status: false,
@@ -31,6 +29,75 @@ const error = reactive({
   color: '',
 })
 
+
+const order = reactive({
+  status: 'Received',
+  from: null,
+  to: null,
+})
+
+const reset = () =>{
+  order.from = null
+  order.to = null
+}
+
+const isActive = ref(false)
+
+const confirm = () =>{
+  console.log(order)
+
+  const accessToken = localStorage.getItem('accessToken')
+
+  axiosIns.post(`api/orders_filter?page=${page.value}`, order, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    isActive.value = false
+    orderList.value = []
+    orderList.value = res.data.data
+    console.log(res.data)
+  }).catch(err=>{
+    console.log(err.data)
+    error.status = true
+    error.title = 'You have some errors'
+    error.text = err.response.data.message
+    error.color = 'rgba(222, 29, 29, 0.8)'
+  })
+
+  axiosIns.post(`api/revenue_interval`, order, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    revenue.value = res.data.revenue
+    console.log(res.data)
+  }).catch(err=>{
+    console.log(err.data)
+    error.status = true
+    error.title = 'You have some errors'
+    error.text = err.response.data.message
+    error.color = 'rgba(222, 29, 29, 0.8)'
+  })
+
+
+}
+
+onMounted( async () => {
+  const accessToken = localStorage.getItem('accessToken')
+
+  await axiosIns.get('api/revenue', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    revenue.value = Number(res.data) 
+    console.log(revenue.value)
+  }).catch(err=>{
+    console.log(err.data)
+  })
+})
+
 const viewOrder = id =>{
   router.push({ name: 'order', params: { id: id } })
   console.log(id)
@@ -40,10 +107,6 @@ const getReceivedOrderByPage = computed(()=>{
   return store.getters.getReceivedOrderByPage
 })
 
-const colorInfor = reactive({
-  name: '',
-  code_color: '',
-})
 
 
 // Call the action to retrieve the warehouse data and set the initial value of currentorderList to the result.
@@ -62,6 +125,8 @@ function updateorderList() {
 }
 
 watch(page, updateorderList)
+
+watch(page, confirm)
 
 
 watchEffect(() => {
@@ -89,9 +154,100 @@ watchEffect(() => {
   <VRow v-if="show">
     <VCol cols="12">
       <VCard 
-        title="All Received Orders"
+        title="Tất cả đơn hàng đã thanh toán"
         prepend-icon="mdi-store-plus-outline"
       >
+        <template #append>
+          <div class="me-n3 tool">
+            <VCol
+              cols="auto"
+              class="d-flex"
+            >
+              <VDialog
+                v-model="isActive"
+                transition="dialog-bottom-transition"
+              >
+                <template #activator="{ props }">
+                  <VBtn
+                    color="none"
+                    v-bind="props"
+                    icon="mdi-clock-time-eight-outline"
+                  >
+                    <VIcon icon="mdi-filter" />
+                  </VBtn>
+                </template>
+                <Transition name="slide-fade">
+                  <VAlert 
+                    v-if="error.status"
+                    :color="error.color"
+                    icon="mdi-alert"
+                    :title="error.title"
+                    closable
+                    class="alert"
+                    max-width="400px"
+                    :text="error.text"
+                    @click:close="error.status = false"
+                  />
+                </Transition>
+                <VCard>
+                  <VToolbar
+                    color="primary"
+                    title="Lọc doanh số"
+                  />
+                  <VCardText>
+                    <VForm class="mt-6">
+                      <VRow>
+                        <!-- 👉 From -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VTextField
+                            v-model="order.from"
+                            type="date"
+                            label="Từ ngày"
+                          />
+                        </VCol>
+
+                        <!-- 👉 To -->
+                        <VCol
+                          cols="12"
+                          md="6"
+                        >
+                          <VTextField
+                            v-model="order.to"
+                            type="date"
+                            label="Đến ngày"
+                          />
+                        </VCol>
+                      </VRow>
+                    </VForm>
+                  </VCardText>
+                  <VCardActions class="justify-end">
+                    <VBtn
+                      variant="text"
+                      @click="isActive = false"
+                    >
+                      Đóng
+                    </VBtn>
+                    <VBtn
+                      variant="text"
+                      @click="reset"
+                    >
+                      Reset
+                    </VBtn>
+                    <VBtn
+                      variant="text"
+                      @click="confirm"
+                    >
+                      Xác nhận
+                    </VBtn>
+                  </VCardActions>
+                </VCard>
+              </VDialog>
+            </VCol>
+          </div>
+        </template> 
         <VDivider />
         <VTable>
           <thead>
@@ -100,16 +256,16 @@ watchEffect(() => {
                 ID
               </th>
               <th class="text-uppercase text-center">
-                Total price
+                Tổng giá trị
               </th>
               <th class="text-uppercase text-center">
-                Created Time
+                Ngày tạo
               </th>
               <th class="text-uppercase text-center">
-                Status
+                Trạng thái
               </th>
               <th class="text-uppercase text-center">
-                Action
+                Cài đặt
               </th>
             </tr>
           </thead>
@@ -123,7 +279,7 @@ watchEffect(() => {
                 {{ order.id }}
               </td>
               <td class="text-center">
-                ${{ order.total_price }}
+                {{ order.total_price }} VND
               </td>
               <td class="text-center">
                 {{ order.created_at }}
@@ -165,6 +321,9 @@ watchEffect(() => {
             </tr>
           </tbody>
         </VTable>
+        <div class="mx-5 my-3 revenue">
+          Tổng thu thập: <span>{{ revenue }} VND</span>
+        </div>
       </VCard>
       <VPagination
         v-model="page"
@@ -211,5 +370,9 @@ watchEffect(() => {
 .color{
     margin-left: 10px;
     align-items: center;
+}
+.revenue{
+  display: flex;
+  justify-content: end;
 }
 </style>

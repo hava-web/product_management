@@ -92,6 +92,14 @@ const updateForm = async id=>{
   })
 }
 
+const searchQuery = ref('')
+
+const filteredItems = computed(() => {
+  return userList.value.filter(item => {
+    return item.firstname.toLowerCase().includes(searchQuery.value.toLowerCase()) 
+  })
+})
+
 const update = async id=>{
   const accessToken = localStorage.getItem('accessToken')
 
@@ -205,9 +213,25 @@ watchEffect( async ()=>{
   <VRow v-if="show">
     <VCol cols="12">
       <VCard 
-        title="All Employees"
+        title="Tất cả nhân viên"
         prepend-icon="mdi-store-plus-outline"
       >
+        <template #append>
+          <div class="me-n3 tool">
+            <VCol
+              cols="auto"
+              class="d-flex"
+            >
+              <VTextField
+                v-model="searchQuery"
+                title="Search"
+                class="mx-3"
+                prepend-inner-icon="mdi-magnify"
+                placeholder="Search"
+              />
+            </VCol>
+          </div>
+        </template> 
         <VDivider />
         <VTable>
           <thead>
@@ -216,30 +240,30 @@ watchEffect( async ()=>{
                 ID
               </th>
               <th class="text-uppercase text-center">
-                Name
+                Tên đầy đủ
               </th>
               <th class="text-uppercase text-center">
-                Created Time
+                Ngày tạo tài khoản
               </th>
               <th class="text-uppercase text-center">
-                Image
+                Ảnh
               </th>
               <th class="text-uppercase text-center">
-                Action
+                Cài đặt
               </th>
             </tr>
           </thead>
 
           <tbody>
             <tr
-              v-for="user in userList"
+              v-for="user in filteredItems"
               :key="user.userList"
             >
               <td>
                 {{ user.id }}
               </td>
               <td class="text-center">
-                {{ user.firstname + ' ' + user.lastname }}
+                {{ user.lastname + ' ' + user.firstname }}
               </td>
               <td class="text-center">
                 {{ user.created_at }}
@@ -319,7 +343,7 @@ watchEffect( async ()=>{
                           </Transition>
                           <VCard
                             prepend-icon="mdi-store-edit"
-                            title=" Update Employee "
+                            title=" Cập nhật nhân viên"
                           >
                             <VCardText>
                               <!-- 👉 Form -->
@@ -332,7 +356,7 @@ watchEffect( async ()=>{
                                   >
                                     <VSelect
                                       v-model="userInfor.warehouse_id"
-                                      label="Warehouse"
+                                      label="Kho"
                                       :items="warehouseList"
                                       :item-title="formatName"
                                       :item-value="getId"
@@ -346,7 +370,7 @@ watchEffect( async ()=>{
                                   >
                                     <VSelect
                                       v-model="userInfor.role"
-                                      label="Role"
+                                      label="Chức vụ"
                                       :items="roles"
                                     />
                                   </VCol>
@@ -355,7 +379,7 @@ watchEffect( async ()=>{
                                   <VCol cols="12">
                                     <VTextField
                                       v-model="userInfor.salary"
-                                      label="Salary"
+                                      label="Lương"
                                     />
                                   </VCol>
                                 </VRow>
@@ -370,7 +394,7 @@ watchEffect( async ()=>{
                                 prepend-icon="mdi-close"
                                 @click="dialog = false"
                               >
-                                Cancel
+                                Hủy bỏ
                               </VBtn>
                               <VBtn
                                 color="primary"
@@ -378,7 +402,7 @@ watchEffect( async ()=>{
                                 prepend-icon="mdi-pencil-outline"
                                 @click="update(user.id)"
                               >
-                                Update
+                                Cập nhật 
                               </VBtn>
                             </VCardActions>
                           </VCard>
@@ -407,10 +431,10 @@ watchEffect( async ()=>{
                           </template>
                           <VCard
                             prepend-icon="mdi-alert"
-                            title="Do you want delete this warehouse ?"
+                            title="Xóa nhân viên"
                           >
                             <VCardText>
-                              Once you delete this warehouse you can not get this warehouse information again. Are you sure you want delete this ?
+                              Bạn có chắc chắn là bạn muốn xóa thông tin này không ?
                             </VCardText>
                             <VCardActions>
                               <VSpacer />
@@ -481,5 +505,8 @@ watchEffect( async ()=>{
 }
 .item-image{
   margin: 10px;
+}
+.tool{
+  width: 400px;
 }
 </style>

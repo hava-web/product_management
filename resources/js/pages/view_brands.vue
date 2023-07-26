@@ -30,6 +30,14 @@ const error = reactive({
 })
 
 
+const searchQuery = ref('')
+
+const filteredItems = computed(() => {
+  return brandList.value.filter(item => {
+    return item.name.toLowerCase().includes(searchQuery.value.toLowerCase()) 
+  })
+})
+
 
 const getBrandByPage = computed(()=>{
   return store.getters.getBrandByPage
@@ -40,7 +48,7 @@ const brandInfor = reactive({
   status: null,
 })
 
-const format = brand => brand.status == 0 ? "Non Visible" : "Visible"
+const format = brand => brand.status == 0 ? "Không hiển thị" : "Hiển thị"
 
 
 
@@ -71,8 +79,8 @@ const update = async id=>{
     console.log(res)
     dialog.value = false
     alert.status = true
-    alert.title = 'Updated Successfully'
-    alert.text = 'Brand Updated Successfully'
+    alert.title = 'Cập nhật thành công'
+    alert.text = 'Thương hiệu đã được Cập nhật thành công'
     alert.color = 'rgba(39, 217, 11, 0.8)'
   }).catch(err=>{
     console.log(brandInfor)
@@ -100,8 +108,8 @@ const deleteBra = id=>{
     console.log(res)
     cancel.value = false
     alert.status = true
-    alert.title = 'Deleted Successfully'
-    alert.text = 'Brand deleted Successfully'
+    alert.title = 'Xóa thành công'
+    alert.text = 'Thương hiệu đã được xóa thành công'
     alert.color = 'rgba(39, 217, 11, 0.8)'
 
     const index = brandList.value.findIndex(cat => cat.id === id)
@@ -112,7 +120,7 @@ const deleteBra = id=>{
   })
 }
 
-// Call the action to retrieve the warehouse data and set the initial value of currentbrandList to the result.
+// Call the action to retrieve the brand data and set the initial value of currentbrandList to the result.
 
 store.dispatch('getBrandByPage', page.value).then(() => {
   brandList.value.push(...getBrandByPage.value.data)
@@ -128,6 +136,7 @@ function updatebrandList() {
 }
 
 watch(page, updatebrandList)
+
 
 
 watchEffect(() => {
@@ -155,9 +164,25 @@ watchEffect(() => {
   <VRow v-if="show">
     <VCol cols="12">
       <VCard 
-        title="All Employees"
+        title="Toàn bộ thương hiệu"
         prepend-icon="mdi-store-plus-outline"
       >
+        <template #append>
+          <div class="me-n3 tool">
+            <VCol
+              cols="auto"
+              class="d-flex"
+            >
+              <VTextField
+                v-model="searchQuery"
+                title="Search"
+                class="mx-3"
+                prepend-inner-icon="mdi-magnify"
+                placeholder="Search"
+              />
+            </VCol>
+          </div>
+        </template> 
         <VDivider />
         <VTable>
           <thead>
@@ -166,23 +191,23 @@ watchEffect(() => {
                 ID
               </th>
               <th class="text-uppercase text-center">
-                Name
+                Tên thương hiệu
               </th>
               <th class="text-uppercase text-center">
-                Created Time
+                Ngày tạo
               </th>
               <th class="text-uppercase text-center">
-                Status
+                Trạng thái
               </th>
               <th class="text-uppercase text-center">
-                Action
+                Cài đặt
               </th>
             </tr>
           </thead>
 
           <tbody>
             <tr
-              v-for="brand in brandList"
+              v-for="brand in filteredItems"
               :key="brand.brandList"
             >
               <td>
@@ -246,7 +271,7 @@ watchEffect(() => {
                           </Transition>
                           <VCard
                             prepend-icon="mdi-store-edit"
-                            title=" Update Brand "
+                            title=" Cập nhật thương hiệu "
                           >
                             <VCardText>
                               <!-- 👉 Form -->
@@ -260,7 +285,7 @@ watchEffect(() => {
                                     <VTextField
                                       v-model="brandInfor.name"
                                       prepend-icon="mdi-rename"
-                                      label="Brand Name"
+                                      label="Tên thương hiệu"
                                     />
                                   </VCol>
 
@@ -274,7 +299,7 @@ watchEffect(() => {
                                       :true-value="1"
                                       :false-value="0"
                                       prepend-icon="mdi-list-status"
-                                      label="Status"
+                                      label="Trạng thái"
                                       color="primary"
                                       :value="status"
                                       hide-details
@@ -292,7 +317,7 @@ watchEffect(() => {
                                 prepend-icon="mdi-close"
                                 @click="dialog = false"
                               >
-                                Cancel
+                                Hủy bỏ
                               </VBtn>
                               <VBtn
                                 color="primary"
@@ -300,7 +325,7 @@ watchEffect(() => {
                                 prepend-icon="mdi-pencil-outline"
                                 @click="update(brand.id)"
                               >
-                                Update
+                                Cập nhật
                               </VBtn>
                             </VCardActions>
                           </VCard>
@@ -316,7 +341,7 @@ watchEffect(() => {
                               icon="mdi-delete-empty"
                               v-bind="props"
                               color="none"
-                              @click="deleteForm(color.id)"
+                              @click="deleteForm(brand.id)"
                             >
                               <VIcon icon="mdi-delete-empty" />
                               <VTooltip
@@ -329,10 +354,10 @@ watchEffect(() => {
                           </template>
                           <VCard
                             prepend-icon="mdi-alert"
-                            title="Do you want delete this warehouse ?"
+                            title="Xóa bỏ thương hiệu"
                           >
                             <VCardText>
-                              Once you delete this warehouse you can not get this warehouse information again. Are you sure you want delete this ?
+                              Bạn có chắc chắn là bạn muốn xóa thông tin này không ?
                             </VCardText>
                             <VCardActions>
                               <VSpacer />
@@ -342,7 +367,7 @@ watchEffect(() => {
                                 variant="elevated"
                                 @click="cancel = false"
                               >
-                                Cancel
+                                Hủy bỏ
                               </VBtn>
                               <VBtn
                                 color="red"
@@ -350,7 +375,7 @@ watchEffect(() => {
                                 variant="elevated"
                                 @click="deleteBra(brand.id)"
                               >
-                                Delete
+                                Xóa
                               </VBtn>
                             </VCardActions>
                           </VCard>
@@ -409,5 +434,8 @@ watchEffect(() => {
 .color{
     margin-left: 10px;
     align-items: center;
+}
+.tool{
+  width: 400px;
 }
 </style>

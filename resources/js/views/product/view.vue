@@ -12,6 +12,7 @@ const product = reactive({
   category: null,
   quantity: null,
   status: null,
+  product_code: '',
   warehouse: null,
   imported_date: null,
   expired_date: null,
@@ -44,6 +45,7 @@ onMounted( async () => {
     product.quantity = res.data.quantity
     product.original_price = res.data.original_price
     product.selling_price = res.data.selling_price
+    product.product_code = res.data.product_code
     product.imported_date = res.data.imported_date
     product.delivered_from = res.data.delivered_from
     product.description = res.data.description
@@ -130,7 +132,7 @@ watchEffect( async ()=>{
   <VRow>
     <VCol cols="12">
       <VCard 
-        title="PRODUCT"
+        :title="'Mã sản phẩm: ' + id"
         prepend-icon="mdi-package-variant-closed"
       >
         <VDivider />
@@ -139,7 +141,7 @@ watchEffect( async ()=>{
             icon="mdi-information-outline"
             class="icon-header"
           />
-          <VCardTitle>BASIC INFORMATION</VCardTitle>
+          <VCardTitle>Thông tin cơ bản</VCardTitle>
         </div>
         <VCardText class="d-flex">
           <!-- 👉 Avatar -->
@@ -181,7 +183,7 @@ watchEffect( async ()=>{
                     icon="mdi-palette-swatch"
                   />
                   <div class="">
-                    Product Name
+                    Tên sản phẩm
                   </div>
                 </div>
               </td>
@@ -197,7 +199,7 @@ watchEffect( async ()=>{
                     icon="mdi-shape"
                   />
                   <div class="">
-                    Category:
+                    Danh mục:
                   </div>
                 </div>
               </td>
@@ -213,12 +215,12 @@ watchEffect( async ()=>{
                     icon="mdi-watermark"
                   />
                   <div class="">
-                    Brand:
+                    Mã nhập:
                   </div>
                 </div>
               </td>
               <td class="title">
-                {{ product.original_price }}
+                {{ product.product_code }}
               </td>
             </tr>
             <tr>
@@ -229,7 +231,7 @@ watchEffect( async ()=>{
                     icon="mdi-view-list-outline"
                   />
                   <div class="">
-                    Quantity:
+                    Số lượng:
                   </div>
                 </div>
               </td>
@@ -245,42 +247,10 @@ watchEffect( async ()=>{
               <div class="title">
                 <VIcon
                   class="icon"
-                  icon="mdi-currency-usd"
-                />
-                <div class="">
-                  Original Price:
-                </div>
-              </div>
-            </td>
-            <td class="title">
-              {{ product.original_price }}
-            </td>
-          </tr>
-          <tr>
-            <td class="title-table">
-              <div class="title">
-                <VIcon
-                  class="icon"
-                  icon="mdi-cash-multiple"
-                />
-                <div class="">
-                  Selling Price:
-                </div>
-              </div>
-            </td>
-            <td class="warehouse">
-              {{ product.selling_price }}
-            </td>
-          </tr>
-          <tr>
-            <td class="title-table">
-              <div class="title">
-                <VIcon
-                  class="icon"
                   icon="mdi-import"
                 />
                 <div class="">
-                  Imported Date:
+                  Ngày nhập:
                 </div>
               </div>
             </td>
@@ -288,24 +258,6 @@ watchEffect( async ()=>{
               {{ product.imported_date }}
             </td>
           </tr>
-
-          <tr>
-            <td class="title-table">
-              <div class="title">
-                <VIcon
-                  class="icon"
-                  icon="mdi-map-marker"
-                />
-                <div class="">
-                  Delivered From:
-                </div>
-              </div>
-            </td>
-            <td class="title">
-              {{ product.delivered_from }}
-            </td>
-          </tr>
- 
           <tr>
             <td class="title-table">
               <div class="title">
@@ -314,7 +266,7 @@ watchEffect( async ()=>{
                   icon="mdi-image-text"
                 />
                 <div class="">
-                  Description:
+                  Mô tả:
                 </div>
               </div>
             </td>
@@ -328,7 +280,7 @@ watchEffect( async ()=>{
           <div class="w-100">
             <VCardTitle>
               <VIcon icon="mdi-format-paint" />
-              Warehouses
+              Kho hàng
             </VCardTitle>
             <div class="d-flex flex-wrap test">
               <VCol
@@ -362,11 +314,6 @@ watchEffect( async ()=>{
             </div>
           </div>
         </div>
-        
-        <VCard
-          title="Products List" 
-          prepend-icon="mdi-account-box"
-        />
       </VCard>
     </VCol>
   </VRow>

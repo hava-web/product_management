@@ -7,6 +7,19 @@ import axiosIns from '@/plugins/axios'
 const vuetifyTheme = useTheme()
 const dataCus = ref([])
 const labelCus = ref([])
+const isActive = ref(false)
+
+const date = reactive({
+  from: null,
+  to: null,
+})
+
+const error = reactive({
+  status: false,
+  title: '',
+  text: '',
+  color: '',
+})
 
 
 onMounted( async () => {
@@ -23,6 +36,27 @@ onMounted( async () => {
     console.log(err.data)
   })
 })
+
+const confirm = () => {
+  const accessToken = localStorage.getItem('accessToken')
+
+  axiosIns.post('api/buy_most_interval', date, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  }).then(res=>{
+    dataCus.value = []
+    dataCus.value.push(...res.data)
+    isActive.value = false
+    console.log(dataCus.value)
+  }).catch(err=>{
+    console.log(err.data)
+    error.status = true
+    error.title = 'You have some errors'
+    error.text = err.response.data.message
+    error.color = 'rgba(222, 29, 29, 0.8)'
+  })
+}
 
 
 const options = controlledComputed(() => vuetifyTheme.name.value, () => {
@@ -135,36 +169,101 @@ const options = controlledComputed(() => vuetifyTheme.name.value, () => {
   }
 })
 
-const series = [{
-  data: dataCus.value,
-}]
+const series = computed(() => {
+  return [{
+    data: dataCus.value,
+  }]
+})
 </script>
 
 <template>
   <VCard>
     <VCardItem>
-      <VCardTitle>Products Most Bought</VCardTitle>
+      <VCardTitle>Sản phẩm được mua nhiều nhất</VCardTitle>
       <template #append>
         <div class="me-n3">
-          <VBtn
-            class="me-2"
-            icon="mdi-bell-outline"
-            color="none"
-          >
-            <VIcon icon="mdi-dots-vertical" />
-            <VMenu
-              activator="parent"
-              location="right"
+          <VCol cols="auto">
+            <VDialog
+              v-model="isActive"
+              transition="dialog-bottom-transition"
             >
-              <VList>
-                <VListItem class="btn">
-                  Customers By Mouth
-                </VListItem>
-              </VList>
-            </VMenu>
-          </VBtn>
+              <template #activator="{ props }">
+                <VBtn
+                  color="none"
+                  v-bind="props"
+                  icon="mdi-clock-time-eight-outline"
+                >
+                  <VIcon icon="mdi-clock-time-eight-outline" />
+                </VBtn>
+              </template>
+              <Transition name="slide-fade">
+                <VAlert 
+                  v-if="error.status"
+                  :color="error.color"
+                  icon="mdi-alert"
+                  :title="error.title"
+                  closable
+                  class="alert"
+                  max-width="400px"
+                  :text="error.text"
+                  @click:close="error.status = false"
+                />
+              </Transition>
+              <VCard>
+                <VToolbar
+                  color="primary"
+                  title="Chọn mốc"
+                />
+                <VCardText>
+                  <VForm class="mt-6">
+                    <VRow>
+                      <!-- 👉 From -->
+                      <VCol
+                        cols="12"
+                        md="6"
+                      >
+                        <VTextField
+                          v-model="date.from"
+                          type="date" 
+                          prepend-icon="mdi-rename"
+                          label="Từ ngày"
+                        />
+                      </VCol>
+
+                      <!-- 👉 To -->
+                      <VCol
+                        cols="12"
+                        md="6"
+                      >
+                        <VTextField
+                          v-model="date.to"
+                          type="date"
+                          prepend-icon="mdi-code-brackets"
+                          label="Dến ngày"
+                        />
+                      </VCol>
+                    </VRow>
+                  </VForm>
+                </VCardText>
+                <VCardActions class="justify-end">
+                  <VBtn
+                    variant="text"
+                    @click="isActive = false"
+                  >
+                    Đóng
+                  </VBtn>
+                  <VBtn
+                    variant="text"
+                    @click="confirm"
+                  >
+                    Xác nhận
+                  </VBtn>
+                </VCardActions>
+              </VCard>
+            </VDialog>
+          </VCol>
         </div>
-      </template>
+      </template> 
     </VCardItem>
     <VCardText>
       <VueApexCharts
@@ -184,5 +283,24 @@ const series = [{
 }
 .btn:hover{
   background-color: #ECEFF1;
+}
+.alert{
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  z-index: 100;
+}
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
 }
 </style>
