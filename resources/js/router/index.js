@@ -39,6 +39,7 @@ const router = createRouter({
         {
           path: 'add_warehouse',
           component: () => import('../pages/add_warehouse.vue'),
+          beforeEnter: isAuthenticated,
         },
         {
           path: 'view_warehouse',

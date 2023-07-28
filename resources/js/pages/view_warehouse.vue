@@ -36,6 +36,16 @@ const warehouse = reactive({
   to: null,
 })
 
+const user = JSON.parse(localStorage.getItem('user'))
+
+const check = ref()
+
+onMounted(() => {
+  if (user && user.role === 'Admin') {
+    check.value = true
+  } 
+})
+
 const isActive = ref(false)
 const searchQuery = ref('')
 
@@ -427,7 +437,7 @@ watchEffect(() => {
                           </VTooltip>
                         </VBtn>
                       </VListItem>
-                      <VListItem>
+                      <VListItem v-show="check">
                         <VDialog
                           v-model="dialog"
                           persistent
@@ -554,7 +564,7 @@ watchEffect(() => {
                           </VCard>
                         </VDialog>
                       </VListItem>
-                      <VListItem>
+                      <VListItem v-show="check">
                         <VDialog
                           v-model="cancel"
                           width="auto"

@@ -31,6 +31,16 @@ const error = reactive({
   color: '',
 })
 
+const user = JSON.parse(localStorage.getItem('user'))
+
+const check = ref()
+
+onMounted(() => {
+  if (user && user.role === 'Admin') {
+    check.value = true
+  } 
+})
+
 const getAllWarehouse = computed(()=> store.getters.getAllWarehouse)
 
 onMounted(async () => {
@@ -306,7 +316,7 @@ watchEffect( async ()=>{
                           </VTooltip>
                         </VBtn>
                       </VListItem>
-                      <VListItem>
+                      <VListItem v-show="check">
                         <VDialog
                           v-model="dialog"
                           persistent
@@ -408,7 +418,7 @@ watchEffect( async ()=>{
                           </VCard>
                         </VDialog>
                       </VListItem>
-                      <VListItem>
+                      <VListItem v-show="check">
                         <VDialog
                           v-model="cancel"
                           width="auto"

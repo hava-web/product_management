@@ -143,23 +143,23 @@ const submit = async ()=>{
   }).then(res=>{
     console.log(res)
     if(res.status === 201){
-      alert.title = 'Successfully'
+      alert.title = 'Thêm thành công'
       alert.status = true
-      alert.text = 'Product Added Successfully'
+      alert.text = 'Sản phẩm đã được thêm thành công'
       alert.color = 'rgba(39, 217, 11, 0.8)'
       productDataLocal.value = structuredClone(productData)
       chosenColors.value = []
       fields.value = []
     }
     else{
-      alert.title = 'Warning'
+      alert.title = 'Cảnh báo'
       alert.status = true
-      alert.text = 'Something went wrong'
+      alert.text = 'Đang có lỗi gì đó'
       alert.color = 'rgba(234, 223, 30, 0.8)'
     }
   }).catch(err=>{
     console.log(err)
-    alert.title = 'Error'
+    alert.title = 'Lỗi'
     alert.status = true
     alert.text = err.response.data.message
     alert.color = 'rgba(222, 29, 29, 0.8)'

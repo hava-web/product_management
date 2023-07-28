@@ -144,7 +144,7 @@ class EmployeeController extends Controller
             ->select(DB::raw('MONTHNAME(o.created_at) AS x'), DB::raw('COUNT(*) AS y'))
             ->where('e.id', $id)
             ->whereYear('o.created_at', now()->year)
-            ->groupBy(DB::raw('DATE(o.created_at)'))
+            ->groupBy(DB::raw('MONTH(o.created_at)'))
             ->get();
         return response()->json($results);
     }

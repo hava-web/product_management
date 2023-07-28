@@ -239,7 +239,7 @@ class OrderController extends Controller
     {
         $results = DB::table('orders')
             ->select(DB::raw('DATE(created_at) AS x'), DB::raw('COUNT(*) AS y'))
-            ->where('status', 'Received')
+            ->whereYear('created_at', '=', date('Y'))
             ->groupBy(DB::raw('DATE(created_at)'))
             ->get();
         return response()->json($results);
@@ -249,7 +249,6 @@ class OrderController extends Controller
     {
         $results = DB::table('orders')
             ->select(DB::raw("CONCAT('Week ', WEEK(created_at)) AS x"), DB::raw('COUNT(*) AS y'))
-            ->where('status', 'Received')
             ->whereYear('created_at', '=', date('Y'))
             ->groupBy(DB::raw('WEEK(created_at)'))
             ->get();
@@ -260,7 +259,6 @@ class OrderController extends Controller
     {
         $result = DB::table('orders')
             ->select(DB::raw('MONTHNAME(created_at) as x'), DB::raw('COUNT(*) as y'))
-            ->where('status', 'Received')
             ->whereYear('created_at', '=', date('Y'))
             ->groupBy(DB::raw('MONTH(created_at)'))
             ->get();
@@ -271,7 +269,6 @@ class OrderController extends Controller
     {
         $result = DB::table('orders')
             ->select(DB::raw('YEAR(created_at) as x'), DB::raw('COUNT(*) as y'))
-            ->where('status', 'Received')
             ->groupBy(DB::raw('YEAR(created_at)'))
             ->get();
         return response()->json($result);
